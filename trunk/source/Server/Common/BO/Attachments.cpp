@@ -15,7 +15,7 @@
 
 namespace HM
 {
-   Attachments::Attachments(boost::shared_ptr<MimeBody> pMimeBody, MessageData *pMsgData) :
+   Attachments::Attachments(shared_ptr<MimeBody> pMimeBody, MessageData *pMsgData) :
       m_pMimeBody(pMimeBody),
       m_pMsgData(pMsgData)
    {
@@ -27,10 +27,10 @@ namespace HM
 
    }
 
-   boost::shared_ptr<Attachment>
+   shared_ptr<Attachment>
    Attachments::GetItem(unsigned int Index) const
    {
-      boost::shared_ptr<Attachment> pItem;
+      shared_ptr<Attachment> pItem;
 
       if (Index < vecObjects.size())
          pItem = vecObjects[Index];  
@@ -47,12 +47,12 @@ namespace HM
    void 
    Attachments::Load()
    {
-      list<boost::shared_ptr<MimeBody> > vecBodyList;
+      list<shared_ptr<MimeBody> > vecBodyList;
       m_pMimeBody->GetAttachmentList(m_pMimeBody, vecBodyList);
 
-      boost_foreach(boost::shared_ptr<MimeBody> pBody, vecBodyList)
+      boost_foreach(shared_ptr<MimeBody> pBody, vecBodyList)
       {
-         boost::shared_ptr<Attachment> item = boost::shared_ptr<Attachment>(new Attachment(m_pMimeBody, pBody));
+         shared_ptr<Attachment> item = shared_ptr<Attachment>(new Attachment(m_pMimeBody, pBody));
          vecObjects.push_back(item);
       }
    }
@@ -72,21 +72,21 @@ namespace HM
          return false;
 
       // Load the attachment
-      boost::shared_ptr<MimeBody> pAttachment = m_pMsgData->CreatePart("application/octet-stream");
+      shared_ptr<MimeBody> pAttachment = m_pMsgData->CreatePart("application/octet-stream");
       pAttachment->SetTransferEncoding("base64");
 
       if (!pAttachment->ReadFromFile(sFilename))
          return false;
 
       // Add the attachment to the collection.
-      boost::shared_ptr<Attachment> pItem = boost::shared_ptr<Attachment>(new Attachment(m_pMimeBody, pAttachment));
+      shared_ptr<Attachment> pItem = shared_ptr<Attachment>(new Attachment(m_pMimeBody, pAttachment));
       vecObjects.push_back(pItem);
 
       return true;
    }
 
    bool
-   Attachments::Add(boost::shared_ptr<Attachment> pAttachment)
+   Attachments::Add(shared_ptr<Attachment> pAttachment)
    {
       vecObjects.push_back(pAttachment);
       return true;

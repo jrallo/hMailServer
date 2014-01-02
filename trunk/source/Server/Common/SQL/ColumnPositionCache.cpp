@@ -43,7 +43,7 @@ namespace HM
    }
 
 
-   boost::shared_ptr<ColumnPositions> 
+   shared_ptr<ColumnPositions> 
    ColumnPositionCache::GetPositions(const AnsiString &sqlStatement, DALRecordset *pRecordset)
    {
       // Extract a select statement identifier.
@@ -57,12 +57,12 @@ namespace HM
       else
          selectIdentifier = sql;
 
-      boost::shared_ptr<ColumnPositions> positions;
+      shared_ptr<ColumnPositions> positions;
 
-      std::map<AnsiString, boost::shared_ptr<ColumnPositions> >::iterator iter = _mapTableColumns.find(selectIdentifier);
+      std::map<AnsiString, shared_ptr<ColumnPositions> >::iterator iter = _mapTableColumns.find(selectIdentifier);
       if (iter == _mapTableColumns.end())
       {
-         positions = boost::shared_ptr<ColumnPositions>(new ColumnPositions(pRecordset->GetColumnNames()));
+         positions = shared_ptr<ColumnPositions>(new ColumnPositions(pRecordset->GetColumnNames()));
          _mapTableColumns[selectIdentifier] = positions;
       }
       else

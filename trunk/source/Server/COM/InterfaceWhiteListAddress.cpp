@@ -173,7 +173,7 @@ STDMETHODIMP InterfaceWhiteListAddress::put_EmailAddress(BSTR newVal)
       if (!m_pObject)
          return GetAccessDenied();
 
-      m_pObject->SetUserEditableEMailAddress(newVal);
+      m_pObject->SetEMailAddress(newVal);
       return S_OK;
    }
    catch (...)
@@ -189,7 +189,7 @@ STDMETHODIMP InterfaceWhiteListAddress::get_EmailAddress(BSTR *pVal)
       if (!m_pObject)
          return GetAccessDenied();
 
-      *pVal = m_pObject->GetUserEditableEmailAddress().AllocSysString();
+      *pVal = m_pObject->GetEmailAddress().AllocSysString();
       return S_OK;
    }
    catch (...)

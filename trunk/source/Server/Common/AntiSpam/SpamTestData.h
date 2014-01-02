@@ -30,8 +30,8 @@ namespace HM
       const IPAddress &GetConnectingIP() const;
 
 
-      void SetMessageData(const boost::shared_ptr<MessageData> pMessageData);
-      boost::shared_ptr<MessageData> GetMessageData() const;
+      void SetMessageData(const shared_ptr<MessageData> pMessageData);
+      shared_ptr<MessageData> GetMessageData() const;
 
    private:
 
@@ -41,7 +41,7 @@ namespace HM
       IPAddress _connectingAddress;
       String m_sHeloHost;
 
-      boost::shared_ptr<MessageData> m_pMessageData;
+      shared_ptr<MessageData> m_pMessageData;
       
    };
 

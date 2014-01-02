@@ -33,25 +33,25 @@ namespace HM
 
 
    bool
-   RuleActions::PreSaveObject(boost::shared_ptr<RuleAction> pRuleAction, XNode *node)
+   RuleActions::PreSaveObject(shared_ptr<RuleAction> pRuleAction, XNode *node)
    {
       pRuleAction->SetRuleID(m_iRuleID);
       return true;
    }   
 
    void
-   RuleActions::MoveUp(boost::shared_ptr<RuleAction> pRuleToMove)
+   RuleActions::MoveUp(shared_ptr<RuleAction> pRuleToMove)
    {
-      vector<boost::shared_ptr<RuleAction> >::iterator iter = _GetRuleActionIterator(pRuleToMove);
-      vector<boost::shared_ptr<RuleAction> >::iterator iterEnd = vecObjects.end();
+      vector<shared_ptr<RuleAction> >::iterator iter = _GetRuleActionIterator(pRuleToMove);
+      vector<shared_ptr<RuleAction> >::iterator iterEnd = vecObjects.end();
 
       if (iter == iterEnd || iter == vecObjects.begin())
          return;
 
-      vector<boost::shared_ptr<RuleAction> >::iterator iterPrevious = iter - 1;
+      vector<shared_ptr<RuleAction> >::iterator iterPrevious = iter - 1;
 
       // Move the rule to the previous position in the vector.
-      boost::shared_ptr<RuleAction> pRuleAction = (*iter);
+      shared_ptr<RuleAction> pRuleAction = (*iter);
 
       // Delete it from the current position
       vecObjects.erase(iter);
@@ -64,18 +64,18 @@ namespace HM
    }
 
    void
-   RuleActions::MoveDown(boost::shared_ptr<RuleAction> pRuleAction)
+   RuleActions::MoveDown(shared_ptr<RuleAction> pRuleAction)
    {
-      vector<boost::shared_ptr<RuleAction> >::iterator iter = _GetRuleActionIterator(pRuleAction);
-      vector<boost::shared_ptr<RuleAction> >::iterator iterEnd = vecObjects.end();
+      vector<shared_ptr<RuleAction> >::iterator iter = _GetRuleActionIterator(pRuleAction);
+      vector<shared_ptr<RuleAction> >::iterator iterEnd = vecObjects.end();
 
-      vector<boost::shared_ptr<RuleAction> >::iterator iterNext = iter +1;
+      vector<shared_ptr<RuleAction> >::iterator iterNext = iter +1;
 
       if (iter == iterEnd || iterNext == vecObjects.end())
          return;
 
       // Move the rule to the next position in the vector.
-      boost::shared_ptr<RuleAction> pNextRuleAction = (*iterNext);
+      shared_ptr<RuleAction> pNextRuleAction = (*iterNext);
 
       // Delete the next rule from the current position.
       vecObjects.erase(iterNext);
@@ -90,14 +90,14 @@ namespace HM
    void 
    RuleActions::_UpdateSortOrder()
    {
-      vector<boost::shared_ptr<RuleAction> >::iterator iter = vecObjects.begin();
-      vector<boost::shared_ptr<RuleAction> >::iterator iterEnd = vecObjects.end();
+      vector<shared_ptr<RuleAction> >::iterator iter = vecObjects.begin();
+      vector<shared_ptr<RuleAction> >::iterator iterEnd = vecObjects.end();
 
       int iSortOrder = 1;
 
       for (; iter != iterEnd; iter++, iSortOrder ++)
       {
-         boost::shared_ptr<RuleAction> pRuleAction = (*iter);
+         shared_ptr<RuleAction> pRuleAction = (*iter);
 
          if (pRuleAction->GetSortOrder() != iSortOrder)
          {
@@ -113,17 +113,17 @@ namespace HM
       }
    }
 
-   vector<boost::shared_ptr<RuleAction> >::iterator 
-   RuleActions::_GetRuleActionIterator(boost::shared_ptr<RuleAction> pRuleAction)
+   vector<shared_ptr<RuleAction> >::iterator 
+   RuleActions::_GetRuleActionIterator(shared_ptr<RuleAction> pRuleAction)
    {
-      vector<boost::shared_ptr<RuleAction> >::iterator iter = vecObjects.begin();
-      vector<boost::shared_ptr<RuleAction> >::iterator iterEnd = vecObjects.end();
+      vector<shared_ptr<RuleAction> >::iterator iter = vecObjects.begin();
+      vector<shared_ptr<RuleAction> >::iterator iterEnd = vecObjects.end();
 
       int iCurrentSortOrder = -1;
 
       for (; iter != iterEnd; iter++)
       {
-         boost::shared_ptr<RuleAction> pCurRuleAction = (*iter);
+         shared_ptr<RuleAction> pCurRuleAction = (*iter);
 
          if (pCurRuleAction == pRuleAction)
          {

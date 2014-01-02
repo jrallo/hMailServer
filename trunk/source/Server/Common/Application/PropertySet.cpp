@@ -31,12 +31,12 @@ namespace HM
    PropertySet::Refresh()
    {
       SQLCommand command("select * from hm_settings");
-      boost::shared_ptr<DALRecordset> pRS = Application::Instance()->GetDBManager()->OpenRecordset(command);
+      shared_ptr<DALRecordset> pRS = Application::Instance()->GetDBManager()->OpenRecordset(command);
    
       if (!pRS)
          return;
 
-      std::map<String, boost::shared_ptr<Property> > tmpMap;
+      std::map<String, shared_ptr<Property> > tmpMap;
 
       while (!pRS->IsEOF())
       {
@@ -52,7 +52,7 @@ namespace HM
             bIsCrypted = true;
          }
       
-         boost::shared_ptr<Property> oProperty = boost::shared_ptr<Property> (new Property(sPropertyName, lPropertyLong, sPropertyString));
+         shared_ptr<Property> oProperty = shared_ptr<Property> (new Property(sPropertyName, lPropertyLong, sPropertyString));
          if (bIsCrypted)
             oProperty->SetIsCrypted();
 
@@ -65,8 +65,8 @@ namespace HM
 
       m_mapItems = tmpMap;
 
-      std::map<String, boost::shared_ptr<Property> >::iterator iter = m_mapItems.begin();
-      std::map<String, boost::shared_ptr<Property> >::iterator iterEnd = m_mapItems.end();
+      std::map<String, shared_ptr<Property> >::iterator iter = m_mapItems.begin();
+      std::map<String, shared_ptr<Property> >::iterator iterEnd = m_mapItems.end();
       for (; iter != iterEnd; iter++)
       {
          // Trigger an change-event for all options.
@@ -74,10 +74,10 @@ namespace HM
       }
    }
 
-   boost::shared_ptr<Property>
+   shared_ptr<Property>
    PropertySet::_GetProperty(const String & sPropertyName)
    {
-      std::map<String, boost::shared_ptr<Property> >::iterator iterProperty = m_mapItems.find(sPropertyName);
+      std::map<String, shared_ptr<Property> >::iterator iterProperty = m_mapItems.find(sPropertyName);
    
       if (iterProperty != m_mapItems.end())
          return (*iterProperty).second;
@@ -88,7 +88,7 @@ namespace HM
 
       // Property was not found. Create one temporary in memory 
       // to avoid further problems.
-      boost::shared_ptr<Property> oProperty = boost::shared_ptr<Property>(new Property());
+      shared_ptr<Property> oProperty = shared_ptr<Property>(new Property());
       return oProperty;
    }
 
@@ -113,7 +113,7 @@ namespace HM
    void 
    PropertySet::SetLong(const String &sPropertyName, long lValue)
    {
-      boost::shared_ptr<Property> pProperty = _GetProperty(sPropertyName);
+      shared_ptr<Property> pProperty = _GetProperty(sPropertyName);
       bool bChanged = lValue != pProperty->GetLongValue();
       pProperty->SetLongValue(lValue);
 
@@ -124,7 +124,7 @@ namespace HM
    void 
    PropertySet::SetBool(const String &sPropertyName, bool bValue)
    {
-      boost::shared_ptr<Property> pProperty = _GetProperty(sPropertyName);
+      shared_ptr<Property> pProperty = _GetProperty(sPropertyName);
       bool bChanged = bValue != pProperty->GetBoolValue();
       pProperty->SetBoolValue(bValue);
 
@@ -135,7 +135,7 @@ namespace HM
    void 
    PropertySet::SetString(const String &sPropertyName, const String &sValue)
    {
-      boost::shared_ptr<Property> pProperty = _GetProperty(sPropertyName);
+      shared_ptr<Property> pProperty = _GetProperty(sPropertyName);
       bool bChanged = sValue != pProperty->GetStringValue();
       pProperty->SetStringValue(sValue);
 
@@ -144,7 +144,7 @@ namespace HM
    }
 
    void 
-   PropertySet::_OnPropertyChanged(boost::shared_ptr<Property> pProperty)
+   PropertySet::_OnPropertyChanged(shared_ptr<Property> pProperty)
    {
       // Notify configuration that a setting has changed.
       Configuration::Instance()->OnPropertyChanged(pProperty);
@@ -163,11 +163,11 @@ namespace HM
    PropertySet::XMLStore(XNode *pBackupNode)
    {
       XNode *pPropertiesNode = pBackupNode->AppendChild(_T("Properties"));
-      std::map<String, boost::shared_ptr<Property> >::iterator iterProperty = m_mapItems.begin();
+      std::map<String, shared_ptr<Property> >::iterator iterProperty = m_mapItems.begin();
 
       while (iterProperty != m_mapItems.end())
       {
-         boost::shared_ptr<Property> oProperty = (*iterProperty).second;
+         shared_ptr<Property> oProperty = (*iterProperty).second;
 
          XNode *pNode = pPropertiesNode->AppendChild(String(oProperty->GetName()));
 
@@ -194,7 +194,7 @@ namespace HM
          String sStringValue = pPropertyNode->GetAttrValue(_T("StringValue"));
          int iLongValue = _ttoi(pPropertyNode->GetAttrValue(_T("LongValue")));
 
-         boost::shared_ptr<Property> pProperty = _GetProperty(sName);
+         shared_ptr<Property> pProperty = _GetProperty(sName);
          if (pProperty)
          {
             pProperty->SetStringValue(sStringValue);

@@ -45,7 +45,7 @@ END_COM_MAP()
 	{
 	}
 
-   void Attach(boost::shared_ptr<HM::DomainAliases> pDomainAliases);
+   void Attach(shared_ptr<HM::DomainAliases> pDomainAliases);
 
 public:
 
@@ -61,7 +61,7 @@ public:
 
 private:
 
-   boost::shared_ptr<HM::DomainAliases> m_pDomainAliases;
+   shared_ptr<HM::DomainAliases> m_pDomainAliases;
 
 };
 

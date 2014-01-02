@@ -2,7 +2,19 @@
 // Global configuration.
 
 /*
-   The full URL to the site where PHPWebAdmin will be running. 
+=== IMPORTANT NOTE ===
+
+http://php.net/manual/en/com.installation.php
+"As of PHP 5.3.15 / 5.4.5, this extension requires php_com_dotnet.dll to be enabled inside of php.ini in order to use these functions.
+Previous versions of PHP enabled these extensions by default."
+
+[COM_DOT_NET]
+extension=php_com_dotnet.dll
+*/
+
+/*
+   The full URL to the site where PHPWebAdmin will be running. Must end in / and for ssl use https vs http.
+   This URL *MUST* work when typed in browser or phpwebadmin will not work sice it's used for redirects.
 
    Example:
    

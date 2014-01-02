@@ -10,14 +10,14 @@ namespace HM
    class MirrorMessage
    {
    public:
-      MirrorMessage(boost::shared_ptr<Message> message);
+      MirrorMessage(shared_ptr<Message> message);
       ~MirrorMessage(void);
 
       void Send();
 
    private:
 
-      boost::shared_ptr<Message> _message;
+      shared_ptr<Message> _message;
 
    };
 }

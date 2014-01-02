@@ -35,8 +35,8 @@ namespace HM
    bool 
    GreyListingWhiteAddresses::GetIPExistsInWhiteList(const String &sCheckIP)
    {
-      vector<boost::shared_ptr<GreyListingWhiteAddress> >::iterator iter = vecObjects.begin();
-      vector<boost::shared_ptr<GreyListingWhiteAddress> >::iterator iterEnd = vecObjects.end();
+      vector<shared_ptr<GreyListingWhiteAddress> >::iterator iter = vecObjects.begin();
+      vector<shared_ptr<GreyListingWhiteAddress> >::iterator iterEnd = vecObjects.end();
 
       for (; iter != iterEnd; iter++)
       {

@@ -267,10 +267,6 @@ extern "C" int WINAPI _tWinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstan
       //     for debugging purposes.
       DEBUG_MODE = true;
 
-
-      _CrtMemState state;
-      _CrtMemCheckpoint(&state);
-
 	   SingletonCreator::Create();
 	
 	   String sErrorMessage;
@@ -290,8 +286,6 @@ extern "C" int WINAPI _tWinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstan
       HM::Application::Instance()->ExitInstance();
       SingletonCreator::Delete();
       Logger::DeleteInstance();
-
-      _CrtMemDumpAllObjectsSince (&state);
    }
    else if (sLastParam.CompareNoCase(_T("/Debug")) == 0)
    {

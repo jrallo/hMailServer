@@ -34,24 +34,24 @@ namespace HM
 
    }
 
-   boost::shared_ptr<RuleCriterias>
+   shared_ptr<RuleCriterias>
    Rule::GetCriterias()
    {
       if (!m_pCriterias)
       {
-         m_pCriterias = boost::shared_ptr<RuleCriterias>(new RuleCriterias(m_iID));
+         m_pCriterias = shared_ptr<RuleCriterias>(new RuleCriterias(m_iID));
          m_pCriterias->Refresh();
       }
 
       return m_pCriterias;
    }
 
-   boost::shared_ptr<RuleActions>
+   shared_ptr<RuleActions>
    Rule::GetActions()
    {
       if (!m_pActions)
       {
-         m_pActions = boost::shared_ptr<RuleActions>(new RuleActions(m_iID));
+         m_pActions = shared_ptr<RuleActions>(new RuleActions(m_iID));
          m_pActions->Refresh();
       }
 

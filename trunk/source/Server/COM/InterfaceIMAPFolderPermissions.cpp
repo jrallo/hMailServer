@@ -12,7 +12,7 @@
 #include "../Common/Application/ACLManager.h"
 
 void 
-InterfaceIMAPFolderPermissions::AttachItem(boost::shared_ptr<HM::IMAPFolder> pFolder)
+InterfaceIMAPFolderPermissions::AttachItem(shared_ptr<HM::IMAPFolder> pFolder)
 {
    m_pFolder = pFolder;
    
@@ -79,7 +79,7 @@ STDMETHODIMP InterfaceIMAPFolderPermissions::get_Item(long Index, IInterfaceIMAP
       CComObject<InterfaceIMAPFolderPermission>* pACLPermission = new CComObject<InterfaceIMAPFolderPermission>();
       pACLPermission->SetAuthentication(m_pAuthentication);
    
-      boost::shared_ptr<HM::ACLPermission> pPersACLPermission = m_pACLPermissions->GetItem(Index);
+      shared_ptr<HM::ACLPermission> pPersACLPermission = m_pACLPermissions->GetItem(Index);
    
       if (!pPersACLPermission)
          return DISP_E_BADINDEX;  
@@ -112,7 +112,7 @@ STDMETHODIMP InterfaceIMAPFolderPermissions::Add(IInterfaceIMAPFolderPermission 
       CComObject<InterfaceIMAPFolderPermission>* pIntACLPermission = new CComObject<InterfaceIMAPFolderPermission>();
       pIntACLPermission->SetAuthentication(m_pAuthentication);
    
-      boost::shared_ptr<HM::ACLPermission> pACLPermission = boost::shared_ptr<HM::ACLPermission>(new HM::ACLPermission);
+      shared_ptr<HM::ACLPermission> pACLPermission = shared_ptr<HM::ACLPermission>(new HM::ACLPermission);
    
       pACLPermission->SetShareFolderID(m_pFolder->GetID());
    
@@ -140,7 +140,7 @@ STDMETHODIMP InterfaceIMAPFolderPermissions::get_ItemByDBID(long DBID, IInterfac
       CComObject<InterfaceIMAPFolderPermission>* pACLPermission = new CComObject<InterfaceIMAPFolderPermission>();
       pACLPermission->SetAuthentication(m_pAuthentication);
    
-      boost::shared_ptr<HM::ACLPermission> pPersACLPermission = m_pACLPermissions->GetItemByDBID(DBID);
+      shared_ptr<HM::ACLPermission> pPersACLPermission = m_pACLPermissions->GetItemByDBID(DBID);
    
       if (pPersACLPermission)
       {
@@ -192,7 +192,7 @@ STDMETHODIMP InterfaceIMAPFolderPermissions::get_ItemByName(BSTR Name, IInterfac
       CComObject<InterfaceIMAPFolderPermission>* pACLPermission = new CComObject<InterfaceIMAPFolderPermission>();
       pACLPermission->SetAuthentication(m_pAuthentication);
    
-      boost::shared_ptr<HM::ACLPermission> pPersACLPermission = m_pACLPermissions->GetItemByName(Name);
+      shared_ptr<HM::ACLPermission> pPersACLPermission = m_pACLPermissions->GetItemByName(Name);
    
       if (pPersACLPermission)
       {

@@ -22,7 +22,7 @@ namespace HM
    }
 
    bool
-   PreReqNoDuplicateFolders::Ensure(boost::shared_ptr<DALConnection> connection, String &sErrorMessage)
+   PreReqNoDuplicateFolders::Ensure(shared_ptr<DALConnection> connection, String &sErrorMessage)
    {
       SQLCommand command("select folderaccountid, folderparentid, foldername from hm_imapfolders "
                          "group by folderaccountid, folderparentid, foldername "
@@ -30,7 +30,7 @@ namespace HM
 
 
       // First locate all duplicate folders.
-      boost::shared_ptr<DALRecordset> duplicateFolderList = connection->CreateRecordset();
+      shared_ptr<DALRecordset> duplicateFolderList = connection->CreateRecordset();
       if (!duplicateFolderList->Open(connection, command))
       {
          sErrorMessage = "Failed to execute SQL statement. Please check hMailServer log file.\r\n" + command.GetQueryString();
@@ -54,7 +54,7 @@ namespace HM
          locateCommand.AddParameter("@PARENTID", parentID);
          locateCommand.AddParameter("@FOLDERNAME", name);
 
-         boost::shared_ptr<DALRecordset> conflictFoldersRecordset = connection->CreateRecordset();
+         shared_ptr<DALRecordset> conflictFoldersRecordset = connection->CreateRecordset();
          if (!conflictFoldersRecordset->Open(connection, locateCommand))
          {
             sErrorMessage = "Failed to execute SQL statement. Please check hMailServer log file.\r\n" + locateCommand.GetQueryString();

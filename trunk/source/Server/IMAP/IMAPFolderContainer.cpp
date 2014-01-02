@@ -34,18 +34,18 @@ namespace HM
 
    }
 
-   boost::shared_ptr<IMAPFolders> 
+   shared_ptr<IMAPFolders> 
    IMAPFolderContainer::GetFoldersForAccount(__int64 AccountID)
    {
       CriticalSectionScope scope(m_hFetchListCriticalSection);
 
-      std::map<__int64, boost::shared_ptr<HM::IMAPFolders> >::iterator iterFolders = m_mapFolders.find(AccountID);
+      std::map<__int64, shared_ptr<HM::IMAPFolders> >::iterator iterFolders = m_mapFolders.find(AccountID);
       
-      boost::shared_ptr<IMAPFolders> pFolders;
+      shared_ptr<IMAPFolders> pFolders;
 
       if (iterFolders == m_mapFolders.end())
       {
-         pFolders = boost::shared_ptr<IMAPFolders>(new IMAPFolders(AccountID, -1));
+         pFolders = shared_ptr<IMAPFolders>(new IMAPFolders(AccountID, -1));
          pFolders->Refresh();
          m_mapFolders[AccountID] = pFolders;
       }
@@ -57,10 +57,10 @@ namespace HM
       return pFolders;
    }
 
-   boost::shared_ptr<IMAPFolders>
+   shared_ptr<IMAPFolders>
    IMAPFolderContainer::GetPublicFolders()
    {
-      boost::shared_ptr<IMAPFolders> pFolders = Configuration::Instance()->GetIMAPConfiguration()->GetPublicFolders();
+      shared_ptr<IMAPFolders> pFolders = Configuration::Instance()->GetIMAPConfiguration()->GetPublicFolders();
 
       return pFolders;
    }
@@ -70,7 +70,7 @@ namespace HM
    {
       CriticalSectionScope scope(m_hFetchListCriticalSection);
 
-      boost::shared_ptr<IMAPFolder> pFolder;
+      shared_ptr<IMAPFolder> pFolder;
       if (AccountID == 0)
       {
          // Get the public folder.
@@ -78,7 +78,7 @@ namespace HM
       }
       else
       {
-         std::map<__int64, boost::shared_ptr<HM::IMAPFolders> >::iterator iterFolder = m_mapFolders.find(AccountID); 
+         std::map<__int64, shared_ptr<HM::IMAPFolders> >::iterator iterFolder = m_mapFolders.find(AccountID); 
 
          if (iterFolder == m_mapFolders.end())
             return;
@@ -103,7 +103,7 @@ namespace HM
    {
       CriticalSectionScope scope(m_hFetchListCriticalSection);
 
-      std::map<__int64, boost::shared_ptr<HM::IMAPFolders> >::iterator iterFolder = m_mapFolders.find(iAccountID); 
+      std::map<__int64, shared_ptr<HM::IMAPFolders> >::iterator iterFolder = m_mapFolders.find(iAccountID); 
 
       if (iterFolder != m_mapFolders.end())
       {
@@ -138,11 +138,11 @@ namespace HM
          return false;
    }
    
-   boost::shared_ptr<IMAPFolder> 
-   IMAPFolderContainer::GetTopMostExistingFolder(boost::shared_ptr<IMAPFolders> pContainer, const std::vector<String> &vecFolderPath)
+   shared_ptr<IMAPFolder> 
+   IMAPFolderContainer::GetTopMostExistingFolder(shared_ptr<IMAPFolders> pContainer, const std::vector<String> &vecFolderPath)
    {
       vector<String> tempFolderPath = vecFolderPath;
-      boost::shared_ptr<IMAPFolder> pTempFolder = pContainer->GetFolderByFullPath(tempFolderPath);
+      shared_ptr<IMAPFolder> pTempFolder = pContainer->GetFolderByFullPath(tempFolderPath);
 
       while (!pTempFolder && tempFolderPath.size() > 0)
       {
@@ -159,7 +159,7 @@ namespace HM
    {
       if (accountID == 0)
       {
-         boost::shared_ptr<IMAPFolder> folder = GetPublicFolders()->GetItemByDBIDRecursive(folderID);
+         shared_ptr<IMAPFolder> folder = GetPublicFolders()->GetItemByDBIDRecursive(folderID);
          if (!folder)
          {
             assert(0);
@@ -173,12 +173,12 @@ namespace HM
       {
          CriticalSectionScope scope(m_hFetchListCriticalSection);
 
-         std::map<__int64, boost::shared_ptr<HM::IMAPFolders> >::iterator iter = m_mapFolders.find(accountID);
+         std::map<__int64, shared_ptr<HM::IMAPFolders> >::iterator iter = m_mapFolders.find(accountID);
 
          if (iter == m_mapFolders.end())
             return;
 
-         boost::shared_ptr<IMAPFolder> folder = (*iter).second->GetItemByDBIDRecursive(folderID);
+         shared_ptr<IMAPFolder> folder = (*iter).second->GetItemByDBIDRecursive(folderID);
          if (!folder)
          {
             assert(0);

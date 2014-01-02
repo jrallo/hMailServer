@@ -23,17 +23,18 @@ if ($action == "edit")
 	
    $Enabled = $obFetchAccount->Enabled;
    $Name = $obFetchAccount->Name;
-   $DaysToKeepMessages   = $obFetchAccount->DaysToKeepMessages;
-   $MinutesBetweenFetch  = $obFetchAccount->MinutesBetweenFetch;
-   $Port  				 = $obFetchAccount->Port;
+   $DaysToKeepMessages    = $obFetchAccount->DaysToKeepMessages;
+   $MinutesBetweenFetch   = $obFetchAccount->MinutesBetweenFetch;
+   $Port  				  = $obFetchAccount->Port;
    $ProcessMIMERecipients = $obFetchAccount->ProcessMIMERecipients;
    $ProcessMIMEDate       = $obFetchAccount->ProcessMIMEDate;
    $ServerAddress  		  = $obFetchAccount->ServerAddress;
    $ServerType  		  = $obFetchAccount->ServerType;
    $Username   			  = $obFetchAccount->Username;
-   $UseAntiSpam         = $obFetchAccount->UseAntiSpam;
-   $UseAntiVirus         = $obFetchAccount->UseAntiVirus;
+   $UseAntiSpam           = $obFetchAccount->UseAntiSpam;
+   $UseAntiVirus          = $obFetchAccount->UseAntiVirus;
    $EnableRouteRecipients = $obFetchAccount->EnableRouteRecipients;
+   $UseSSL				  = $obFetchAccount->UseSSL;
 }
 else 
 {
@@ -50,7 +51,7 @@ else
    $UseAntiSpam = 0;
    $UseAntiVirus = 0;
    $EnableRouteRecipients = 0;
-   
+   $UseSSL = 0;
 }
 
 $EnabledChecked = hmailCheckedIf1($Enabled);
@@ -118,6 +119,9 @@ if ($DaysToKeepMessages > 0)
          				</table>
          			</td>
          		</tr>	
+				<?php
+					PrintCheckboxRow("UseSSL", "Use SSL", $UseSSL);
+				?>
          		<tr>
          			<td colspan="2">
          				<table width="350">

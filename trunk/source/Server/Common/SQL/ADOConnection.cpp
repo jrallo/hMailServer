@@ -8,6 +8,7 @@
 #include "SQLCommand.h"
 #include "DatabaseSettings.h"
 #include "Macros/MSSQLMacroExpander.h"
+#include "ADOInt64Helper.h"
 
 using namespace std;
 
@@ -18,7 +19,7 @@ using namespace std;
 
 namespace HM
 {
-   ADOConnection::ADOConnection(boost::shared_ptr<DatabaseSettings> pSettings) :
+   ADOConnection::ADOConnection(shared_ptr<DatabaseSettings> pSettings) :
       DALConnection(pSettings)
    {
       HRESULT hr =cADOConnection.CreateInstance(__uuidof(Connection));
@@ -390,7 +391,7 @@ namespace HM
    bool 
    ADOConnection::CheckServerVersion(String &errorMessage)
    {
-      boost::shared_ptr<ADOConnection> connection = shared_from_this();
+      shared_ptr<ADOConnection> connection = shared_from_this();
 
       ADORecordset recordset;
       if (recordset.TryOpen(connection, SQLCommand("SELECT SERVERPROPERTY('productversion') as ProductVersion"), errorMessage) != DALConnection::DALSuccess)
@@ -410,10 +411,10 @@ namespace HM
       return true;
    }
 
-   boost::shared_ptr<DALRecordset> 
+   shared_ptr<DALRecordset> 
    ADOConnection::CreateRecordset()
    {
-      boost::shared_ptr<ADORecordset> recordset = boost::shared_ptr<ADORecordset>(new ADORecordset());
+      shared_ptr<ADORecordset> recordset = shared_ptr<ADORecordset>(new ADORecordset());
       return recordset;
    }
 
@@ -423,10 +424,10 @@ namespace HM
       sInput.Replace(_T("'"), _T("''"));
    }
 
-   boost::shared_ptr<IMacroExpander> 
+   shared_ptr<IMacroExpander> 
    ADOConnection::CreateMacroExpander()
    {
-      boost::shared_ptr<MSSQLMacroExpander> expander = boost::shared_ptr<MSSQLMacroExpander>(new MSSQLMacroExpander());
+      shared_ptr<MSSQLMacroExpander> expander = shared_ptr<MSSQLMacroExpander>(new MSSQLMacroExpander());
       return expander;
    }
 
@@ -447,11 +448,8 @@ namespace HM
          }
          else if (parameter.GetType() == SQLParameter::ParamTypeInt64)
          {
-            VARIANT integerType;
-            integerType.vt = VT_I8;
-            integerType.llVal = parameter.GetInt64Value();
-
-            adoCommand->Parameters->Append(adoCommand->CreateParameter(_bstr_t(),adBigInt,adParamInput, 8, integerType));
+            // Windows 2000 backwards compatibility:
+            ADO64Helper::AddInt64Parameter(adoCommand, parameterName, parameter.GetInt64Value());
          }
          else if (parameter.GetType() == SQLParameter::ParamTypeUnsignedInt32)
          {

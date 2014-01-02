@@ -105,6 +105,9 @@ namespace HM
       int GetLoadHeaderReadSize () {return m_iLoadHeaderReadSize; }
       int GetLoadBodyReadSize () {return m_iLoadBodyReadSize; }
       int GetBlockedIPHoldSeconds () {return m_iBlockedIPHoldSeconds; }
+      int GetSMTPDMaxSizeDrop () {return m_iSMTPDMaxSizeDrop; }
+      bool GetBackupMessagesDBOnly () const { return m_bBackupMessagesDBOnly; }
+      bool GetAddXAuthUserIP () const { return m_bAddXAuthUserIP; }
 
       bool GetUseSSLVerifyPeer() {return _useSSLVerifyPeer;}
       
@@ -181,5 +184,8 @@ namespace HM
       int m_iLoadHeaderReadSize;
       int m_iLoadBodyReadSize;
       int m_iBlockedIPHoldSeconds;
+      int m_iSMTPDMaxSizeDrop;
+      bool m_bBackupMessagesDBOnly;
+      bool m_bAddXAuthUserIP;
    };
 }

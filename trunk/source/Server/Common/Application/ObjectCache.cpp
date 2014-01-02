@@ -34,14 +34,14 @@ namespace HM
       m_bDomainAliasesNeedsReload = true;
    }
 
-   boost::shared_ptr<DomainAliases> 
+   shared_ptr<DomainAliases> 
    ObjectCache::GetDomainAliases()
    {
       CriticalSectionScope scope(m_oDACritSec);
 
       if (!m_pDomainAliases || m_bDomainAliasesNeedsReload)
       {
-         m_pDomainAliases = boost::shared_ptr<DomainAliases>(new DomainAliases(0));
+         m_pDomainAliases = shared_ptr<DomainAliases>(new DomainAliases(0));
          m_pDomainAliases->Refresh();
 
          m_bDomainAliasesNeedsReload = false;
@@ -59,14 +59,14 @@ namespace HM
    }
 
 
-   boost::shared_ptr<Rules> 
+   shared_ptr<Rules> 
    ObjectCache::GetGlobalRules()
    {
       CriticalSectionScope scope(m_oGRCritSec);
 
       if (!m_pGlobalRules || m_bGlobalRulesNeedsReload)
       {
-         m_pGlobalRules = boost::shared_ptr<Rules>(new Rules(0));
+         m_pGlobalRules = shared_ptr<Rules>(new Rules(0));
          m_pGlobalRules->Refresh();
 
          m_bGlobalRulesNeedsReload = false;
@@ -85,18 +85,18 @@ namespace HM
          m_setAccountRulesToRefresh.insert(iAccountID);
    }
 
-   boost::shared_ptr<Rules> 
+   shared_ptr<Rules> 
    ObjectCache::GetAccountRules(__int64 iAccountID)
    {
       CriticalSectionScope scope(m_oARCritSec);
 
       // First find the rules.
-      map<__int64, boost::shared_ptr<Rules> >::iterator iterRules = m_mapAccountRules.find(iAccountID);
-      boost::shared_ptr<Rules> pRules;
+      map<__int64, shared_ptr<Rules> >::iterator iterRules = m_mapAccountRules.find(iAccountID);
+      shared_ptr<Rules> pRules;
 
       if (iterRules == m_mapAccountRules.end())
       {
-         pRules = boost::shared_ptr<Rules>(new Rules(iAccountID));
+         pRules = shared_ptr<Rules>(new Rules(iAccountID));
          m_mapAccountRules[iAccountID] = pRules;
       
          // We need to refresh this one.

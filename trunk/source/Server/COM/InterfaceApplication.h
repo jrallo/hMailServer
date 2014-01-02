@@ -71,7 +71,7 @@ public:
 
 private:
    HRESULT _EnsureDatabaseConnectivity();
-   boost::shared_ptr<HM::COMAuthentication> m_pAuthentication;
+   shared_ptr<HM::COMAuthentication> m_pAuthentication;
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(Application), InterfaceApplication)

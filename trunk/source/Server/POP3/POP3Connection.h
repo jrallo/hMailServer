@@ -21,7 +21,7 @@ namespace HM
 	   virtual ~POP3Connection();
 
       virtual void ParseData(const AnsiString &Request);
-      virtual void ParseData(boost::shared_ptr<ByteBuffer> pBuffer) { };
+      virtual void ParseData(shared_ptr<ByteBuffer> pBuffer) { };
 
       virtual void OnDataSent();
 
@@ -97,19 +97,19 @@ namespace HM
       void _SaveMailboxChanges();
       void _UnlockMailbox();
 
-      void _StartSendFile(boost::shared_ptr<Message> message);
+      void _StartSendFile(shared_ptr<Message> message);
 	  void _ReadAndSend();
       void _ResetMailbox();
-      boost::shared_ptr<Message> _GetMessage(unsigned int index);
+      shared_ptr<Message> _GetMessage(unsigned int index);
 
       String m_Username;
       String m_Password;
 
-      boost::shared_ptr<const Account> _account;
+      shared_ptr<const Account> _account;
 
       ConnectionState m_CurrentState;
 
-      std::vector<boost::shared_ptr<Message>> _messages;
+      std::vector<shared_ptr<Message>> _messages;
       TransparentTransmissionBuffer m_oTransmissionBuffer;
 
       bool m_bPendingDisconnect;

@@ -98,7 +98,15 @@ namespace HM
       }
 
       PDNS_RECORD pDnsRecords = NULL;
-      DNS_STATUS nDnsStatus = DnsQuery(sSearchFor, wType, DNS_QUERY_STANDARD, NULL, &pDnsRecords,NULL);
+      PIP4_ARRAY pSrvList = NULL;
+
+      DWORD fOptions;
+      fOptions = DNS_QUERY_STANDARD;
+
+      // We need this if not using system dns servers
+      //      fOptions = DNS_QUERY_BYPASS_CACHE;
+      
+      DNS_STATUS nDnsStatus = DnsQuery(sSearchFor, wType, fOptions, NULL, &pDnsRecords,NULL);
 
       PDNS_RECORD pDnsRecordsToDelete = pDnsRecords;
 
@@ -207,6 +215,24 @@ namespace HM
                   retVal += pDnsRecords->Data.TXT.pStringArray[i];
                }
                
+               vecFoundNames.push_back(retVal);
+            }
+            break;
+         }
+      // JDR: Added to perform PTR lookups.
+      case DNS_TYPE_PTR: 
+         {
+            if (pDnsRecords->wType == DNS_TYPE_CNAME)
+            {
+               // we received a CNAME response so we need to recurse over that.
+               String sDomainName = pDnsRecords->Data.CNAME.pNameHost;
+               if (!_Resolve(sDomainName, vecFoundNames, DNS_TYPE_PTR, iRecursion+1))
+                  return false;
+            }   
+            else if (pDnsRecords->wType == DNS_TYPE_PTR)
+            {
+               AnsiString retVal;
+               retVal = pDnsRecords->Data.PTR.pNameHost;
                vecFoundNames.push_back(retVal);
             }
             break;
@@ -404,6 +430,30 @@ namespace HM
 
       return false;
    }
+
+   // JDR: added to do PTR lookups.
+   bool 
+   DNSResolver::GetPTRRecords(const String &sIP, std::vector<String> &vecFoundNames)
+   {
+
+      try
+      {
+         std::vector<String> vecItems = StringParser::SplitString(sIP, ".");
+         reverse(vecItems.begin(), vecItems.end());
+         String result = StringParser::JoinVector(vecItems, ".");
+         return _Resolve(result + ".in-addr.arpa", vecFoundNames, DNS_TYPE_PTR, 0);
+      }
+      catch (std::exception& e)
+      {
+         string ErrorMessage = "An exception was thrown: ";
+         ErrorMessage.append(e.what());
+         ErrorManager::Instance()->ReportError(ErrorManager::Medium, 5039, "DNSResolver::GetPTRRecords", ErrorMessage);
+         throw;
+      }
+
+      return false;
+   }
+
 
    #ifdef _DEBUG
    void DNSResolverTester::Test()

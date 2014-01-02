@@ -6,7 +6,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using NUnit.Framework;
-using UnitTest;
+using RegressionTests;
+using RegressionTests.Shared;
 
 namespace StressTest
 {
@@ -16,7 +17,7 @@ namespace StressTest
         [SetUp]
         public new void SetUp()
         {
-            SingletonProvider<Utilities>.Instance.AddAccount(_domain, "test@test.com", "test");
+            SingletonProvider<TestSetup>.Instance.AddAccount(_domain, "test@test.com", "test");
         }
 
         [Test]
@@ -24,9 +25,9 @@ namespace StressTest
         {
             for (int i = 0; i < 2500; i++)
             {
-                TCPSocket socket = new TCPSocket();
+                TcpSocket socket = new TcpSocket();
 
-                Assert.IsTrue(socket.CanConnect(25));
+                Assert.IsTrue(socket.CanConnect(25), i.ToString());
             }
         }
 
@@ -58,7 +59,7 @@ namespace StressTest
         [Test]
         public void TestLongSMTPCommand()
         {
-            TCPSocket socket = new TCPSocket();
+            TcpSocket socket = new TcpSocket();
             socket.Connect(25);
 
             // Build a large string...
@@ -101,7 +102,7 @@ namespace StressTest
 
            _application.Settings.MaxMessageSize = 0;
 
-            TCPSocket socket = new TCPSocket();
+            TcpSocket socket = new TcpSocket();
             socket.Connect(25);
             socket.Receive();
 
@@ -161,38 +162,44 @@ namespace StressTest
 
             POP3Simulator.AssertMessageCount("test@test.com", "test", 1);
 
-            TCPSocket socket = new TCPSocket();
+            TcpSocket socket = new TcpSocket();
             socket.Connect(110);
 
             // Receive welcome message.
-            string sData = socket.Receive();
+            socket.Receive();
 
             socket.Send("USER " + "test@test.com" + "\r\n");
-            sData = socket.ReadUntil("+OK");
+            socket.ReadUntil("+OK");
 
             socket.Send("PASS " + "test" + "\r\n");
-            sData = socket.ReadUntil("+OK");
+            socket.ReadUntil("+OK");
 
             socket.Send("RETR 1\r\n");
 
-            string sRetVal = "";
-            while (sRetVal.IndexOf("\r\n.\r\n") < 0)
+            var endOfResponseSB = new StringBuilder();
+           
+            string endOfResponse = "";
+            while (endOfResponse.IndexOf("\r\n.\r\n") < 0)
             {
-                if (sRetVal.IndexOf("-ERR no such message") >= 0)
+                if (endOfResponse.IndexOf("-ERR no such message") >= 0)
                 {
                     socket.Disconnect();
                     Assert.Fail("Nope");
                 }
 
-                sRetVal = socket.Receive();
+                endOfResponseSB.Append(socket.Receive());
 
+                if (endOfResponseSB.Length > 100)
+                   endOfResponseSB.Remove(0, endOfResponseSB.Length - 100);
+
+                endOfResponse = endOfResponseSB.ToString();
             }
 
             socket.Send("DELE 1\r\n");
-            sData = socket.ReadUntil("+OK");
+            socket.ReadUntil("+OK");
 
             socket.Send("QUIT\r\n");
-            sData = socket.ReadUntil("+OK");
+            socket.ReadUntil("+OK");
 
             socket.Disconnect();
         }
@@ -205,7 +212,7 @@ namespace StressTest
         {
            long memoryUsage = Shared.GetCurrentMemoryUsage();
 
-            TCPSocket socket = new TCPSocket();
+            TcpSocket socket = new TcpSocket();
             socket.Connect(25);
             socket.Receive();
 
@@ -252,39 +259,6 @@ namespace StressTest
 
 
             socket.Disconnect();
-        }
-
-        
-
-        [Test]
-        public void TestExploit()
-        {
-            List<string> files = new List<string>();
-
-            files.Add(@"C:\Dev\hMailServer\exploit\CREATE.txt");
-            files.Add(@"C:\Dev\hMailServer\exploit\APPEND.txt");
-            files.Add(@"C:\Dev\hMailServer\exploit\EXAMINE.txt");
-            files.Add(@"C:\Dev\hMailServer\exploit\LIST1.txt");
-            files.Add(@"C:\Dev\hMailServer\exploit\LIST2.txt");
-            files.Add(@"C:\Dev\hMailServer\exploit\LSUB.txt");
-            files.Add(@"C:\Dev\hMailServer\exploit\RENAME1.txt");
-            files.Add(@"C:\Dev\hMailServer\exploit\RENAME2.txt");
-            files.Add(@"C:\Dev\hMailServer\exploit\SEARCH.txt");
-            files.Add(@"C:\Dev\hMailServer\exploit\SELECT.txt");
-            files.Add(@"C:\Dev\hMailServer\exploit\STATUS.txt");
-            files.Add(@"C:\Dev\hMailServer\exploit\SUBSCRIBE.txt");
-            files.Add(@"C:\Dev\hMailServer\exploit\UNSUBSCRIBE.txt");
-
-            foreach (string file in files)
-            {
-                SendExploitFile(file, false);
-            }
-
-            foreach (string file in files)
-            {
-                SendExploitFile(file, true);
-            }
-
         }
 
         public void SendExploitFile(string file, bool sendAllAtOnce)

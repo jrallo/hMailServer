@@ -41,11 +41,9 @@ namespace hMailServer.Administrator
           // 
           this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)
                       | System.Windows.Forms.AnchorStyles.Right)));
-          this.groupBox1.Location = new System.Drawing.Point(9, 186);
-          this.groupBox1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+          this.groupBox1.Location = new System.Drawing.Point(7, 151);
           this.groupBox1.Name = "groupBox1";
-          this.groupBox1.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
-          this.groupBox1.Size = new System.Drawing.Size(388, 5);
+          this.groupBox1.Size = new System.Drawing.Size(291, 4);
           this.groupBox1.TabIndex = 10;
           this.groupBox1.TabStop = false;
           // 
@@ -53,10 +51,9 @@ namespace hMailServer.Administrator
           // 
           this.btnClose.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
           this.btnClose.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-          this.btnClose.Location = new System.Drawing.Point(279, 202);
-          this.btnClose.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+          this.btnClose.Location = new System.Drawing.Point(209, 164);
           this.btnClose.Name = "btnClose";
-          this.btnClose.Size = new System.Drawing.Size(119, 31);
+          this.btnClose.Size = new System.Drawing.Size(89, 25);
           this.btnClose.TabIndex = 9;
           this.btnClose.Text = "&Close";
           this.btnClose.UseVisualStyleBackColor = true;
@@ -65,30 +62,27 @@ namespace hMailServer.Administrator
           // 
           this.labelVersion.AutoSize = true;
           this.labelVersion.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-          this.labelVersion.Location = new System.Drawing.Point(17, 15);
-          this.labelVersion.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+          this.labelVersion.Location = new System.Drawing.Point(13, 12);
           this.labelVersion.Name = "labelVersion";
-          this.labelVersion.Size = new System.Drawing.Size(111, 21);
+          this.labelVersion.Size = new System.Drawing.Size(85, 16);
           this.labelVersion.TabIndex = 11;
           this.labelVersion.Text = "hMailServer";
           // 
           // labelCopyright
           // 
           this.labelCopyright.AutoSize = true;
-          this.labelCopyright.Location = new System.Drawing.Point(17, 54);
-          this.labelCopyright.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+          this.labelCopyright.Location = new System.Drawing.Point(13, 44);
           this.labelCopyright.Name = "labelCopyright";
-          this.labelCopyright.Size = new System.Drawing.Size(195, 17);
+          this.labelCopyright.Size = new System.Drawing.Size(147, 13);
           this.labelCopyright.TabIndex = 12;
-          this.labelCopyright.Text = "Copyright 2011 Martin Knafve";
+          this.labelCopyright.Text = "Copyright 2012 Martin Knafve";
           // 
           // linkVisitors
           // 
           this.linkVisitors.AutoSize = true;
-          this.linkVisitors.Location = new System.Drawing.Point(16, 85);
-          this.linkVisitors.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+          this.linkVisitors.Location = new System.Drawing.Point(12, 69);
           this.linkVisitors.Name = "linkVisitors";
-          this.linkVisitors.Size = new System.Drawing.Size(125, 17);
+          this.linkVisitors.Size = new System.Drawing.Size(93, 13);
           this.linkVisitors.TabIndex = 13;
           this.linkVisitors.TabStop = true;
           this.linkVisitors.Text = "List of contributors";
@@ -97,19 +91,18 @@ namespace hMailServer.Administrator
           // labelAttribution
           // 
           this.labelAttribution.AutoSize = true;
-          this.labelAttribution.Location = new System.Drawing.Point(17, 119);
-          this.labelAttribution.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+          this.labelAttribution.Location = new System.Drawing.Point(13, 97);
           this.labelAttribution.Name = "labelAttribution";
-          this.labelAttribution.Size = new System.Drawing.Size(272, 34);
+          this.labelAttribution.Size = new System.Drawing.Size(199, 26);
           this.labelAttribution.TabIndex = 14;
           this.labelAttribution.Text = "Please run installation program for full list \r\nof copyrights and attributions.";
           // 
           // formAbout
           // 
           this.AcceptButton = this.btnClose;
-          this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+          this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
           this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-          this.ClientSize = new System.Drawing.Size(413, 240);
+          this.ClientSize = new System.Drawing.Size(310, 195);
           this.Controls.Add(this.labelAttribution);
           this.Controls.Add(this.linkVisitors);
           this.Controls.Add(this.labelCopyright);
@@ -118,7 +111,6 @@ namespace hMailServer.Administrator
           this.Controls.Add(this.btnClose);
           this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
           this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-          this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
           this.MaximizeBox = false;
           this.MinimizeBox = false;
           this.Name = "formAbout";

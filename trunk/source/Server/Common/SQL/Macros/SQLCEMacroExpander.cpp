@@ -16,7 +16,7 @@
 namespace HM
 {
    bool
-   SQLCEMacroExpander::ProcessMacro(boost::shared_ptr<DALConnection> connection, const Macro &macro, String &sErrorMessage)
+   SQLCEMacroExpander::ProcessMacro(shared_ptr<DALConnection> connection, const Macro &macro, String &sErrorMessage)
    {
       switch (macro.GetType())
       {

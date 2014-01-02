@@ -12,7 +12,7 @@ namespace HM
    class DALConnection  
    {
    public:
-	   DALConnection(boost::shared_ptr<DatabaseSettings> pDatabaseSettings);
+	   DALConnection(shared_ptr<DatabaseSettings> pDatabaseSettings);
 	   virtual ~DALConnection();
 
       enum ConnectionResult
@@ -54,14 +54,14 @@ namespace HM
 
       virtual void EscapeString(String &sInput) = 0;
 
-      virtual boost::shared_ptr<DALRecordset> CreateRecordset() = 0;
-      virtual boost::shared_ptr<IMacroExpander> CreateMacroExpander() = 0;
+      virtual shared_ptr<DALRecordset> CreateRecordset() = 0;
+      virtual shared_ptr<IMacroExpander> CreateMacroExpander() = 0;
 
-      boost::shared_ptr<DatabaseSettings> GetSettings() {return m_pDatabaseSettings; }
+      shared_ptr<DatabaseSettings> GetSettings() {return m_pDatabaseSettings; }
 
    protected:
 
-      boost::shared_ptr<DatabaseSettings> m_pDatabaseSettings;
+      shared_ptr<DatabaseSettings> m_pDatabaseSettings;
 
    private:
 

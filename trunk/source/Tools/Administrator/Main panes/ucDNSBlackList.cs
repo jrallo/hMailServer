@@ -137,7 +137,5 @@ namespace hMailServer.Administrator
       {
          OnContentChanged();
       }
-
-
    }
 }

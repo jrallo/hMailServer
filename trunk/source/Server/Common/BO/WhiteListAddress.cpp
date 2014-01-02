@@ -65,17 +65,4 @@ namespace HM
    {
       return m_iWhiteUpperIPAddress.TryParse(iIPAddress);
    }
-
-   String 
-   WhiteListAddress::GetUserEditableEmailAddress() const
-   {
-      return SQLStatement::ConvertLikeToWildcard(m_sWhiteEmailAddress);
-   }
-
-   void 
-   WhiteListAddress::SetUserEditableEMailAddress(const String &sEmail)
-   {
-      m_sWhiteEmailAddress = SQLStatement::ConvertWildcardToLike(sEmail);
-   }
-
 }

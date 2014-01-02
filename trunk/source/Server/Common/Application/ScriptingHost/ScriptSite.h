@@ -180,7 +180,7 @@ public:
    }
 
    protected:
-      boost::shared_ptr<HM::ScriptObjectContainer> m_oObjectContainer;
+      shared_ptr<HM::ScriptObjectContainer> m_oObjectContainer;
 
       HM::String m_sLastErrorMessage;
 };
@@ -313,7 +313,7 @@ public:
       
    }
 
-   STDMETHOD(SetObjectContainer)(boost::shared_ptr<HM::ScriptObjectContainer> pObject)
+   STDMETHOD(SetObjectContainer)(shared_ptr<HM::ScriptObjectContainer> pObject)
    {
       m_oObjectContainer = pObject;
 

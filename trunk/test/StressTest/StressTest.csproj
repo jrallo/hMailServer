@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="3.5" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -14,12 +14,6 @@
     <FileAlignment>512</FileAlignment>
     <StartupObject>
     </StartupObject>
-    <FileUpgradeFlags>
-    </FileUpgradeFlags>
-    <OldToolsVersion>3.5</OldToolsVersion>
-    <UpgradeBackupLocation />
-    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\StressTest\</SolutionDir>
-    <RestorePackages>true</RestorePackages>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -30,7 +24,6 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x86</PlatformTarget>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -40,18 +33,12 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x86</PlatformTarget>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.VisualBasic" />
-    <Reference Include="nunit.framework">
-      <HintPath>packages\NUnit.2.5.10.11092\lib\nunit.framework.dll</HintPath>
-    </Reference>
-    <Reference Include="nunit.mocks">
-      <HintPath>packages\NUnit.2.5.10.11092\lib\nunit.mocks.dll</HintPath>
-    </Reference>
-    <Reference Include="pnunit.framework">
-      <HintPath>packages\NUnit.2.5.10.11092\lib\pnunit.framework.dll</HintPath>
+    <Reference Include="nunit.framework, Version=2.5.3.9345, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\libraries\nunit-2.5.3\nunit.framework.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
@@ -67,26 +54,26 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\RegressionTests\ClientSocket.cs">
-      <Link>ClientSocket.cs</Link>
-    </Compile>
-    <Compile Include="..\RegressionTests\IMAPSimulator.cs">
+    <Compile Include="..\RegressionTests\Shared\IMAPSimulator.cs">
       <Link>IMAPSimulator.cs</Link>
     </Compile>
-    <Compile Include="..\RegressionTests\POP3Simulator.cs">
+    <Compile Include="..\RegressionTests\Shared\POP3Simulator.cs">
       <Link>POP3Simulator.cs</Link>
     </Compile>
-    <Compile Include="..\RegressionTests\SingletonProvider.cs">
+    <Compile Include="..\RegressionTests\Shared\SingletonProvider.cs">
       <Link>SingletonProvider.cs</Link>
     </Compile>
-    <Compile Include="..\RegressionTests\SMTPSimulator.cs">
-      <Link>SMTPSimulator.cs</Link>
+    <Compile Include="..\RegressionTests\Shared\SMTPClientSimulator.cs">
+      <Link>SMTPClientSimulator.cs</Link>
     </Compile>
-    <Compile Include="..\RegressionTests\TestFixtureBase.cs">
+    <Compile Include="..\RegressionTests\Shared\TcpSocket.cs">
+      <Link>TcpSocket.cs</Link>
+    </Compile>
+    <Compile Include="..\RegressionTests\Shared\TestFixtureBase.cs">
       <Link>TestFixtureBase.cs</Link>
     </Compile>
-    <Compile Include="..\RegressionTests\Utilities.cs">
-      <Link>Utilities.cs</Link>
+    <Compile Include="..\RegressionTests\Shared\TestSetup.cs">
+      <Link>TestSetup.cs</Link>
     </Compile>
     <Compile Include="DKIM.cs" />
     <Compile Include="IMAPSortPerformance.cs" />
@@ -107,11 +94,7 @@
       <Isolated>False</Isolated>
     </COMReference>
   </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

@@ -22,16 +22,6 @@ namespace hMailServer.Administrator
             InitializeComponent();
 
             new TabOrderManager(this).SetTabOrder(TabOrderManager.TabScheme.AcrossFirst);
-
-            foreach (ColumnHeader column in listObjects.Columns)
-            {
-               if (column.Tag == null)
-                  continue;
-
-               if ((string) column.Tag == "Numeric")
-                  listObjects.SetNumericSortOrder(column.Index);
-            }
-            
         }
 
         protected override void LoadList()

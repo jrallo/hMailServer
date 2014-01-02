@@ -25,7 +25,7 @@ namespace HM
 
 
    IMAPResult
-   IMAPCommandFETCH::ExecuteCommand(boost::shared_ptr<IMAPConnection> pConnection, boost::shared_ptr<IMAPCommandArgument> pArgument)
+   IMAPCommandFETCH::ExecuteCommand(shared_ptr<IMAPConnection> pConnection, shared_ptr<IMAPCommandArgument> pArgument)
    {
       if (!pConnection->IsAuthenticated())
          return IMAPResult(IMAPResult::ResultNo, "Authenticate first");
@@ -36,7 +36,7 @@ namespace HM
       if (!pConnection->GetCurrentFolder())
          return IMAPResult(IMAPResult::ResultNo, "No folder selected.");
 
-      boost::shared_ptr<IMAPFetch> pFetch = boost::shared_ptr<IMAPFetch>(new IMAPFetch());
+      shared_ptr<IMAPFetch> pFetch = shared_ptr<IMAPFetch>(new IMAPFetch());
       pFetch->SetIsUID(false);
 
       String sResponse; 

@@ -165,6 +165,10 @@ namespace HM
       m_iLoadHeaderReadSize =  _ReadIniSettingInteger("Settings", "LoadHeaderReadSize",4000);
       m_iLoadBodyReadSize =  _ReadIniSettingInteger("Settings", "LoadBodyReadSize",4000);
       m_iBlockedIPHoldSeconds =  _ReadIniSettingInteger("Settings", "BlockedIPHoldSeconds",0);
+      m_iSMTPDMaxSizeDrop =  _ReadIniSettingInteger("Settings", "SMTPDMaxSizeDrop",0);
+      m_bBackupMessagesDBOnly =  _ReadIniSettingInteger("Settings", "BackupMessagesDBOnly",0) == 1;
+      m_bAddXAuthUserIP =  _ReadIniSettingInteger("Settings", "AddXAuthUserIP",1) == 1;
+
       //Probably need some more sanity checks on these settings but for now we assume user has some sense
 
       // check if we should validate peer's.

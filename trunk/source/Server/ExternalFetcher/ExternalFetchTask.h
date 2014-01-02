@@ -12,13 +12,13 @@ namespace HM
    class ExternalFetchTask : public Task
    {
    public:
-      ExternalFetchTask(boost::shared_ptr<FetchAccount> pFA);
+      ExternalFetchTask(shared_ptr<FetchAccount> pFA);
       ~ExternalFetchTask(void);
 
       virtual void DoWork();
       virtual void StopWork();
    private:
 
-      boost::shared_ptr<FetchAccount> m_pFA;
+      shared_ptr<FetchAccount> m_pFA;
    };
 }

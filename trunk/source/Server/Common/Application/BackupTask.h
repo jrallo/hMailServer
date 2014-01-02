@@ -16,12 +16,12 @@ namespace HM
       virtual void DoWork();
       virtual void StopWork();
 
-      void SetBackupToRestore(boost::shared_ptr<Backup> pBackup);
+      void SetBackupToRestore(shared_ptr<Backup> pBackup);
 
    private:
 
       bool m_bDoBackup;
       
-      boost::shared_ptr<Backup> m_pBackup;
+      shared_ptr<Backup> m_pBackup;
    };
 }

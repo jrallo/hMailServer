@@ -22,7 +22,8 @@ namespace HM
    public:
       TCPConnection(bool useSSL,
                     boost::asio::io_service& io_service,    
-                    boost::asio::ssl::context& context);
+                    boost::asio::ssl::context& context,
+                    int stateSTARTTLS);
       ~TCPConnection(void);
 
       enum ShutdownOption
@@ -40,11 +41,11 @@ namespace HM
 
       int GetBufferSize() {return BufferSize; }
       bool Connect(const AnsiString &remoteServer, long remotePort, const IPAddress &localAddress);
-      void Start(boost::shared_ptr<ProtocolParser> protocolParser);
+      void Start(shared_ptr<ProtocolParser> protocolParser);
       void SetReceiveBinary(bool binary);
 
       void PostWrite(const AnsiString &sData);
-      void PostWrite(boost::shared_ptr<ByteBuffer> pByteBuffer);
+      void PostWrite(shared_ptr<ByteBuffer> pByteBuffer);
       void PostRead(const AnsiString &delimitor);
 
       void PostShutdown(ShutdownOption what);
@@ -60,18 +61,20 @@ namespace HM
 
       static bool PrepareSSLContext(boost::asio::ssl::context &ctx);
 
-      void SetSecurityRange(boost::shared_ptr<SecurityRange> securityRange);
-      boost::shared_ptr<SecurityRange> GetSecurityRange();
+      void SetSecurityRange(shared_ptr<SecurityRange> securityRange);
+      shared_ptr<SecurityRange> GetSecurityRange();
 
-      boost::shared_ptr<TCPConnection> GetSharedFromThis();
+      shared_ptr<TCPConnection> GetSharedFromThis();
 
       Event GetConnectionTerminationEvent() {return _connectionTermination;}
 
       int GetSessionID();
 
+      bool STARTTLS_Handshake(void);
+
       bool ReportReadErrors(bool newValue);
    private:
-      
+      CriticalSection _criticalSection;
       void _StartAsyncConnect(tcp::resolver::iterator endpoint_iterator);
 
       static void OnTimeout(boost::weak_ptr<TCPConnection> connection, boost::system::error_code const& err);
@@ -84,7 +87,7 @@ namespace HM
 
       void Disconnect();
       void Shutdown(boost::asio::socket_base::shutdown_type, bool removeFromQueue);
-      void Write(boost::shared_ptr<ByteBuffer> buffer);
+      void Write(shared_ptr<ByteBuffer> buffer);
       void Read(const AnsiString &delimitor);
 
       void HandleResolve(const boost::system::error_code& err, tcp::resolver::iterator endpoint_iterator);
@@ -104,7 +107,7 @@ namespace HM
       boost::asio::ip::tcp::resolver _resolver;
       boost::asio::deadline_timer _timer;
       boost::asio::streambuf _receiveBuffer;
-      boost::shared_ptr<ProtocolParser> _protocolParser;
+      shared_ptr<ProtocolParser> _protocolParser;
       
       IOOperationQueue _operationQueue;
 
@@ -112,10 +115,14 @@ namespace HM
       bool _useSSL;
       long _remotePort;
       bool _hasTimeout;
+
+      int _stateSTARTTLS;
+      bool _handshakeDone;
+
       String _remoteServer;
       Event _connectionTermination;
 
-      boost::shared_ptr<SecurityRange> _securityRange;
+      shared_ptr<SecurityRange> _securityRange;
 
    };
 

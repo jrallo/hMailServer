@@ -29,3 +29,4 @@ SQL CE
 
 hMailServer 5.0 (MSSQL) 			 	 Latest 	Success			Supported upgrade path.
 hMailServer 5.1 (MSSQL) 			 	 Latest 	Success			Supported upgrade path.
+

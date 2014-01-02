@@ -11,8 +11,7 @@ var
   rdoUseExternal : TRadioButton;
 
   // BEGIN .NET INSTALLER
-  iePath, mdacPath, jetPath, dotnet20Path, msi31Path, msi20Path: string;
-  //iePath, dotnet20Path, msi31Path, msi20Path: string;
+  mdacPath, dotnet20Path: string;
   downloadNeeded: boolean;
   neededDependenciesDownloadMemo: string;
   neededDependenciesInstallMemo: string;
@@ -67,12 +66,9 @@ const
 	SERVICE_CONTINUE_PENDING    = $5;
 	SERVICE_PAUSE_PENDING       = $6;
 	SERVICE_PAUSED              = $7;
+
   // BEGIN .NET INSTALLER	
-  msi20URL = 'http://download.microsoft.com/download/WindowsInstaller/Install/2.0/W9XMe/EN-US/InstMsiA.exe';
-  msi31URL = 'http://download.microsoft.com/download/1/4/7/147ded26-931c-4daf-9095-ec7baf996f46/WindowsInstaller-KB893803-v2-x86.exe';
   mdacURL = 'http://download.microsoft.com/download/4/a/a/4aafff19-9d21-4d35-ae81-02c48dcbbbff/MDAC_TYP.EXE';
-  jetURL = 'http://download.microsoft.com/download/4/3/9/4393c9ac-e69e-458d-9f6d-2fe191c51469/Jet40SP8_9xNT.exe';
-  ieURL = 'http://download.microsoft.com/download/ie6sp1/finrel/6_sp1/W98NT42KMeXP/EN-US/ie6setup.exe';
   dotnet20URL = 'http://download.microsoft.com/download/5/6/7/567758a3-759e-473e-bf8f-52154438565a/dotnetfx.exe';
   // END .NET INSTALLER	
 
@@ -126,16 +122,6 @@ begin
   b := word(Version and not $ffff0000);
 end;
 
-function IsMinMSIAvailable(HV:Integer; NV:Integer ): boolean;
-var  Version,  dummy     : cardinal;
-     MsiHiVer,  MsiLoVer  : word;
-
-begin
-    Result:=(FileExists(ExpandConstant('{sys}\msi.dll'))) and
-        (GetVersionNumbers(ExpandConstant('{sys}\msi.dll'), Version, dummy));
-    DecodeVersion(Version, MsiHiVer, MsiLoVer);
-    Result:= (Result) and (MsiHiVer >= HV) and (MsiLoVer >= NV);
-end;
 
 function OpenServiceManager() : HANDLE;
 begin
@@ -510,74 +496,6 @@ begin
     exit;
   end;
 
-  // Check for IIS installation
-  //if not RegKeyExists(HKLM, 'SYSTEM\CurrentControlSet\Services\W3SVC\Security') then begin
-  //  MsgBox(CustomMessage('IISMsg'), mbError, MB_OK);
-  //  Result := false;
-  //  exit;
-  //end;
-
-  // Check for required Windows Installer 2.0 on Windows 98 and ME
-  if (not WindowsVersion.NTPlatform) and
-     (WindowsVersion.Major >= 4) and
-     (WindowsVersion.Minor >= 1) and
-     (not IsMinMSIAvailable(2,0)) then
-  begin
-    neededDependenciesInstallMemo := neededDependenciesInstallMemo + '      ' + CustomMessage('MSI20Title') + #13;
-    msi20Path := ExpandConstant('{src}') + '\' + CustomMessage('DependenciesDir') + '\instmsia.exe';
-    if not FileExists(msi20Path) then begin
-      msi20Path := ExpandConstant('{tmp}\msi20.exe');
-      if not FileExists(msi20Path) then begin
-        neededDependenciesDownloadMemo := neededDependenciesDownloadMemo + '      ' + CustomMessage('MSI20Title') + #13;
-        neededDependenciesDownloadMsg := neededDependenciesDownloadMsg + CustomMessage('MSI20Title') + ' (' + CustomMessage('MSI20DownloadSize') + ')' + #13;
-        isxdl_AddFile(msi20URL, msi20Path);
-        downloadNeeded := true;
-      end;
-    end;
-    SetIniString('install', 'msi20', msi20Path, ExpandConstant('{tmp}\dep.ini'));
-  end;
-
-  // Check for required Windows Installer 3.0 on Windows 2000, XP, Server 2003, Vista or higher
-  if WindowsVersion.NTPlatform and
-     (WindowsVersion.Major >= 5) and
-     (not IsMinMSIAvailable(3,0)) then
-  begin
-    neededDependenciesInstallMemo := neededDependenciesInstallMemo + '      ' + CustomMessage('MSI31Title') + #13;
-    msi31Path := ExpandConstant('{src}') + '\' + CustomMessage('DependenciesDir') + '\WindowsInstaller-KB893803-v2-x86.exe';
-    if not FileExists(msi31Path) then begin
-      msi31Path := ExpandConstant('{tmp}\msi31.exe');
-      if not FileExists(msi31Path) then begin
-        neededDependenciesDownloadMemo := neededDependenciesDownloadMemo + '      ' + CustomMessage('MSI31Title') + #13;
-        neededDependenciesDownloadMsg := neededDependenciesDownloadMsg + CustomMessage('MSI31Title') + ' (' + CustomMessage('MSI31DownloadSize') + ')' + #13;
-        isxdl_AddFile(msi31URL, msi31Path);
-        downloadNeeded := true;
-      end;
-    end;
-    SetIniString('install', 'msi31', msi31Path, ExpandConstant('{tmp}\dep.ini'));
-  end;
-
-  // Check for required Internet Explorer installation
-  // Note that if Internet Explorer 6 is downloaded, the express setup will be downloaded, however it is the same
-  // ie6setup.exe that would be available in the ie6 folder. The only difference is that the
-  // user will be presented with an option as to where to download Internet Explorer 6 and a progress dialog.
-  // Most common components will still be installed automatically.
-  SoftwareVersion := '';
-  RegQueryStringValue(HKLM, 'Software\Microsoft\Internet Explorer', 'Version', SoftwareVersion);
-  if (SoftwareVersion < '5') then begin
-    neededDependenciesInstallMemo := neededDependenciesInstallMemo + '      ' + CustomMessage('IE6Title') + #13;
-    iePath := ExpandConstant('{src}') + '\' + CustomMessage('DependenciesDir') + '\ie6\ie6setup.exe';
-    if not FileExists(iePath) then begin
-      iePath := ExpandConstant('{tmp}\ie6setup.exe');
-      if not FileExists(iePath) then begin
-        neededDependenciesDownloadMemo := neededDependenciesDownloadMemo + '      ' + CustomMessage('IE6Title') + #13;
-        neededDependenciesDownloadMsg := neededDependenciesDownloadMsg + CustomMessage('IE6Title') + ' (' + CustomMessage('IE6DownloadSize') + ')' + #13;
-        isxdl_AddFile(ieURL, iePath);
-        downloadNeeded := true;
-      end;
-    end;
-    SetIniString('install', 'ie', iePath, ExpandConstant('{tmp}\dep.ini'));
-  end;
-	
   // Check for required MDAC installation
   SoftwareVersion := '';
   RegQueryStringValue(HKLM, 'Software\Microsoft\DataAccess', 'FullInstallVer', SoftwareVersion);
@@ -596,22 +514,6 @@ begin
     SetIniString('install', 'mdac', mdacPath, ExpandConstant('{tmp}\dep.ini'));
   end;
 
-	// Check for required Jet installation
-	if (not RegKeyExists(HKLM, 'Software\Microsoft\Jet\4.0')) then begin
-	  neededDependenciesInstallMemo := neededDependenciesInstallMemo + '      ' + CustomMessage('JETTitle') + #13;
-	  jetPath := ExpandConstant('{src}') + '\' + CustomMessage('DependenciesDir') + '\Jet40SP8_9xNT.exe';
-	  if not FileExists(jetPath) then begin
-	    jetPath := ExpandConstant('{tmp}\Jet40SP8_9xNT.exe');
-	    if not FileExists(jetPath) then begin
-	      neededDependenciesDownloadMemo := neededDependenciesDownloadMemo + '      ' + CustomMessage('JETTitle') + #13;
-        neededDependenciesDownloadMsg := neededDependenciesDownloadMsg + CustomMessage('JETTitle') + ' (' + CustomMessage('JETDownloadSize') + ')' + #13;
-	      isxdl_AddFile(jetURL, jetPath);
-	      downloadNeeded := true;
-	    end;
-	  end;
-	  SetIniString('install', 'jet', jetPath, ExpandConstant('{tmp}\dep.ini'));
-	end;
-
   // Check for required dotnetfx 2.0 installation
   if (not RegKeyExists(HKLM, 'SOFTWARE\Microsoft\NET Framework Setup\NDP\v2.0.50727')) then begin
     neededDependenciesInstallMemo := neededDependenciesInstallMemo + '      ' + CustomMessage('DOTNET20Title') + #13;
@@ -627,8 +529,6 @@ begin
     end;
     SetIniString('install', 'dotnet20', dotnet20Path, ExpandConstant('{tmp}\dep.ini'));
   end;
-
-
 
 end;
 

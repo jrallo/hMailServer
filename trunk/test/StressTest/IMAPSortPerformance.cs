@@ -6,8 +6,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using NUnit.Framework;
-using UnitTest;
+using RegressionTests;
 using System.Diagnostics;
+using RegressionTests.Shared;
 
 namespace StressTest
 {

@@ -23,7 +23,7 @@ namespace HM
    }
 
    void 
-   MessageCache::AddMessage(boost::shared_ptr<Message> pMessage)
+   MessageCache::AddMessage(shared_ptr<Message> pMessage)
    {
       CriticalSectionScope scope(m_csMessage);
 
@@ -48,14 +48,14 @@ namespace HM
 
    }
 
-   boost::shared_ptr<Message> 
+   shared_ptr<Message> 
    MessageCache::GetMessage(__int64 iMessageID)
    {
       CriticalSectionScope scope(m_csMessage);
 
-      std::map<__int64, boost::shared_ptr<Message> >::iterator iterMessage = m_mapMessage.find(iMessageID);
+      std::map<__int64, shared_ptr<Message> >::iterator iterMessage = m_mapMessage.find(iMessageID);
 
-      boost::shared_ptr<Message> pMessage;
+      shared_ptr<Message> pMessage;
       if (iterMessage == m_mapMessage.end())
       {
          // Message not found in cache.

@@ -34,17 +34,17 @@ namespace HM
    bool 
    SMTPConfiguration::Load()
    {
-      _incomingRelays = boost::shared_ptr<IncomingRelays>(new IncomingRelays());
+      _incomingRelays = shared_ptr<IncomingRelays>(new IncomingRelays());
       if (!_incomingRelays->Refresh())
          return false;
 
-      _routes = boost::shared_ptr<Routes> (new Routes());
+      _routes = shared_ptr<Routes> (new Routes());
       _routes->Refresh();
 
       return true;
    }
 
-   boost::shared_ptr<PropertySet>
+   shared_ptr<PropertySet>
    SMTPConfiguration::_GetSettings() const
    {
       return Configuration::Instance()->GetSettings();
@@ -300,13 +300,13 @@ namespace HM
    }
 
    void 
-   SMTPConfiguration::OnPropertyChanged(boost::shared_ptr<Property> pProperty)
+   SMTPConfiguration::OnPropertyChanged(shared_ptr<Property> pProperty)
    {
       String sPropertyName = pProperty->GetName();
 
       if (sPropertyName == PROPERTY_MAXDELIVERYTHREADS)
       {
-         boost::shared_ptr<SMTPDeliveryManager> pDeliveryManager = Application::Instance()->GetSMTPDeliveryManager();
+         shared_ptr<SMTPDeliveryManager> pDeliveryManager = Application::Instance()->GetSMTPDeliveryManager();
          if (!pDeliveryManager)
             return;
 

@@ -34,11 +34,11 @@ namespace HM
 
    
    void 
-   SMTPVacationMessageCreator::CreateVacationMessage(boost::shared_ptr<const Account> recipientAccount, 
+   SMTPVacationMessageCreator::CreateVacationMessage(shared_ptr<const Account> recipientAccount, 
                                         const String &sToAddress, 
                                         const String &sVacationSubject, 
                                         const String &sVacationMessage,
-                                        const boost::shared_ptr<Message> pOriginalMessage)
+                                        const shared_ptr<Message> pOriginalMessage)
    {
       
       
@@ -87,14 +87,14 @@ namespace HM
 
 
       // Send a copy of this email.
-      boost::shared_ptr<Message> pMsg = boost::shared_ptr<Message>(new Message());
+      shared_ptr<Message> pMsg = shared_ptr<Message>(new Message());
 
       pMsg->SetState(Message::Delivering);
       pMsg->SetFromAddress(recipientAccount->GetAddress());
 
       const String newFileName = PersistentMessage::GetFileName(pMsg);
 
-      boost::shared_ptr<MessageData> pNewMsgData = boost::shared_ptr<MessageData>(new MessageData());
+      shared_ptr<MessageData> pNewMsgData = shared_ptr<MessageData>(new MessageData());
       pNewMsgData->LoadFromMessage(newFileName, pMsg);
       
       // Required headers
@@ -108,6 +108,7 @@ namespace HM
       pNewMsgData->SetTo(sToAddress);
       pNewMsgData->SetSubject(sModifiedSubject);
       pNewMsgData->SetBody(sModifiedBody);
+	  pNewMsgData->SetAutoReplied();
       pNewMsgData->IncreaseRuleLoopCount();
       
       // Write message data

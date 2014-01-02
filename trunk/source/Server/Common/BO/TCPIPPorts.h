@@ -18,7 +18,7 @@ namespace HM
       TCPIPPorts();
       ~TCPIPPorts(void);
 
-      boost::shared_ptr<TCPIPPort> GetPort(const IPAddress &iIPAddress, int iPort);
+      shared_ptr<TCPIPPort> GetPort(const IPAddress &iIPAddress, int iPort);
 
       void Refresh();
       // Refreshes this collection from the database.
@@ -30,7 +30,7 @@ namespace HM
       virtual String GetCollectionName() const {return "TCPIPPorts"; }
 
    private:
-      boost::shared_ptr<TCPIPPort> _GetPrimaryPort(SessionType st);
+      shared_ptr<TCPIPPort> _GetPrimaryPort(SessionType st);
      
    };
 }

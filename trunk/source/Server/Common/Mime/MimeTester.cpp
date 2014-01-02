@@ -83,9 +83,9 @@ namespace HM
 	   {
          OutputDebugString("Loading file " + sFilename +"\n");
 
-		   boost::shared_ptr<Message> pMessage = boost::shared_ptr<Message>(new Message(false));
+		   shared_ptr<Message> pMessage = shared_ptr<Message>(new Message(false));
 
-		   boost::shared_ptr<MessageData> pMsgData = boost::shared_ptr<MessageData>(new MessageData());
+		   shared_ptr<MessageData> pMsgData = shared_ptr<MessageData>(new MessageData());
 		   pMsgData->LoadFromMessage(sFilename, pMessage);
 	   }
 	   catch (...)
@@ -101,9 +101,9 @@ namespace HM
    {
       try
       {
-         boost::shared_ptr<Message> pMessage = boost::shared_ptr<Message>(new Message(false));
+         shared_ptr<Message> pMessage = shared_ptr<Message>(new Message(false));
          
-         boost::shared_ptr<MessageData> pMsgData = boost::shared_ptr<MessageData>(new MessageData());
+         shared_ptr<MessageData> pMsgData = shared_ptr<MessageData>(new MessageData());
          pMsgData->LoadFromMessage(sFilename, pMessage);
 
          String sOutput = "hMailServer: [MimeTester] --> "; 
@@ -116,8 +116,8 @@ namespace HM
          pMsgData->SetFieldValue("X-MyHeader", "ValueOfMyHeader");
 
          // New message
-         boost::shared_ptr<Message> pNewMessage = boost::shared_ptr<Message>(new Message());
-         boost::shared_ptr<Account> account;
+         shared_ptr<Message> pNewMessage = shared_ptr<Message>(new Message());
+         shared_ptr<Account> account;
          String newFileName = PersistentMessage::GetFileName(account, pNewMessage);
 
          pMsgData->Write(newFileName);

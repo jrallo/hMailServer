@@ -6,9 +6,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using NUnit.Framework;
-using UnitTest;
 using System.IO;
 using System.Threading;
+using RegressionTests.Shared;
+
 
 namespace StressTest
 {
@@ -27,8 +28,8 @@ namespace StressTest
          antiSpam.SpamAssassinEnabled = true;
          antiSpam.SpamAssassinHost = "localhost";
          antiSpam.SpamAssassinHost = "192.168.127.128";
-         
-         Utilities.AssertSpamAssassinIsRunning();
+
+         TestSetup.AssertSpamAssassinIsRunning();
       }
 
       [Test]
@@ -36,11 +37,11 @@ namespace StressTest
       public void SingleThread()
       {
          hMailServer.Account account =
-                    SingletonProvider<Utilities>.Instance.AddAccount(_domain.Accounts, "test@test.com", "test");
+                    SingletonProvider<TestSetup>.Instance.AddAccount(_domain.Accounts, "test@test.com", "test");
 
          for (int i = 0; i < 15; i++)
          {
-            SMTPSimulator.StaticSend("test@test.com", "test@test.com", "test", "test");
+             SMTPClientSimulator.StaticSend("test@test.com", "test@test.com", "test", "test");
          }
 
          POP3Simulator.AssertMessageCount(account.Address, "test", 15);
@@ -59,7 +60,7 @@ namespace StressTest
       public void MultiThread()
       {
          hMailServer.Account account =
-                    SingletonProvider<Utilities>.Instance.AddAccount(_domain.Accounts, "test@test.com", "test");
+                    SingletonProvider<TestSetup>.Instance.AddAccount(_domain.Accounts, "test@test.com", "test");
 
          int threadCount = 5;
          _threadedMessageCount = 100;
@@ -94,7 +95,7 @@ namespace StressTest
       {
          for (int message = 0; message < _threadedMessageCount; message++)
          {
-            SMTPSimulator.StaticSend("test@test.com", "test@test.com", "test", "test");
+             SMTPClientSimulator.StaticSend("test@test.com", "test@test.com", "test", "test");
          }
       }
 

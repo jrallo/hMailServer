@@ -52,7 +52,7 @@ namespace HM
       bool GetUseSSL() const  {return m_bUseSSL; }
       void SetUseSSL(bool bNewVal) {m_bUseSSL = bNewVal; }
 
-      boost::shared_ptr<RouteAddresses> GetAddresses();
+      shared_ptr<RouteAddresses> GetAddresses();
    
       bool XMLStore(XNode *pRoutesNode, int iOptions);
       bool XMLLoad(XNode *pNode, int iOptions);
@@ -75,7 +75,7 @@ namespace HM
       bool m_bTreatRecipientAsLocalDomain;
       bool m_bTreatSenderAsLocalDomain;
 
-      boost::shared_ptr<RouteAddresses> m_pAddresses;
+      shared_ptr<RouteAddresses> m_pAddresses;
    };
 
 }

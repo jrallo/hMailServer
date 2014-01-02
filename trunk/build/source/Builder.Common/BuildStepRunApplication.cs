@@ -36,14 +36,14 @@ namespace Builder.Common
            m_oBuilder.Log("Running application " + m_sExecutable + "...\r\n", true);
 
             ProcessLauncher launcher = new ProcessLauncher();
-            launcher.Output += new ProcessLauncher.OutputDelegate(launcher_Output);
+            launcher.Output += launcher_Output;
 
 
             string output;
             int exitCode = launcher.LaunchProcess(ExpandMacros(m_sExecutable), ExpandMacros(m_sArguments), out output);
 
             if (exitCode != 0)
-               throw new Exception("Failed");
+               throw new Exception(string.Format("Running of application failed. Exit code: {0}", exitCode));
         }
 
         void launcher_Output(string output)

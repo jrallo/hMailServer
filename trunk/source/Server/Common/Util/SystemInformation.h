@@ -24,5 +24,9 @@ namespace HM
       ~SystemInformation(void);
 
       static OperatingSystem GetOperatingSystem();
+
+   private:
+
+      static OperatingSystem _operatingSystem;
    };
 }

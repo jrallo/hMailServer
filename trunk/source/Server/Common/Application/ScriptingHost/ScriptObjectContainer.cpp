@@ -26,7 +26,7 @@ namespace HM
    ScriptObjectContainer::ScriptObjectContainer(void)
    {
       // Default objects
-      boost::shared_ptr<void> pDummy;
+      shared_ptr<void> pDummy;
       AddObject("EventLog", pDummy, ScriptObject::OTEventLog);
    }
 
@@ -37,7 +37,7 @@ namespace HM
    void 
    ScriptObjectContainer::AddObject(const String &sName, ScriptObject::ObjectType type)
    {
-      boost::shared_ptr<ScriptObject> pObject = boost::shared_ptr<ScriptObject>(new ScriptObject);
+      shared_ptr<ScriptObject> pObject = shared_ptr<ScriptObject>(new ScriptObject);
       pObject->eType = type;
       pObject->sName = sName;
 
@@ -45,9 +45,9 @@ namespace HM
    }
 
    void 
-   ScriptObjectContainer::AddObject(const String &sName, boost::shared_ptr<void> pObj, ScriptObject::ObjectType type)
+   ScriptObjectContainer::AddObject(const String &sName, shared_ptr<void> pObj, ScriptObject::ObjectType type)
    {
-      boost::shared_ptr<ScriptObject> pObject = boost::shared_ptr<ScriptObject>(new ScriptObject);
+      shared_ptr<ScriptObject> pObject = shared_ptr<ScriptObject>(new ScriptObject);
       pObject->eType = type;
       pObject->sName = sName;
       pObject->pObject = pObj;
@@ -57,17 +57,17 @@ namespace HM
    bool
    ScriptObjectContainer::GetObjectByName(const String &sName, LPUNKNOWN* ppunkItem) const
    {
-      map<String, boost::shared_ptr<ScriptObject> >::const_iterator iterPos = m_mapObjects.find(sName);
+      map<String, shared_ptr<ScriptObject> >::const_iterator iterPos = m_mapObjects.find(sName);
       if (iterPos == m_mapObjects.end())
          return false;
 
-      boost::shared_ptr<ScriptObject> pObj = (*iterPos).second;
+      shared_ptr<ScriptObject> pObj = (*iterPos).second;
       switch (pObj->eType)
       {
       case ScriptObject::OTResult:
          {
             CComObject<InterfaceResult> *pResultInt = new CComObject<InterfaceResult>();
-            boost::shared_ptr<Result> pResult = shared_static_cast<Result>(pObj->pObject);
+            shared_ptr<Result> pResult = shared_static_cast<Result>(pObj->pObject);
             pResultInt->AttachItem(pResult);
             pResultInt->QueryInterface(ppunkItem);
             return true;
@@ -75,7 +75,7 @@ namespace HM
       case ScriptObject::OTMessage:
          {
             CComObject<InterfaceMessage> *pInterface = new CComObject<InterfaceMessage>();
-            boost::shared_ptr<Message> pObject = shared_static_cast<Message>(pObj->pObject);
+            shared_ptr<Message> pObject = shared_static_cast<Message>(pObj->pObject);
             pInterface->AttachItem(pObject);
             pInterface->QueryInterface(ppunkItem);
            
@@ -84,7 +84,7 @@ namespace HM
       case ScriptObject::OTClient:
          {
             CComObject<InterfaceClient> *pInterface = new CComObject<InterfaceClient>();
-            boost::shared_ptr<ClientInfo> pObject = shared_static_cast<ClientInfo>(pObj->pObject);
+            shared_ptr<ClientInfo> pObject = shared_static_cast<ClientInfo>(pObj->pObject);
             
             pInterface->AttachItem(pObject);
             pInterface->QueryInterface(ppunkItem);
@@ -99,7 +99,7 @@ namespace HM
       case ScriptObject::OTFetchAccount:
          {
             CComObject<InterfaceFetchAccount> *pInterface = new CComObject<InterfaceFetchAccount>();
-            boost::shared_ptr<FetchAccount> pObject = shared_static_cast<FetchAccount>(pObj->pObject);
+            shared_ptr<FetchAccount> pObject = shared_static_cast<FetchAccount>(pObj->pObject);
             pInterface->AttachItem(pObject);
             pInterface->QueryInterface(ppunkItem);
 
@@ -116,7 +116,7 @@ namespace HM
    ScriptObjectContainer::GetObjectNames()
    {
       vector<String> vecNames;
-      map<String, boost::shared_ptr<ScriptObject> >::iterator iterPos = m_mapObjects.begin();     
+      map<String, shared_ptr<ScriptObject> >::iterator iterPos = m_mapObjects.begin();     
       
       while (iterPos != m_mapObjects.end())
       {

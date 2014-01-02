@@ -38,7 +38,7 @@ namespace HM
    }
 
    IMAPResult
-   IMAPFetch::DoAction(boost::shared_ptr<IMAPConnection> pConnection, int messageIndex, boost::shared_ptr<Message> pMessage, const boost::shared_ptr<IMAPCommandArgument> pArgument)
+   IMAPFetch::DoAction(shared_ptr<IMAPConnection> pConnection, int messageIndex, shared_ptr<Message> pMessage, const shared_ptr<IMAPCommandArgument> pArgument)
    {
       if (!pArgument || !pMessage)
          return IMAPResult(IMAPResult::ResultBad, "Invalid parameters");
@@ -50,7 +50,7 @@ namespace HM
       // Parse the command
       if (!m_pParser)
       {
-         m_pParser = boost::shared_ptr<IMAPFetchParser>(new IMAPFetchParser());
+         m_pParser = shared_ptr<IMAPFetchParser>(new IMAPFetchParser());
          String sTemp = pArgument->Command();
          m_pParser->ParseCommand(sTemp);
       }
@@ -180,7 +180,7 @@ namespace HM
       // Sometimes we need to load the entire mail into memory.
       // If the user want's to download a specific attachment or
       // if he wants to look at the structure of the mime message.
-      boost::shared_ptr<MimeBody> pMimeBody = _LoadMimeBody(m_pParser, messageFileName);
+      shared_ptr<MimeBody> pMimeBody = _LoadMimeBody(m_pParser, messageFileName);
       
       if (m_pParser->GetShowBodyStructure() ||
           m_pParser->GetShowBodyStructureNonExtensible())
@@ -216,7 +216,7 @@ namespace HM
             int iOctetCount = oPart.m_iOctetCount;
            
             const String messageFileName = PersistentMessage::GetFileName(pConnection->GetAccount(), pMessage);
-            boost::shared_ptr<ByteBuffer> pBuffer = _GetByteBufferByBodyPart(messageFileName, pMimeBody, oPart);
+            shared_ptr<ByteBuffer> pBuffer = _GetByteBufferByBodyPart(messageFileName, pMimeBody, oPart);
             
             String sPartIdentifier;
             if (iOctetStart == -1 && iOctetCount == -1)
@@ -304,8 +304,8 @@ namespace HM
       iOutCount = iOctetCount;
    }
 
-   boost::shared_ptr<MimeBody> 
-   IMAPFetch::_GetBodyPartByRecursiveIdentifier(boost::shared_ptr<MimeBody> pBody, const String &sName)
+   shared_ptr<MimeBody> 
+   IMAPFetch::_GetBodyPartByRecursiveIdentifier(shared_ptr<MimeBody> pBody, const String &sName)
    //---------------------------------------------------------------------------()
    // DESCRIPTION:
    // Returns a body part by a given identifier. An identifier can be 1, 2, 1.2 etc.
@@ -313,7 +313,7 @@ namespace HM
    {
       if (!pBody || sName.IsEmpty())
       {
-         boost::shared_ptr<MimeBody> pEmpty;
+         shared_ptr<MimeBody> pEmpty;
          return pEmpty;
       }
 
@@ -354,7 +354,7 @@ namespace HM
 
                   ErrorManager::Instance()->ReportError(ErrorManager::Medium, 5060, "IMAPFetch::_GetBodyPartByRecursiveIdentifier", sErrorMessage);
 
-                  boost::shared_ptr<MimeBody> empty;
+                  shared_ptr<MimeBody> empty;
                   return empty;
                }
             }
@@ -368,14 +368,14 @@ namespace HM
    }
 
 
-   boost::shared_ptr<ByteBuffer> 
-   IMAPFetch::_GetByteBufferByBodyPart(const String &messageFileName, boost::shared_ptr<MimeBody> pBodyPart, IMAPFetchParser::BodyPart &oPart)
+   shared_ptr<ByteBuffer> 
+   IMAPFetch::_GetByteBufferByBodyPart(const String &messageFileName, shared_ptr<MimeBody> pBodyPart, IMAPFetchParser::BodyPart &oPart)
    //---------------------------------------------------------------------------()
    // DESCRIPTION:
    // Returns a buffer containing the data for the given body/part
    //---------------------------------------------------------------------------()
    {
-      boost::shared_ptr<ByteBuffer> pOutBuf = boost::shared_ptr<ByteBuffer>(new ByteBuffer);
+      shared_ptr<ByteBuffer> pOutBuf = shared_ptr<ByteBuffer>(new ByteBuffer);
 
       if (!pBodyPart)
       {
@@ -546,18 +546,18 @@ namespace HM
       return pOutBuf;
    }
 
-   boost::shared_ptr<MimeBody>
-   IMAPFetch::_GetMessagePartByPartNo(boost::shared_ptr<MimeBody> pBody, long iPartNo)
+   shared_ptr<MimeBody>
+   IMAPFetch::_GetMessagePartByPartNo(shared_ptr<MimeBody> pBody, long iPartNo)
    {
       
       if (!pBody)
       {
-         boost::shared_ptr<MimeBody> pEmpty;
+         shared_ptr<MimeBody> pEmpty;
          return pEmpty;
       }
       
       // Fetch the first part of the message.
-      boost::shared_ptr<MimeBody> oPart = pBody->FindFirstPart();
+      shared_ptr<MimeBody> oPart = pBody->FindFirstPart();
 
       if (!oPart)
       {
@@ -578,7 +578,7 @@ namespace HM
          oPart = pBody->FindNextPart();
       }      
 
-      boost::shared_ptr<MimeBody> pEmpty;
+      shared_ptr<MimeBody> pEmpty;
       return pEmpty;
    }
 
@@ -763,7 +763,7 @@ namespace HM
    }
 
    String
-   IMAPFetch::_IteratePartRecursive(boost::shared_ptr<MimeBody> oPart, bool bExtensible, int iRecursion)
+   IMAPFetch::_IteratePartRecursive(shared_ptr<MimeBody> oPart, bool includeExtensionData, int iRecursion)
    {
       iRecursion++;
 
@@ -774,27 +774,32 @@ namespace HM
       {
          // This part has many parts. Iterate those.
 
-         String sType = oPart->GetSubType();
-         sType.ToUpper();
 
          String sResult = "(";
 
-         boost::shared_ptr<MimeBody> pSubPart = oPart->FindFirstPart();
+         shared_ptr<MimeBody> pSubPart = oPart->FindFirstPart();
 
          while (pSubPart)
          {
-            sResult += _IteratePartRecursive(pSubPart, bExtensible, iRecursion);
+            sResult += _IteratePartRecursive(pSubPart, includeExtensionData, iRecursion);
 
             pSubPart = oPart->FindNextPart();
          }
 
-         // Add multipart stamp.
+         // Add subtype stamp.
+			String sType = oPart->GetSubType();
+			sType.ToUpper();
 
-         String sTemp;
-         String sBoundary = oPart->GetBoundary();
-         sTemp.Format(_T(" \"%s\" (\"BOUNDARY\" \"%s\") NIL NIL"), sType, sBoundary);
-         sResult += sTemp;
+			String sTemp;
+			sTemp.Format(_T(" \"%s\""), sType);
+			sResult += sTemp;
 
+			if (includeExtensionData)
+			{
+				String sBoundary = oPart->GetBoundary();
+				sTemp.Format(_T(" (\"BOUNDARY\" \"%s\") NIL NIL"), sBoundary);
+				sResult += sTemp;
+			}
          
          sResult += ")";
 
@@ -803,28 +808,27 @@ namespace HM
       }
       else
       {
-         return _GetPartStructure(oPart, bExtensible, iRecursion);
+         return _GetPartStructure(oPart, includeExtensionData, iRecursion);
       }
    }
 
    String 
-   IMAPFetch::_GetPartStructure(boost::shared_ptr<MimeBody> oPart, bool bExtensible, int iRecursion)   
+   IMAPFetch::_GetPartStructure(shared_ptr<MimeBody> oPart, bool includeExtensionData, int iRecursion)   
    {
       String sMainType = oPart->GetMainType();
       sMainType.ToUpper();
       String sSubType = oPart->GetSubType();
       sSubType.ToUpper();
 
-      String sCharset = oPart->GetCharset();
       String sBodyParams;
-      
-      String file = oPart->GetUnicodeFilename();
 
       if (oPart->IsAttachment())
          sBodyParams.Format(_T("(\"NAME\" \"%s\")"), oPart->GetRawFilename());
       else
       {
-         if (sCharset.IsEmpty())
+			String sCharset = oPart->GetCharset();
+			
+			if (sCharset.IsEmpty())
          {
             // Fallback to default. One could think that the client
             // should assume this if we don't tell it, but at least
@@ -864,8 +868,11 @@ namespace HM
       else
          sResult += " \"" + sSubject + "\"";
 
+      // RFC 3501 states 7bit should have quotes
+      // Missing quotes around 7bit causes problems with Thunderbird
+      // http://www.hmailserver.com/forum/viewtopic.php?f=10&t=22887
       if (sEncoding.IsEmpty())
-         sResult += " 7bit";
+         sResult += " \"7bit\"";
       else
          sResult += " \"" + sEncoding + "\"";
 
@@ -882,14 +889,14 @@ namespace HM
       
          try
          {
-            boost::shared_ptr<MimeBody> pBody = oPart->LoadEncapsulatedMessage();
+            shared_ptr<MimeBody> pBody = oPart->LoadEncapsulatedMessage();
 
             AnsiString sMessageHeader = pBody->GetHeaderContents();
             MimeHeader oHeader;
             oHeader.Load(sMessageHeader, sMessageHeader.GetLength());
             
             String sEnvelope = _CreateEnvelopeStructure(oHeader);
-            String sBodyStructure = _IteratePartRecursive(pBody, bExtensible, iRecursion);
+            String sBodyStructure = _IteratePartRecursive(pBody, includeExtensionData, iRecursion);
 
             AnsiString contentString = (const char*) pBody->GetContent();
 
@@ -972,9 +979,9 @@ namespace HM
 
       // First remove the newline characters.
       
-      boost::shared_ptr<AddresslistParser> pParser = boost::shared_ptr<AddresslistParser>(new AddresslistParser());
-      std::vector<boost::shared_ptr<Address> > vecAddresses = pParser->ParseList(sField);
-      std::vector<boost::shared_ptr<Address> >::iterator iterElement = vecAddresses.begin();
+      shared_ptr<AddresslistParser> pParser = shared_ptr<AddresslistParser>(new AddresslistParser());
+      std::vector<shared_ptr<Address> > vecAddresses = pParser->ParseList(sField);
+      std::vector<shared_ptr<Address> >::iterator iterElement = vecAddresses.begin();
 
       while (iterElement != vecAddresses.end())
       {
@@ -1017,14 +1024,14 @@ namespace HM
 
    }
 
-   boost::shared_ptr<MimeBody> 
-   IMAPFetch::_LoadMimeBody(boost::shared_ptr<IMAPFetchParser> pParser, const String &fileName)
+   shared_ptr<MimeBody> 
+   IMAPFetch::_LoadMimeBody(shared_ptr<IMAPFetchParser> pParser, const String &fileName)
    //---------------------------------------------------------------------------()
    // DESCRIPTION:
    // Loads the part of a message needed. 
    //---------------------------------------------------------------------------()
    {
-      boost::shared_ptr<MimeBody> pMimeBody;
+      shared_ptr<MimeBody> pMimeBody;
       
       if (pParser->GetPartsToLookAt().size() == 0 &&
           !pParser->GetShowBodyStructure() &&
@@ -1043,7 +1050,7 @@ namespace HM
 
       try
       {
-         pMimeBody = boost::shared_ptr<MimeBody>(new MimeBody);
+         pMimeBody = shared_ptr<MimeBody>(new MimeBody);
 
          if (bLoadFullMail)
             pMimeBody->LoadFromFile(fileName);
@@ -1065,7 +1072,7 @@ namespace HM
    }
 
    bool 
-   IMAPFetch::_GetMessageBodyNeeded(boost::shared_ptr<IMAPFetchParser> pParser)
+   IMAPFetch::_GetMessageBodyNeeded(shared_ptr<IMAPFetchParser> pParser)
    //---------------------------------------------------------------------------()
    // DESCRIPTION:
    // This method determines whether we need to load the entire body, or if
@@ -1110,7 +1117,7 @@ namespace HM
    }
 
    void
-   IMAPFetch::_SendAndReset(boost::shared_ptr<IMAPConnection> pConnection, String &sOutput)
+   IMAPFetch::_SendAndReset(shared_ptr<IMAPConnection> pConnection, String &sOutput)
    {
       pConnection->SendAsciiData(sOutput);
       sOutput = "";

@@ -49,11 +49,11 @@ namespace HM
 
       command.AddParameter("@FOLDERACCOUNTID", m_iAccountID);
    
-      boost::shared_ptr<DALRecordset> pRS = Application::Instance()->GetDBManager()->OpenRecordset(command);
+      shared_ptr<DALRecordset> pRS = Application::Instance()->GetDBManager()->OpenRecordset(command);
       if (!pRS)
          return;
 
-      std::vector<std::pair<__int64, boost::shared_ptr<IMAPFolder> > > vecIMAPFolders;
+      std::vector<std::pair<__int64, shared_ptr<IMAPFolder> > > vecIMAPFolders;
 
       if (!pRS->IsEOF())
       {
@@ -76,7 +76,7 @@ namespace HM
 
             // Initialize with dummy parent folder. We can't set it here since it may not
             // even be loaded from the recordset yet.
-            boost::shared_ptr<IMAPFolder> pFolder = boost::shared_ptr<IMAPFolder>(new IMAPFolder(m_iAccountID, iParentID));
+            shared_ptr<IMAPFolder> pFolder = shared_ptr<IMAPFolder>(new IMAPFolder(m_iAccountID, iParentID));
             
             pFolder->SetID(iFolderID);
             pFolder->SetFolderName(sFolderName);
@@ -93,7 +93,7 @@ namespace HM
          long lPanicLevel = 0;
          while (vecIMAPFolders.size() > 0)
          {
-            std::vector<std::pair<__int64, boost::shared_ptr<IMAPFolder> > >::iterator iterFolder = vecIMAPFolders.begin();
+            std::vector<std::pair<__int64, shared_ptr<IMAPFolder> > >::iterator iterFolder = vecIMAPFolders.begin();
 
             while (iterFolder != vecIMAPFolders.end())
             {
@@ -108,7 +108,7 @@ namespace HM
                }
                else
                {
-                  boost::shared_ptr<IMAPFolder> pParent = GetItemByDBIDRecursive(iFolderParentID);
+                  shared_ptr<IMAPFolder> pParent = GetItemByDBIDRecursive(iFolderParentID);
 
                   if (pParent)
                   {
@@ -145,12 +145,12 @@ namespace HM
 
    }
 
-   boost::shared_ptr<IMAPFolder> 
+   shared_ptr<IMAPFolder> 
    IMAPFolders::GetFolderByName(const String &sName, bool bRecursive)
    { 
       CriticalSectionScope scope(_lock);
 
-      boost_foreach(boost::shared_ptr<IMAPFolder> pFolder, vecObjects)
+      boost_foreach(shared_ptr<IMAPFolder> pFolder, vecObjects)
       {
          if (pFolder->GetFolderName().Equals(sName, false))
             return pFolder;
@@ -158,7 +158,7 @@ namespace HM
          if (bRecursive)
          {
             // Visit this folder.
-            boost::shared_ptr<IMAPFolders> pSubFolders = pFolder->GetSubFolders();
+            shared_ptr<IMAPFolders> pSubFolders = pFolder->GetSubFolders();
             pFolder = pSubFolders->GetFolderByName(sName, bRecursive);
 
             if (pFolder)
@@ -166,7 +166,7 @@ namespace HM
          }
       }
 
-      boost::shared_ptr<IMAPFolder> pEmpty;
+      shared_ptr<IMAPFolder> pEmpty;
       return pEmpty;
    }
 
@@ -174,7 +174,7 @@ namespace HM
   
 
 
-   boost::shared_ptr<IMAPFolder>
+   shared_ptr<IMAPFolder>
    IMAPFolders::GetFolderByFullPath(const String &sPath)
    {
       CriticalSectionScope scope(_lock);
@@ -186,12 +186,12 @@ namespace HM
       return GetFolderByFullPath(sVecPath);
    }
 
-   boost::shared_ptr<IMAPFolder>
+   shared_ptr<IMAPFolder>
    IMAPFolders::GetFolderByFullPath(const std::vector<String> &vecFolders)
    {
       CriticalSectionScope scope(_lock);
 
-      boost::shared_ptr<IMAPFolder> pCurFolder;
+      shared_ptr<IMAPFolder> pCurFolder;
       size_t lNoOfParts= vecFolders.size();
       for (unsigned int i = 0; i < lNoOfParts; i++)
       {
@@ -215,17 +215,17 @@ namespace HM
    }
 
    void
-   IMAPFolders::RemoveFolder(boost::shared_ptr<IMAPFolder> pFolderToRemove)
+   IMAPFolders::RemoveFolder(shared_ptr<IMAPFolder> pFolderToRemove)
    {
       CriticalSectionScope scope(_lock);
 
-      vector<boost::shared_ptr<IMAPFolder> >::iterator iterCurPos = vecObjects.begin();
-      vector<boost::shared_ptr<IMAPFolder> >::iterator iterEnd = vecObjects.end();
+      vector<shared_ptr<IMAPFolder> >::iterator iterCurPos = vecObjects.begin();
+      vector<shared_ptr<IMAPFolder> >::iterator iterEnd = vecObjects.end();
 
       __int64 lRemoveFolderID = pFolderToRemove->GetID();
       for (; iterCurPos!= iterEnd; iterCurPos++)
       {
-         boost::shared_ptr<IMAPFolder> pFolder = (*iterCurPos);
+         shared_ptr<IMAPFolder> pFolder = (*iterCurPos);
 
          if (pFolder->GetID() == lRemoveFolderID)
          {
@@ -237,7 +237,7 @@ namespace HM
    }
   
    void
-   IMAPFolders::CreatePath(boost::shared_ptr<IMAPFolders> pParentContainer,
+   IMAPFolders::CreatePath(shared_ptr<IMAPFolders> pParentContainer,
                            const std::vector<String> &vecFolderPath, 
                            bool bAutoSubscribe)
    {
@@ -249,14 +249,14 @@ namespace HM
 
       std::vector<String> vecTempPath = vecFolderPath;
 
-      boost::shared_ptr<IMAPFolder> pParentFolder;
+      shared_ptr<IMAPFolder> pParentFolder;
 
       while (vecTempPath.size() > 0)
       {
          // Get first level.
          String sTopLevel = vecTempPath[0];
 
-         boost::shared_ptr<IMAPFolder> pParentCheck = pParentContainer->GetFolderByName(sTopLevel, false);
+         shared_ptr<IMAPFolder> pParentCheck = pParentContainer->GetFolderByName(sTopLevel, false);
 
          if (pParentCheck)
          {
@@ -272,7 +272,7 @@ namespace HM
          if (pParentFolder)
             iParentFolderID = pParentFolder->GetID();
 
-         boost::shared_ptr<IMAPFolder> pFolder = boost::shared_ptr<IMAPFolder>(new IMAPFolder(m_iAccountID, iParentFolderID));
+         shared_ptr<IMAPFolder> pFolder = shared_ptr<IMAPFolder>(new IMAPFolder(m_iAccountID, iParentFolderID));
          pFolder->SetFolderName(sTopLevel);
          pFolder->SetIsSubscribed(bAutoSubscribe);
 
@@ -291,7 +291,7 @@ namespace HM
    }
 
    bool
-   IMAPFolders::PreSaveObject(boost::shared_ptr<IMAPFolder> pObject, XNode *node)
+   IMAPFolders::PreSaveObject(shared_ptr<IMAPFolder> pObject, XNode *node)
    {
       pObject->SetAccountID(GetAccountID());
       pObject->SetParentFolderID(m_iParentFolderID);
@@ -299,20 +299,20 @@ namespace HM
    }
 
 
-   boost::shared_ptr<IMAPFolder> 
+   shared_ptr<IMAPFolder> 
    IMAPFolders::GetItemByDBIDRecursive(__int64 lFolderID)
    {
       CriticalSectionScope scope(_lock);
 
-      std::vector<boost::shared_ptr<IMAPFolder> >::iterator iterCurPos = vecObjects.begin();
+      std::vector<shared_ptr<IMAPFolder> >::iterator iterCurPos = vecObjects.begin();
 
-      boost_foreach(boost::shared_ptr<IMAPFolder> pFolder, vecObjects)
+      boost_foreach(shared_ptr<IMAPFolder> pFolder, vecObjects)
       {
          if (pFolder->GetID() == lFolderID)
             return pFolder;
 
          // Visit this folder.
-         boost::shared_ptr<IMAPFolders> pSubFolders = pFolder->GetSubFolders();
+         shared_ptr<IMAPFolders> pSubFolders = pFolder->GetSubFolders();
          pFolder = pSubFolders->GetItemByDBIDRecursive(lFolderID);
 
          if (pFolder)
@@ -320,7 +320,7 @@ namespace HM
       }
 
 
-      boost::shared_ptr<IMAPFolder> pEmpty;
+      shared_ptr<IMAPFolder> pEmpty;
       return pEmpty;
 
    }

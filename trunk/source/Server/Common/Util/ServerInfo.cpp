@@ -68,4 +68,15 @@ namespace HM
    {
       return _useSSL;
    }
+
+   bool 
+   ServerInfo::operator== (const ServerInfo &other) const
+   {
+      return _fixed == other._fixed &&
+         _hostName == other._hostName &&
+         _port == other._port &&
+         _userName == other._userName &&
+         _passWord == other._passWord &&
+         _useSSL == other._useSSL;
+   }
 }

@@ -38,6 +38,13 @@ namespace hMailServer.Administrator.Dialogs
             textMessage.Text = fileContent;
 
          }
+         catch (System.IO.FileNotFoundException)
+         {
+             textMessage.Text =
+                 string.Format(
+                     "The file {0} could not be loaded. The message has probably been delivered to the recipient and is no longer available in the queue.",
+                     _filename);
+         }
          catch (Exception ex)
          {
             textMessage.Text = ex.Message;

@@ -43,57 +43,57 @@ namespace HM
 
    }
 
-   boost::shared_ptr<Accounts>
+   shared_ptr<Accounts>
    Domain::GetAccounts()
    {
       if (!m_pAccounts)
-         m_pAccounts = boost::shared_ptr<Accounts>(new Accounts(m_iID));
+         m_pAccounts = shared_ptr<Accounts>(new Accounts(m_iID));
 
       m_pAccounts->Refresh();
       return m_pAccounts;
    }
 
 
-   boost::shared_ptr<DomainAliases>
+   shared_ptr<DomainAliases>
    Domain::GetDomainAliases()
    {
       if (!m_pDomainAliases)
-         m_pDomainAliases = boost::shared_ptr<DomainAliases>(new DomainAliases(m_iID));
+         m_pDomainAliases = shared_ptr<DomainAliases>(new DomainAliases(m_iID));
 
       m_pDomainAliases->Refresh();
       return m_pDomainAliases;
    }
 
-   boost::shared_ptr<Accounts>
+   shared_ptr<Accounts>
    Domain::GetAccounts(__int64 iAccountID)
    {
       if (!m_pAccounts)
       {
          // Only fetch a specific account and put it in the list. This happens
          // when an API client only has limited access.
-         m_pAccounts = boost::shared_ptr<Accounts>(new Accounts(m_iID, iAccountID));
+         m_pAccounts = shared_ptr<Accounts>(new Accounts(m_iID, iAccountID));
       }
 
       m_pAccounts->Refresh();
       return m_pAccounts;
    }
 
-   boost::shared_ptr<Aliases>
+   shared_ptr<Aliases>
    Domain::GetAliases()
    {
       if (!m_pAliases)
-         m_pAliases = boost::shared_ptr<Aliases>(new Aliases(m_iID));
+         m_pAliases = shared_ptr<Aliases>(new Aliases(m_iID));
       
       m_pAliases->Refresh();
 
       return m_pAliases;
    }
 
-   boost::shared_ptr<DistributionLists>
+   shared_ptr<DistributionLists>
    Domain::GetDistributionLists()
    {
       if (!m_pDistributionLists)
-         m_pDistributionLists = boost::shared_ptr<DistributionLists>(new DistributionLists(m_iID));
+         m_pDistributionLists = shared_ptr<DistributionLists>(new DistributionLists(m_iID));
 
       m_pDistributionLists->Refresh();
 

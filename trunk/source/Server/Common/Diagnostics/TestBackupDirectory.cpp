@@ -32,8 +32,8 @@ namespace HM
       String backupDirectory = Configuration::Instance()->GetBackupDestination();
       if (backupDirectory.IsEmpty())
       {
-         diagResult.SetSuccess(true);
-         diagResult.SetDetails(_T("Backup directory has not been specified."));
+         diagResult.SetSuccess(false);
+         diagResult.SetDetails(_T("ERROR: Backup directory has not been specified."));
       }
       else
       {

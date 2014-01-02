@@ -21,13 +21,13 @@ namespace HM
 {
    
    IMAPResult
-   IMAPCommandSTATUS::ExecuteCommand(boost::shared_ptr<HM::IMAPConnection> pConnection, boost::shared_ptr<IMAPCommandArgument> pArgument)
+   IMAPCommandSTATUS::ExecuteCommand(shared_ptr<HM::IMAPConnection> pConnection, shared_ptr<IMAPCommandArgument> pArgument)
    {
 
       if (!pConnection->IsAuthenticated())
          return IMAPResult(IMAPResult::ResultNo, "Authenticate first");
 
-      boost::shared_ptr<IMAPSimpleCommandParser> pParser = boost::shared_ptr<IMAPSimpleCommandParser>(new IMAPSimpleCommandParser());
+      shared_ptr<IMAPSimpleCommandParser> pParser = shared_ptr<IMAPSimpleCommandParser>(new IMAPSimpleCommandParser());
 
       pParser->Parse(pArgument);
 
@@ -37,7 +37,7 @@ namespace HM
       String sFolderName = pParser->GetParamValue(pArgument, 0);
       String sFlags = pParser->GetParamValue(pArgument, 1);
 
-      boost::shared_ptr<IMAPFolder> pTheFolder = pConnection->GetFolderByFullPath(sFolderName);
+      shared_ptr<IMAPFolder> pTheFolder = pConnection->GetFolderByFullPath(sFolderName);
       if (!pTheFolder)
          return IMAPResult(IMAPResult::ResultBad, "Folder could not be found.");
 
@@ -49,7 +49,7 @@ namespace HM
       if (!pConnection->CheckPermission(pTheFolder, ACLPermission::PermissionRead))
          return IMAPResult(IMAPResult::ResultBad, "ACL: Read permission denied.");
 
-      boost::shared_ptr<Messages> pMessages = pTheFolder->GetMessages();
+      shared_ptr<Messages> pMessages = pTheFolder->GetMessages();
       
       String sResponse = "";
 

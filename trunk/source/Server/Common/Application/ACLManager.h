@@ -16,12 +16,12 @@ namespace HM
       ACLManager(void);
       ~ACLManager(void);
       
-      boost::shared_ptr<ACLPermission> GetPermissionForFolder(__int64 iAccountID, boost::shared_ptr<IMAPFolder> pFolder);
+      shared_ptr<ACLPermission> GetPermissionForFolder(__int64 iAccountID, shared_ptr<IMAPFolder> pFolder);
 
-      bool SetACL(boost::shared_ptr<IMAPFolder> pFolder, const String& sIdentifier, const String &sPermissions);
+      bool SetACL(shared_ptr<IMAPFolder> pFolder, const String& sIdentifier, const String &sPermissions);
 
 	private:
 
-      boost::shared_ptr<ACLPermission> _GetPermissionForAccount(boost::shared_ptr<ACLPermissions> pPermissions, __int64 iAccountID);
+      shared_ptr<ACLPermission> _GetPermissionForAccount(shared_ptr<ACLPermissions> pPermissions, __int64 iAccountID);
    };
 }

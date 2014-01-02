@@ -21,7 +21,7 @@ namespace HM
 
    }
 
-   boost::shared_ptr<PropertySet> 
+   shared_ptr<PropertySet> 
    POP3Configuration::_GetSettings() const
    {
       return Configuration::Instance()->GetSettings();

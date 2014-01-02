@@ -142,6 +142,8 @@ namespace hMailServer.Administrator.Nodes
 
             IMainForm mainForm = Instances.MainForm;
             mainForm.RefreshCurrentNode(null);
+
+            mainForm.ShowItem(mainForm.GetCurrentNode());
         }
     }
 }

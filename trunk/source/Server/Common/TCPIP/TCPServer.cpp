@@ -27,7 +27,7 @@ using boost::asio::ip::tcp;
 
 namespace HM
 {
-   TCPServer::TCPServer(boost::asio::io_service& io_service, const IPAddress &ipaddress, int port, SessionType sessionType, boost::shared_ptr<SSLCertificate> certificate) :
+   TCPServer::TCPServer(boost::asio::io_service& io_service, const IPAddress &ipaddress, int port, SessionType sessionType, shared_ptr<SSLCertificate> certificate,bool UseSTARTTLS) :
       _acceptor(io_service),
       _context(io_service, boost::asio::ssl::context::sslv23),
       _ipaddress(ipaddress),
@@ -35,6 +35,7 @@ namespace HM
    {
       _sessionType = sessionType;
       _certificate = certificate;
+	  _bUseSTARTTLS = UseSTARTTLS;
    }
 
    TCPServer::~TCPServer(void)
@@ -220,8 +221,20 @@ namespace HM
       if (_acceptor.is_open())
       {
          bool useSSL = _certificate != 0;
-         
-         boost::shared_ptr<TCPConnection> pNewConnection = boost::shared_ptr<TCPConnection> (new TCPConnection(useSSL, _acceptor.get_io_service(), _context));
+         int stateSTARTTLS;
+
+		 // JDR: set to use STARTTLS, NOTE: above we check for a certificate so useSSL will be set that way, in the future it may be 
+		 // relevant to pass in something else for useSSL so the methods in TCPConnection and all protocol parsers can properly implement their 
+		 // own versions of STARTTLS.
+         if ((useSSL) && (_bUseSTARTTLS)) {
+			stateSTARTTLS=1;
+         }
+         else
+         {
+			stateSTARTTLS=0;
+         }         
+                  
+         shared_ptr<TCPConnection> pNewConnection = shared_ptr<TCPConnection> (new TCPConnection(useSSL, _acceptor.get_io_service(), _context, stateSTARTTLS));
 
          _acceptor.async_accept(pNewConnection->GetSocket(),
             boost::bind(&TCPServer::HandleAccept, this, pNewConnection,
@@ -232,12 +245,16 @@ namespace HM
    void
    TCPServer::StopAccept()
    {
+      // eat any errors thrown by cancel:
+      boost::system::error_code error;
+      _acceptor.cancel(error);
+
       _acceptor.close();
    }
 
 
    void 
-   TCPServer::HandleAccept(boost::shared_ptr<TCPConnection> pConnection,
+   TCPServer::HandleAccept(shared_ptr<TCPConnection> pConnection,
       const boost::system::error_code& error)
    {
       if (error.value() == 995)
@@ -267,7 +284,7 @@ namespace HM
          String sMessage = Formatter::Format("TCP - {0} connected to {1}:{2}.", remoteAddress.ToString(), localAddress.ToString(), _port);
          LOG_TCPIP(sMessage);
 
-         boost::shared_ptr<SecurityRange> securityRange = PersistentSecurityRange::ReadMatchingIP(remoteAddress);
+         shared_ptr<SecurityRange> securityRange = PersistentSecurityRange::ReadMatchingIP(remoteAddress);
 
          if (!securityRange)
          {
@@ -275,7 +292,7 @@ namespace HM
             return;
          }
 
-         boost::shared_ptr<ProtocolParser> pProtocolParser = 
+         shared_ptr<ProtocolParser> pProtocolParser = 
             SessionManager::Instance()->CreateConnection(_sessionType, securityRange);
 
          if (!pProtocolParser)
@@ -327,12 +344,12 @@ namespace HM
       if (!Configuration::Instance()->GetUseScriptServer())
          return true;
 
-      boost::shared_ptr<ClientInfo> pCliInfo = boost::shared_ptr<ClientInfo>(new ClientInfo);
+      shared_ptr<ClientInfo> pCliInfo = shared_ptr<ClientInfo>(new ClientInfo);
       pCliInfo->SetIPAddress(remoteAddress.ToString());
       pCliInfo->SetPort(port);
 
-      boost::shared_ptr<ScriptObjectContainer> pContainer = boost::shared_ptr<ScriptObjectContainer>(new ScriptObjectContainer);
-      boost::shared_ptr<Result> pResult = boost::shared_ptr<Result>(new Result);
+      shared_ptr<ScriptObjectContainer> pContainer = shared_ptr<ScriptObjectContainer>(new ScriptObjectContainer);
+      shared_ptr<Result> pResult = shared_ptr<Result>(new Result);
 
       pContainer->AddObject("Result", pResult, ScriptObject::OTResult);
       pContainer->AddObject("HMAILSERVER_CLIENT", pCliInfo, ScriptObject::OTClient);

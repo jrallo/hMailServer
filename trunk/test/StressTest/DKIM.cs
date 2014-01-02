@@ -6,8 +6,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using NUnit.Framework;
-using UnitTest;
+using RegressionTests;
 using System.IO;
+using RegressionTests.Shared;
+
 
 namespace StressTest
 {
@@ -17,26 +19,7 @@ namespace StressTest
         [SetUp]
         public new void SetUp()
         {
-            SingletonProvider<Utilities>.Instance.AddAccount(_domain, "test@test.com", "test");
-        }
-
-        /// <summary>
-        /// Test a specific DKIm mesage.
-        /// </summary>
-        [Test]
-        public void TestDKIMSpecificMessage()
-        {
-           hMailServer.AntiSpam antiSpam = _application.Settings.AntiSpam;
-
-           string folderGood = Path.GetFullPath("../../../TestData/DKIM/Good");
-           string path = Path.Combine(Environment.CurrentDirectory, folderGood);
-
-           string file = Path.Combine(path, "a.txt");
-
-           DeleteCurrentLog();
-           hMailServer.eDKIMResult result = antiSpam.DKIMVerify(file);
-           Assert.AreEqual(hMailServer.eDKIMResult.eDKPass, result, file);
-           Assert.IsTrue(VerifyLoadSuccess());
+            SingletonProvider<TestSetup>.Instance.AddAccount(_domain, "test@test.com", "test");
         }
 
         private void DeleteCurrentLog()

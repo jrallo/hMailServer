@@ -45,7 +45,7 @@ END_COM_MAP()
 
 public:
    
-   void Attach(boost::shared_ptr<HM::RuleActions> pActions);
+   void Attach(shared_ptr<HM::RuleActions> pActions);
 
    STDMETHOD(get_ItemByDBID)(/*[in]*/ long DBID, /*[out, retval]*/ IInterfaceRuleAction** pVal);
    STDMETHOD(get_Item)(/*[in]*/ long Index, /*[out, retval]*/ IInterfaceRuleAction **pVal);
@@ -57,7 +57,7 @@ public:
 
 private:
 
-   boost::shared_ptr<HM::RuleActions> m_pRuleActions;
+   shared_ptr<HM::RuleActions> m_pRuleActions;
 
 };
 

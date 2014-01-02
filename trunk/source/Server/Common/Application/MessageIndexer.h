@@ -24,7 +24,7 @@ namespace HM
 
    private:
    
-      static boost::shared_ptr<MessageIndexer> _GetRunningIndexer();
+      static shared_ptr<MessageIndexer> _GetRunningIndexer();
 
       void _IndexMessages();
 

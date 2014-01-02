@@ -14,7 +14,7 @@ namespace VMwareIntegration.Common
 {
    public class TestRunner
    {
-       private const string NUnitPath = @"%PROGRAM_FILES%\NUnit 2.5.2\bin\net-2.0";
+       private const string NUnitPath = @"..\..\..\..\..\..\libraries\nunit-2.5.3";
       
       private TestEnvironment _environment;
       private bool _stopOnError;
@@ -72,6 +72,9 @@ namespace VMwareIntegration.Common
          VMware vm = new VMware();
 
          bool success = true;
+
+         if (!File.Exists(ExpandVariables(NUnitPath) + "\\nunit-console.exe"))
+             throw new Exception("Incorrect path to NUnit.");
 
          try
          {

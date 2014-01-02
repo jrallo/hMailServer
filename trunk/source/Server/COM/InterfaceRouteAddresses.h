@@ -47,11 +47,11 @@ END_COM_MAP()
    STDMETHOD(DeleteByAddress)(/*[in]*/ BSTR sAddress);
    STDMETHOD(Add)(/*[out, retval]*/ IInterfaceRouteAddress **pVal);
 
-   void Attach(boost::shared_ptr<HM::RouteAddresses> pRouteAddresses);
+   void Attach(shared_ptr<HM::RouteAddresses> pRouteAddresses);
 
 public:
 
-   boost::shared_ptr<HM::RouteAddresses> m_pRouteAddresses;
+   shared_ptr<HM::RouteAddresses> m_pRouteAddresses;
 
 };
 

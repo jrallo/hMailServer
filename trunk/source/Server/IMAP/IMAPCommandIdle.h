@@ -10,17 +10,17 @@ namespace HM
    class IMAPCommandIdle : public IMAPCommand
    {
    public:
-	   IMAPCommandIdle(boost::shared_ptr<IMAPConnection> pConnection);
+	   IMAPCommandIdle(shared_ptr<IMAPConnection> pConnection);
 	   virtual ~IMAPCommandIdle();
 
-      IMAPResult ExecuteCommand(boost::shared_ptr<IMAPConnection> pConnection, boost::shared_ptr<IMAPCommandArgument> pArgument);
+      IMAPResult ExecuteCommand(shared_ptr<IMAPConnection> pConnection, shared_ptr<IMAPCommandArgument> pArgument);
       void Finish(bool sendNotificationToClient);
 
    private:
 
       String m_sTag;
 
-      boost::weak_ptr<IMAPConnection> _connection;
+      weak_ptr<IMAPConnection> _connection;
    };
 
 }

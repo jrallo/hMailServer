@@ -24,7 +24,7 @@ namespace HM
    }
 
    IMAPResult
-   IMAPCommandStore::ExecuteCommand(boost::shared_ptr<IMAPConnection> pConnection, boost::shared_ptr<IMAPCommandArgument> pArgument)
+   IMAPCommandStore::ExecuteCommand(shared_ptr<IMAPConnection> pConnection, shared_ptr<IMAPCommandArgument> pArgument)
    {
 
 
@@ -38,7 +38,7 @@ namespace HM
          return IMAPResult(IMAPResult::ResultNo, "No folder selected.");
 
 
-      boost::shared_ptr<IMAPStore> pStore = boost::shared_ptr<IMAPStore>(new IMAPStore());
+      shared_ptr<IMAPStore> pStore = shared_ptr<IMAPStore>(new IMAPStore());
       pStore->SetIsUID(false);
 
       String sResponse; 

@@ -32,11 +32,11 @@ namespace HM
 
    private:
 
-      void _OnPropertyChanged(boost::shared_ptr<Property> pProperty);
+      void _OnPropertyChanged(shared_ptr<Property> pProperty);
 
-      boost::shared_ptr<Property> _GetProperty(const String &sPropertyName);
+      shared_ptr<Property> _GetProperty(const String &sPropertyName);
 
       bool _IsCryptedProperty(const String &sPropertyName);
-      std::map<String, boost::shared_ptr<Property> > m_mapItems;
+      std::map<String, shared_ptr<Property> > m_mapItems;
    };
 }

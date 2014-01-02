@@ -30,8 +30,8 @@ namespace HM
       // Session types
       bool RegisterSessionType(SessionType st);
 
-      boost::shared_ptr<TCPConnection> CreateConnection(boost::asio::ssl::context& context);
-      boost::shared_ptr<TCPConnection> CreateConnection();
+      shared_ptr<TCPConnection> CreateConnection(boost::asio::ssl::context& context);
+      shared_ptr<TCPConnection> CreateConnection();
 
       boost::asio::io_service &GetIOService();
 
@@ -44,6 +44,7 @@ namespace HM
       std::set<SessionType> m_setSessionTypes;
       boost::asio::io_service _io_service;
       boost::asio::ssl::context _dummy_context;
+	  bool m_bUseSTARTTLS;
       
    };
 

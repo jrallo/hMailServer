@@ -43,7 +43,7 @@ END_COM_MAP()
 
 public:
 
-   void Attach(boost::shared_ptr<HM::Backup> pBackup);
+   void Attach(shared_ptr<HM::Backup> pBackup);
    
    STDMETHOD(StartRestore)(void);
 
@@ -61,7 +61,7 @@ public:
 
 private:
 
-   boost::shared_ptr<HM::Backup> m_pBackup;
+   shared_ptr<HM::Backup> m_pBackup;
 
 };
 

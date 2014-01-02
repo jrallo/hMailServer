@@ -12,6 +12,7 @@
 #include "../TCPIP/LocalIPAddresses.h"
 #include "../TCPIP/IPAddress.h"
 #include "../TCPIP/TCPServer.h"
+#include "../TCPIP/DNSResolver.h"
 
 #ifdef _DEBUG
 #define DEBUG_NEW new(_NORMAL_BLOCK, __FILE__, __LINE__)
@@ -94,14 +95,14 @@ namespace HM
 
    }
 
-   boost::shared_ptr<MimeHeader>
+   shared_ptr<MimeHeader>
    Utilities::GetMimeHeader(const BYTE *pByteBuf, int iBufSize)
    {
       // First locate end of header in the buffer.
       const char *pBuffer = (const char*) pByteBuf;
       const char *pBufferEndPos = StringParser::Search(pBuffer, iBufSize, "\r\n\r\n");
 
-      boost::shared_ptr<MimeHeader> pMimeHeader = boost::shared_ptr<MimeHeader>(new MimeHeader);
+      shared_ptr<MimeHeader> pMimeHeader = shared_ptr<MimeHeader>(new MimeHeader);
 
       if (!pBufferEndPos)
       {
@@ -154,6 +155,25 @@ namespace HM
    Utilities::GenerateReceivedHeader(const String &sRemoteIP, String sHostName)
    {
       String sComputerName = Utilities::ComputerName(); 
+      vector<String> results;
+      // do a PTR lookup, solves an issue with some spam filerting programs such as SA
+      // not having a PTR in the Received header.
+      String ptrRecord;
+      DNSResolver resolver;
+      if (!resolver.GetPTRRecords(sRemoteIP, results))
+      {
+         LOG_DEBUG("Could not get PTR record for IP (false)! " + sRemoteIP);
+         ptrRecord = "Unknown";
+      }
+      else
+      {
+         if (results.size() == 0)
+         {
+            LOG_DEBUG("Could not get PTR record for IP (empty)! " + sRemoteIP);
+            ptrRecord = "Unknown";
+         }
+         else ptrRecord = results[0];
+      }
 
       if (sHostName.IsEmpty())
          sHostName = sRemoteIP;
@@ -183,11 +203,13 @@ namespace HM
       //              by <thiscomputername> 
       //              ; timestamp
 
+      // JDR: insert the PTR result here. If none was found Unknown is used.
       String sResult;
-      sResult.Format(_T("from %s ([%s])\r\n")
+      sResult.Format(_T("from %s (%s [%s])\r\n")
                      _T("\tby %s\r\n")
                      _T("\t; %s"), 
                         sHostName,
+                        ptrRecord,
                         sRemoteIP,
                         sComputerName, 
                         Time::GetCurrentMimeDate());

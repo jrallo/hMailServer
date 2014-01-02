@@ -49,10 +49,7 @@ STDMETHODIMP InterfaceRoutes::get_Item(long Index, IInterfaceRoute **pVal)
       CComObject<InterfaceRoute>* pInterfaceRoute = new CComObject<InterfaceRoute>();
       pInterfaceRoute->SetAuthentication(m_pAuthentication);
    
-      boost::shared_ptr<HM::Route> pRoute = m_pRoutes->GetItem(Index);
-   
-      if (!pRoute)
-         return S_FALSE;
+      shared_ptr<HM::Route> pRoute = m_pRoutes->GetItem(Index);
    
       if (pRoute)
       {
@@ -105,7 +102,7 @@ STDMETHODIMP InterfaceRoutes::Add(IInterfaceRoute **pVal)
       CComObject<InterfaceRoute>* pRouteInterface = new CComObject<InterfaceRoute>();
       pRouteInterface->SetAuthentication(m_pAuthentication);
    
-      boost::shared_ptr<HM::Route> pRoute = boost::shared_ptr<HM::Route>(new HM::Route);
+      shared_ptr<HM::Route> pRoute = shared_ptr<HM::Route>(new HM::Route);
    
       pRouteInterface->AttachItem(pRoute);
       pRouteInterface->AttachParent(m_pRoutes, false);
@@ -128,14 +125,13 @@ InterfaceRoutes::get_ItemByName(BSTR ItemName, IInterfaceRoute **pVal)
    {
       if (!m_pRoutes)
          return GetAccessDenied();
-
    
       CComObject<InterfaceRoute>* pRouteInterface = new CComObject<InterfaceRoute>();
       pRouteInterface->SetAuthentication(m_pAuthentication);
    
-      boost::shared_ptr<HM::Route> pRoute = m_pRoutes->GetItemByName(ItemName);
+      shared_ptr<HM::Route> pRoute = m_pRoutes->GetItemByName(ItemName);
       if (!pRoute)
-         return S_FALSE;
+         return DISP_E_BADINDEX;
    
       pRouteInterface->AttachItem(pRoute);
       pRouteInterface->AttachParent(m_pRoutes, true);
@@ -162,9 +158,9 @@ InterfaceRoutes::get_ItemByDBID(long lDBID, IInterfaceRoute **pVal)
       CComObject<InterfaceRoute>* pRouteInterface = new CComObject<InterfaceRoute>();
       pRouteInterface->SetAuthentication(m_pAuthentication);
    
-      boost::shared_ptr<HM::Route> pRoute = m_pRoutes->GetItemByDBID(lDBID);
+      shared_ptr<HM::Route> pRoute = m_pRoutes->GetItemByDBID(lDBID);
       if (!pRoute)
-         return S_FALSE;
+         return DISP_E_BADINDEX;
    
       pRouteInterface->AttachItem(pRoute);
       pRouteInterface->AttachParent(m_pRoutes, true);

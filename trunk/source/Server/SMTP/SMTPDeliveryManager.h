@@ -25,14 +25,14 @@ namespace HM
 
       void UncachePendingMessages();
 
-      void OnPropertyChanged(boost::shared_ptr<Property> pProperty);
+      void OnPropertyChanged(shared_ptr<Property> pProperty);
 
    private:
       
       void _SendStatistics(bool bIgnoreMessageCount = false);
 
       void _LoadPendingMessageList();
-      boost::shared_ptr<Message> _GetNextMessage();
+      shared_ptr<Message> _GetNextMessage();
 
       void _StartTimer();
 
@@ -42,7 +42,7 @@ namespace HM
 
       long m_lCurNumberOfSent;
 
-      boost::shared_ptr<DALRecordset> m_pPendingMessages;
+      shared_ptr<DALRecordset> m_pPendingMessages;
 
       Event m_hStopRequest;
       

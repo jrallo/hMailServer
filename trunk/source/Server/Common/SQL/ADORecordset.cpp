@@ -26,11 +26,11 @@ namespace HM
    }
 
    DALConnection::ExecutionResult
-   ADORecordset::TryOpen(boost::shared_ptr<DALConnection> pDALConn, const SQLCommand &command, String &sErrorMessage)
+   ADORecordset::TryOpen(shared_ptr<DALConnection> pDALConn, const SQLCommand &command, String &sErrorMessage)
    {  
       m_iCurRow = 0;
 
-      boost::shared_ptr<ADOConnection> pConn = static_pointer_cast<ADOConnection>(pDALConn);
+      shared_ptr<ADOConnection> pConn = static_pointer_cast<ADOConnection>(pDALConn);
       _ConnectionPtr pADOConnection = pConn->GetConnection();
 
       // Do we have a connection towards the database?

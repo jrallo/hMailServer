@@ -32,41 +32,19 @@ namespace HM
    
 
    bool 
-   SURBL::Run(boost::shared_ptr<SURBLServer> pSURBLServer, boost::shared_ptr<MessageData> pMessageData)
+   SURBL::Run(shared_ptr<SURBLServer> pSURBLServer, shared_ptr<MessageData> pMessageData)
    {
-      Stopwatch stopWatch(true);
-      LOG_DEBUG("SURBL::Run");
+      LOG_DEBUG("SURBL: Execute");
 
       // Extract body
       String sBody = pMessageData->GetBody() + pMessageData->GetHTMLBody(); 
 
       int iCurPos = -1;
+	  
+      set<String> addresses;
 
-      // We stop processing URL's if:
-      // - 15 or more URLss have been processed.
-      // - More than 10 seconds have passed.
-      //
-	  // NEED FOR FIX NOTE: URL's are reduced down & we end up with many duplicates so the list should
-	  // be consolidated before checking or wasteful & likely miss later unique URL's after 15 limit
-	  // ACTUAL EXAMPLE:
-	  // "DEBUG"	3288	"2011-10-21 07:15:21.281"	"SURBL:: Found URL: www.e-rewards.com"
-	  // "DEBUG"	3288	"2011-10-21 07:15:21.281"	"SURBL:: Lookup: e-rewards.com.multi.surbl.org"
-	  // "DEBUG"	3288	"2011-10-21 07:15:21.296"	"SURBL:: Found URL: www.e-rewards.com"
-	  // "DEBUG"	3288	"2011-10-21 07:15:21.296"	"SURBL:: Lookup: e-rewards.com.multi.surbl.org"
-      // There were 15 of those for the same lookup and URL's later in email were skipped & never checked.
-
-	  // NEED FOR IMPROVEMENT: max URL's & time should be user-adjustable even if just by INI
-
-	  const int maxURLsToProcess = 15;
-
-      for (int i = 0; i < maxURLsToProcess; i++)
+      while (true)
       {
-         if (stopWatch.GetElapsedSeconds() > 10)
-         {
-            LOG_DEBUG("Aborting SURBL processing. Too long time elapsed.");
-            return true;
-         }
-
          iCurPos = _GetURLStart(sBody, iCurPos);
 
          if (iCurPos < 0 )
@@ -78,11 +56,6 @@ namespace HM
 
          String sURL = sBody.Mid(iCurPos, iURLLength);
 
-         String logMessage;
-         logMessage.Format(_T("SURBL:: Found URL: %s"), sURL);
-         LOG_DEBUG(logMessage);
-
-
          // Clean the URL from linefeeds
          _CleanURL(sURL);
 
@@ -90,28 +63,69 @@ namespace HM
          if (!_CleanHost(sURL))
             continue;
 
+			if (addresses.find(sURL) == addresses.end())
+			{
+				String logMessage;
+				logMessage.Format(_T("SURBL: Found URL: %s"), sURL);
+				LOG_DEBUG(logMessage);
+
+				addresses.insert(sURL);
+			}
+      }
+
+		if (addresses.size() > 0)
+		{
+			String logMessage = Formatter::Format("SURBL: {0} unique addresses found.", addresses.size());
+			LOG_DEBUG(logMessage);
+		}
+
+      // We stop processing URL's if:
+      // - 15 or more URLss have been processed.
+      // - More than 10 seconds have passed.
+      //
+     	// NEED FOR IMPROVEMENT: max URL's & time should be user-adjustable even if just by INI
+
+	   const int maxURLsToProcess = 15;
+
+      Stopwatch stopWatch(true);
+
+      int processedAddresses = 0;
+      boost_foreach (String sURL, addresses)
+      {
+         if (stopWatch.GetElapsedSeconds() > 10)
+         {
+				LOG_DEBUG("SURBL: Aborting. Too long time elapsed.");
+            return true;
+         }
+
+         if (processedAddresses > maxURLsToProcess)
+         {
+				LOG_DEBUG("SURBL: Aborting. Too many urls.");
+            return true;
+         }
+
          String sHostToLookup = sURL + "." + pSURBLServer->GetDNSHost();
 
-         logMessage.Format(_T("SURBL:: Lookup: %s"), sHostToLookup);
-         LOG_DEBUG(logMessage);
+         LOG_DEBUG(Formatter::Format(_T("SURBL: Lookup: {0}"), sHostToLookup));
 
          std::vector<String> saFoundNames;
          DNSResolver resolver;
          if (!resolver.GetARecords(sHostToLookup, saFoundNames))
          {
-            LOG_DEBUG("SURBL::~Run");
+				LOG_DEBUG("SURBL: Match found");
             return true;
          }
 
          if (saFoundNames.size() > 0)
          {
-            // Found
-            LOG_DEBUG("SURBL::~Run");
+				LOG_DEBUG("SURBL: Match found");
             return false;
          }
+
+         processedAddresses++;
       }
 
-      LOG_DEBUG("SURBL::~Run");
+		LOG_DEBUG("SURBL: Match not found");
       return true;
 
    }
@@ -122,18 +136,25 @@ namespace HM
       for (int i = iURLStart; i < sBody.GetLength(); i++)
       {
          // Space added as fix to no test on plain-text emails without end slash
-         // cr and lf added as well for same reason
+         // Bill: cr and lf added as well for same reason
+         // Martin: Removed newline characters again. A URL may span multiple lines
+         //         If we stop searching for end of URL at end of newline, we'll
+         //         miss certain tests. Please see test case TestSURBLWithWrappedURL.
          // Might be best to look for 1st non-allowed domain char instead..
-         wchar_t c = sBody.GetAt(i);
-         if (c == '<' || 
-             c == '/' || 
-             c == '\\' || 
-             c == '>' ||
-             c == ' ' ||
-             c == '\r' ||
-             c == '\n' ||
-             c == '"')
-             return i;
+         wchar_t c = sBody[i];
+         if (c == '<' || c == '/' ||  c == '\\' ||  c == '>' ||c == ' ' || c == '"' || c == '\'')
+            return i;
+
+         if (c == '\r')
+         {
+            // if previous char was a =, which indicates that the url
+            // continues on the next line, keep on looking for end of link
+            if (i > 0)
+            {
+               if (sBody[i-1] != '=')
+                  return i;
+            }
+         }
       }
 
       return -1;
@@ -142,29 +163,29 @@ namespace HM
    int 
    SURBL::_GetURLStart(const String &sBody, int iCurrentPos)
    {
-      int iHTTPStart = sBody.Find(_T("http://"), iCurrentPos+1);
-      int iHTTPSStart = sBody.Find(_T("https://"), iCurrentPos+1);
+      int iHttpStart = sBody.Find(_T("http://"), iCurrentPos+1);
+      int iHttpsStart = sBody.Find(_T("https://"), iCurrentPos+1);
 
-      if (iHTTPStart == -1)
-      {
-         if (iHTTPSStart == -1)
-            return -1;
+		const int HttpPrefixLength = 7;
+		const int HttpsPrefixLength = 8;
 
-         return iHTTPSStart + 8;
-      }
+		// If neither http nor https is found, return
+		if (iHttpStart == -1 && iHttpsStart == -1)
+			return -1;
 
-      if (iHTTPSStart == -1)
-      {
-         if (iHTTPStart == -1 )
-            return -1;
+		// If only https is found, return thatt
+      if (iHttpStart == -1)
+         return iHttpsStart + HttpsPrefixLength;
 
-         return iHTTPStart + 7;
-      }
+		// If only http is found, return that
+      if (iHttpsStart == -1)
+         return iHttpStart + HttpPrefixLength;
 
-      if (iHTTPStart < iHTTPSStart)
-         return iHTTPStart + 7;
+		// If both are found, return closest.
+      if (iHttpStart < iHttpsStart)
+         return iHttpStart + HttpPrefixLength;
       else
-         return iHTTPStart + 8;
+         return iHttpsStart + HttpsPrefixLength;
    }
 
    void
@@ -174,6 +195,7 @@ namespace HM
       // We need to replace them individually as well just in case..
       url.Replace(_T("=\r"), _T(""));
       url.Replace(_T("=\n"), _T(""));
+      url.MakeLower();
    }
 
    bool

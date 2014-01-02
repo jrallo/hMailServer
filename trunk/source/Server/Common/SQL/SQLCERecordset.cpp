@@ -27,13 +27,13 @@ namespace HM
    }
 
    DALConnection::ExecutionResult
-   SQLCERecordset::TryOpen(boost::shared_ptr<DALConnection> pDALConn, const SQLCommand &command, String &sErrorMessage)
+   SQLCERecordset::TryOpen(shared_ptr<DALConnection> pDALConn, const SQLCommand &command, String &sErrorMessage)
    {  
       m_iCurRow = 0;
 
       String sSQL = command.GetQueryString();
 
-      boost::shared_ptr<SQLCEConnection> pConn = static_pointer_cast<SQLCEConnection>(pDALConn);
+      shared_ptr<SQLCEConnection> pConn = static_pointer_cast<SQLCEConnection>(pDALConn);
 
       _ConnectionPtr pADOConnection = pConn->GetConnection();
 

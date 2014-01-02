@@ -15,11 +15,14 @@ namespace hMailServer.Shared
    {
       private string internalText;
       private bool _numeric;
+	  private bool bolAllowDec;    //sets the box can accept decimal numbers, when _numeric is set
+	  private bool bolAllowNeg;    //sets the box can accept negative numbers, when _numeric is set
       public ucText()
       {
          internalText = "";
          _numeric = false;
-
+		 bolAllowNeg = false;
+		 bolAllowDec = false;
       }
 
       public new string Text
@@ -78,6 +81,40 @@ namespace hMailServer.Shared
          }
       }
 
+	   /// <summary>
+	   /// Gets and returns the number as a float.
+	   /// </summary>
+	  public float NumberFloat
+	  {
+		  get
+		  {
+			  // is it a numeric and do we have bolAllowDec?
+			  if (_numeric == false || bolAllowDec == false)
+				  return 0f;
+
+			  // is the box blank?
+			  if (Text == "")
+				  return 0;
+
+			  // correct way, parse it and if it fails will return an exception.
+			  return float.Parse(Text);
+		  }
+
+		  set
+		  {
+			  // make sure this is a numeric box
+			  if (_numeric == false || bolAllowDec == false)
+				  return;
+
+			  // set the text
+			  Text = value.ToString();
+		  }
+
+	  }
+
+	   /// <summary>
+	   /// Sets the text box is dirty.
+	   /// </summary>
       public bool Dirty
       {
          get
@@ -95,6 +132,9 @@ namespace hMailServer.Shared
          internalText = base.Text;
       }
 
+	   /// <summary>
+	   /// Gets and sets the text box is a numeric type
+	   /// </summary>
       public bool Numeric
       {
          get
@@ -107,14 +147,71 @@ namespace hMailServer.Shared
          }
       }
 
+	   /// <summary>
+	   /// Public property to set the text box as a negative accepting box.
+	   /// </summary>
+	  public bool Negative
+	  {
+		  get { return bolAllowNeg; }
+		  set { bolAllowNeg = value; }
+	  }
+
+	   /// <summary>
+	   /// Public property to set the text box as a decimal accepting box.
+	   /// </summary>
+	  public bool Decimal
+	  {
+		  get { return bolAllowDec; }
+		  set { bolAllowDec = value; }
+	  }
+
+	   /// <summary>
+	   /// Fires when a key is pressed for the text box.
+	   /// </summary>
+	   /// <param name="e"></param>
       protected override void OnKeyPress(KeyPressEventArgs e)
       {
          if (_numeric)
          {
-            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
-            {
-               e.Handled = true;
-            }
+			 // single decimal point allowed
+			 if ((e.KeyChar == '.') && (bolAllowDec == true))
+			 {
+				 if (base.Text.Contains("."))
+				 {
+					 e.Handled = true;
+				 }
+				 return;
+			 }
+
+			 // single negative sign allowed
+			 if (e.KeyChar == '-' && bolAllowNeg == true)
+			 {
+				 if (base.Text.Contains("-"))
+				 {
+					 e.Handled = true;
+				 }
+
+				 // make sure the negative sign is the first digit
+				 if (base.SelectionStart != 0)
+				 {
+					 e.Handled = true;
+				 }
+				 return;
+			 }
+
+			 
+
+			 // digits and backspace only
+			 if (!Char.IsDigit(e.KeyChar) && e.KeyChar != 0x08)
+			 {
+				 e.Handled = true;
+			 }
+
+			 // make sure there is not a number in front of the negative
+			 if ((bolAllowNeg == true)  && (base.Text.Contains("-")) && (base.SelectionStart < 1))
+			 {
+				 e.Handled = true;
+			 }
          }
 
          base.OnKeyPress(e);

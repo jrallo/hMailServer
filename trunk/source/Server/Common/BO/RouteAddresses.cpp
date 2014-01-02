@@ -34,11 +34,11 @@ namespace HM
    void
    RouteAddresses::DeleteByAddress(const String &sAddress)
    {
-      std::vector<boost::shared_ptr<RouteAddress> >::iterator iterRoute = vecObjects.begin();
+      std::vector<shared_ptr<RouteAddress> >::iterator iterRoute = vecObjects.begin();
 
       while (iterRoute != vecObjects.end())
       {  
-         boost::shared_ptr<RouteAddress> pRoute = (*iterRoute);
+         shared_ptr<RouteAddress> pRoute = (*iterRoute);
 
          if (pRoute->GetAddress().CompareNoCase(sAddress) == 0)
          {
@@ -52,7 +52,7 @@ namespace HM
    }
 
    bool
-   RouteAddresses::PreSaveObject(boost::shared_ptr<RouteAddress> routeAddress, XNode *node)
+   RouteAddresses::PreSaveObject(shared_ptr<RouteAddress> routeAddress, XNode *node)
    {
       routeAddress->SetRouteID(m_iRouteID);
 

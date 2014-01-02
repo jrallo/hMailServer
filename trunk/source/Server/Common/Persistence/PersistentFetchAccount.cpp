@@ -52,11 +52,24 @@ namespace HM
       bool bRetVal = Application::Instance()->GetDBManager()->Execute(command);
    }
 
+	bool
+	PersistentFetchAccount::IsLocked(__int64 ID)
+	{
+		SQLCommand command("select falocked from hm_fetchaccounts where faid = @FAID");
+		command.AddParameter("@FAID", ID);
+
+		shared_ptr<DALRecordset> pRS = Application::Instance()->GetDBManager()->OpenRecordset(command);
+		if (!pRS || pRS->IsEOF())
+			return false;
+
+		return pRS->GetLongValue("falocked") == 1;
+	}
+
 
    bool
-   PersistentFetchAccount::ReadObject(boost::shared_ptr<FetchAccount> oFA, const SQLCommand& command)
+   PersistentFetchAccount::ReadObject(shared_ptr<FetchAccount> oFA, const SQLCommand& command)
    {
-      boost::shared_ptr<DALRecordset> pRS = Application::Instance()->GetDBManager()->OpenRecordset(command);
+      shared_ptr<DALRecordset> pRS = Application::Instance()->GetDBManager()->OpenRecordset(command);
       if (!pRS)
          return false;
 
@@ -70,7 +83,7 @@ namespace HM
    }
 
    bool
-   PersistentFetchAccount::ReadObject(boost::shared_ptr<FetchAccount> oFA, boost::shared_ptr<DALRecordset> pRS)
+   PersistentFetchAccount::ReadObject(shared_ptr<FetchAccount> oFA, shared_ptr<DALRecordset> pRS)
    {
 
       if (pRS->IsEOF())
@@ -100,7 +113,7 @@ namespace HM
    }
 
    bool
-   PersistentFetchAccount::DeleteObject(boost::shared_ptr<FetchAccount> pFA)
+   PersistentFetchAccount::DeleteObject(shared_ptr<FetchAccount> pFA)
    {
       SQLCommand command("delete from hm_fetchaccounts where faid = @FAID");
       command.AddParameter("@FAID", pFA->GetID());
@@ -121,20 +134,20 @@ namespace HM
    void
    PersistentFetchAccount::DeleteByAccountID(__int64 iAccountID)
    {
-      boost::shared_ptr<FetchAccounts> pFetchAccounts = boost::shared_ptr<FetchAccounts>(new FetchAccounts(iAccountID));
+      shared_ptr<FetchAccounts> pFetchAccounts = shared_ptr<FetchAccounts>(new FetchAccounts(iAccountID));
       pFetchAccounts->Refresh();
       pFetchAccounts->DeleteAll();
    }
 
    bool 
-   PersistentFetchAccount::SaveObject(boost::shared_ptr<FetchAccount> pFA, String &errorMessage)
+   PersistentFetchAccount::SaveObject(shared_ptr<FetchAccount> pFA, String &errorMessage)
    {
       // errorMessage - Not supported yet.
       return SaveObject(pFA);
    }
 
    bool 
-   PersistentFetchAccount::SaveObject(boost::shared_ptr<FetchAccount> pFA)
+   PersistentFetchAccount::SaveObject(shared_ptr<FetchAccount> pFA)
    {
       SQLStatement oStatement;
       oStatement.SetTable("hm_fetchaccounts");
@@ -194,7 +207,7 @@ namespace HM
    }
       
    void
-   PersistentFetchAccount::SetNextTryTime(boost::shared_ptr<FetchAccount> pFA)
+   PersistentFetchAccount::SetNextTryTime(shared_ptr<FetchAccount> pFA)
    {
       SQLCommand command;
 

@@ -13,16 +13,20 @@ namespace HM
    class ServerTargetResolver
    {
    public:
-      ServerTargetResolver(boost::shared_ptr<Message> message, const RuleResult &globalRuleResult);
+      ServerTargetResolver(shared_ptr<Message> message, const RuleResult &globalRuleResult);
       ~ServerTargetResolver(void);
       
-      map<boost::shared_ptr<ServerInfo>, std::vector<boost::shared_ptr<MessageRecipient> > > Resolve();
+      map<shared_ptr<ServerInfo>, std::vector<shared_ptr<MessageRecipient> > > Resolve();
+
+      
 
    private:
 
-      static boost::shared_ptr<ServerInfo> _GetFixedSMTPHostForDomain(const String &sDomain);
+      map<shared_ptr<ServerInfo>, std::vector<shared_ptr<MessageRecipient> > > CreateDistinctMap(map<shared_ptr<ServerInfo>, std::vector<shared_ptr<MessageRecipient> > > serverInfos);
 
-      boost::shared_ptr<Message> _message;
+      static shared_ptr<ServerInfo> _GetFixedSMTPHostForDomain(const String &sDomain);
+
+      shared_ptr<Message> _message;
       const RuleResult &_globalRuleResult;
    };
 }

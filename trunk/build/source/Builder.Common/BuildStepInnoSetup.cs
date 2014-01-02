@@ -53,7 +53,7 @@ namespace Builder.Common
             m_oBuilder.Log(output + "\r\n", true);
 
             if (output.IndexOf("0 succeeded") >= 0)
-                throw new Exception("Failed");
+                throw new Exception("Innosetup compilation failed");
         }
 
     }

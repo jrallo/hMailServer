@@ -43,14 +43,10 @@ namespace HM
       AnsiString sEncodedValue;
       decoder.GetOutput(sEncodedValue);
 
-      // the MIME encoder will insert newlines. We don't want this
-      // here since this is a generic base64 encoder which may be
-      // used in none-mime environments (key encoding anyone?)
-      sEncodedValue.Replace("\r\n", "");
-
+      // Disabled crlf replace due to facebook dkim issue http://www.hmailserver.com/forum/viewtopic.php?f=7&t=24232
+      // Should the replace be removed for encode as well?
       return sEncodedValue;
    }
-
 
    void
    Base64Tester::Test()

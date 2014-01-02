@@ -50,11 +50,11 @@ public:
    STDMETHOD(Clear)();
    STDMETHOD(Add)(BSTR sFilename);
 
-   void Attach(boost::shared_ptr<HM::Attachments> pAttachments);
+   void Attach(shared_ptr<HM::Attachments> pAttachments);
 
 private:
 
-   boost::shared_ptr<HM::Attachments> m_pAttachments;
+   shared_ptr<HM::Attachments> m_pAttachments;
 
 };
 

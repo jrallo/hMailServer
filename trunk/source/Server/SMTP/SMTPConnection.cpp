@@ -111,6 +111,10 @@ namespace HM
    void
    SMTPConnection::OnConnected()
    {
+
+//bool bStartTLS = true; //temp hack to disable banner for starttls after handshake
+//if (!bStartTLS)
+//{
       String sWelcome = Configuration::Instance()->GetSMTPConfiguration()->GetWelcomeMessage();
 
       String sData = "220 ";
@@ -121,7 +125,7 @@ namespace HM
          sData += sWelcome;
 
       _SendData(sData);
-
+//}
       PostReceive();
    }
 
@@ -160,6 +164,8 @@ namespace HM
          return SMTP_COMMAND_NOOP;
       else if (sFirstWord == _T("ETRN"))
          return SMTP_COMMAND_ETRN;
+      else if (sFirstWord == _T("STARTTLS"))
+         return SMTP_COMMAND_STARTTLS;
 
       return SMTP_COMMAND_UNKNOWN;
    }
@@ -364,6 +370,21 @@ namespace HM
          
             return;
          }
+         else if (eCommandType == SMTP_COMMAND_STARTTLS)
+         {
+            _SendData("220 Handshake starting.");
+
+				if (StartTLS() == false){
+                    // log an error, propery
+// 					_SendData("455 STARTTLS HANDSHAKE ERROR!");
+ 				}
+ 				else
+ 				{
+// 					_SendData("220 Handshake complete");
+ 				}
+         
+            return;
+         }
          else if (eCommandType == SMTP_COMMAND_DATA)
          {
    
@@ -385,9 +406,9 @@ namespace HM
             // Let's add an event call on DATA so we can act on reception during SMTP conversation..
             if (Configuration::Instance()->GetUseScriptServer())
             {
-               boost::shared_ptr<ScriptObjectContainer> pContainer = boost::shared_ptr<ScriptObjectContainer>(new ScriptObjectContainer);
-               boost::shared_ptr<Result> pResult = boost::shared_ptr<Result>(new Result);
-               boost::shared_ptr<ClientInfo> pClientInfo = boost::shared_ptr<ClientInfo>(new ClientInfo);
+               shared_ptr<ScriptObjectContainer> pContainer = shared_ptr<ScriptObjectContainer>(new ScriptObjectContainer);
+               shared_ptr<Result> pResult = shared_ptr<Result>(new Result);
+               shared_ptr<ClientInfo> pClientInfo = shared_ptr<ClientInfo>(new ClientInfo);
 
                pClientInfo->SetUsername(m_sUsername);
                pClientInfo->SetIPAddress(GetIPAddressString());
@@ -429,7 +450,7 @@ namespace HM
 
             m_CurrentState = DATA;
 
-            m_pTransmissionBuffer = boost::shared_ptr<TransparentTransmissionBuffer>(new TransparentTransmissionBuffer(false));
+            m_pTransmissionBuffer = shared_ptr<TransparentTransmissionBuffer>(new TransparentTransmissionBuffer(false));
             m_pTransmissionBuffer->Initialize(PersistentMessage::GetFileName(m_pCurrentMessage));
             m_pTransmissionBuffer->SetMaxSizeKB(m_iMaxMessageSizeKB);
 
@@ -459,7 +480,7 @@ namespace HM
          return;
       }
 
-      boost::shared_ptr<IncomingRelays> incomingRelays = Configuration::Instance()->GetSMTPConfiguration()->GetIncomingRelays();
+      shared_ptr<IncomingRelays> incomingRelays = Configuration::Instance()->GetSMTPConfiguration()->GetIncomingRelays();
       // Check if we should do it before or after data transfer
       if (incomingRelays->IsIncomingRelay(GetIPAddress()))
          m_spType = SPPostTransmission;
@@ -545,7 +566,7 @@ namespace HM
       _InitializeSpamProtectionType(sFromAddress);
 
       // Apply domain name aliases to this domain name.
-      boost::shared_ptr<DomainAliases> pDA = ObjectCache::Instance()->GetDomainAliases();
+      shared_ptr<DomainAliases> pDA = ObjectCache::Instance()->GetDomainAliases();
       const String sAccountAddress = pDA->ApplyAliasesOnAddress(sFromAddress);
 
       // Pre-transmission spam protection.
@@ -615,7 +636,7 @@ namespace HM
          // Next time we do a mail from, we should re-authenticate the login credentials
          m_bReAuthenticateUser = true;
 
-         m_pCurrentMessage = boost::shared_ptr<Message> (new Message);
+         m_pCurrentMessage = shared_ptr<Message> (new Message);
          m_pCurrentMessage->SetFromAddress(sFromAddress);
          m_pCurrentMessage->SetState(Message::Delivering);
       }
@@ -647,7 +668,7 @@ namespace HM
          return true;
       }
          
-      boost::shared_ptr<const Account> pAccount = PasswordValidator::ValidatePassword(m_sUsername, m_sPassword);
+      shared_ptr<const Account> pAccount = PasswordValidator::ValidatePassword(m_sUsername, m_sPassword);
       
       if (pAccount)
          return true;
@@ -805,7 +826,7 @@ namespace HM
 
       if (_GetDoSpamProtection())
       {
-         boost::shared_ptr<DomainAliases> pDA = ObjectCache::Instance()->GetDomainAliases();
+         shared_ptr<DomainAliases> pDA = ObjectCache::Instance()->GetDomainAliases();
          const String sToAddress = pDA->ApplyAliasesOnAddress(sRecipientAddress);
 
          if (!SpamProtection::Instance()->PerformGreyListing(m_pCurrentMessage, m_setSpamTestResults, sToAddress, GetIPAddress()))
@@ -831,7 +852,7 @@ namespace HM
       }
 
       // OK, the recipient is acceptable.
-      boost::shared_ptr<MessageRecipients> pRecipients = m_pCurrentMessage->GetRecipients();
+      shared_ptr<MessageRecipients> pRecipients = m_pCurrentMessage->GetRecipients();
       bool recipientOK = false;
       _recipientParser.CreateMessageRecipientList(sRecipientAddress, pRecipients, recipientOK);
 
@@ -857,14 +878,14 @@ namespace HM
 
       if (spType == SPPreTransmission)
       {
-         set<boost::shared_ptr<SpamTestResult> > setResult = 
+         set<shared_ptr<SpamTestResult> > setResult = 
             SpamProtection::Instance()->RunPreTransmissionTests(sFromAddress, lIPAddress, GetIPAddress(), hostName);
 
          m_setSpamTestResults.insert(setResult.begin(), setResult.end());
       }
       else if (spType == SPPostTransmission)
       {
-         set<boost::shared_ptr<SpamTestResult> > setResult = 
+         set<shared_ptr<SpamTestResult> > setResult = 
             SpamProtection::Instance()->RunPostTransmissionTests(sFromAddress, lIPAddress, GetIPAddress(), m_pCurrentMessage);
 
          m_setSpamTestResults.insert(setResult.begin(), setResult.end());
@@ -904,9 +925,9 @@ namespace HM
    }
 
    String 
-   SMTPConnection::_GetSpamTestResultMessage(set<boost::shared_ptr<SpamTestResult> > testResults) const
+   SMTPConnection::_GetSpamTestResultMessage(set<shared_ptr<SpamTestResult> > testResults) const
    {
-      boost_foreach(boost::shared_ptr<SpamTestResult> result, testResults)
+      boost_foreach(shared_ptr<SpamTestResult> result, testResults)
       {
          if (result->GetResult() == SpamTestResult::Fail)
             return result->GetMessage();
@@ -934,21 +955,30 @@ namespace HM
    {
       if (m_bTraceHeadersWritten)
       {
-         boost::shared_ptr<ByteBuffer> pBuffer = m_pTransmissionBuffer->GetBuffer();
-         boost::shared_ptr<MimeHeader> pHeader = Utilities::GetMimeHeader(pBuffer->GetBuffer(), pBuffer->GetSize());
+         shared_ptr<ByteBuffer> pBuffer = m_pTransmissionBuffer->GetBuffer();
+         shared_ptr<MimeHeader> pHeader = Utilities::GetMimeHeader(pBuffer->GetBuffer(), pBuffer->GetSize());
 
          String sOutput;
 
          // Add received by tag.
          String sReceivedLine;
          String sReceivedIP;
+         String sAUTHIP;
          String sAuthSenderReplacementIP = IniFileSettings::Instance()->GetAuthUserReplacementIP();
+         bool bAddXAuthUserIP = IniFileSettings::Instance()->GetAddXAuthUserIP();
          
+
          // If sender is logged in and replace IP is enabled use it
          if (!m_sUsername.IsEmpty() && !sAuthSenderReplacementIP.empty())
+         {
             sReceivedIP = sAuthSenderReplacementIP;
+            sAUTHIP = GetIPAddressString();
+         }
          else
+         {
             sReceivedIP = GetIPAddressString();
+            sAUTHIP = sReceivedIP;
+         }
 
          sReceivedLine.Format(_T("Received: %s\r\n"), Utilities::GenerateReceivedHeader(sReceivedIP, m_sHeloHost));
          sOutput += sReceivedLine;
@@ -972,14 +1002,14 @@ namespace HM
 
          // Now add x- header for AUTH user if enabled since it was replaced above if so
          // Likely would be good idea for this to be optional at some point
-         if (!m_sUsername.IsEmpty() && !sAuthSenderReplacementIP.empty())
+         if (!m_sUsername.IsEmpty() && !sAuthSenderReplacementIP.empty() && bAddXAuthUserIP)
          {
             if (!pHeader->FieldExists("X-AuthUserIP"))
-               sOutput += "X-AuthUserIP: " + sReceivedIP + "\r\n";
+               sOutput += "X-AuthUserIP: " + sAUTHIP + "\r\n";
          }
          
          // We need to prepend these headers to the message buffer.
-         boost::shared_ptr<ByteBuffer> pTempBuf = boost::shared_ptr<ByteBuffer>(new ByteBuffer);
+         shared_ptr<ByteBuffer> pTempBuf = shared_ptr<ByteBuffer>(new ByteBuffer);
 
          AnsiString sOutputStr = sOutput;
          pTempBuf->Add((BYTE*) sOutputStr.GetBuffer(), sOutputStr.GetLength());
@@ -994,7 +1024,7 @@ namespace HM
    }
 
    void
-   SMTPConnection::ParseData(boost::shared_ptr<ByteBuffer> pBuf)
+   SMTPConnection::ParseData(shared_ptr<ByteBuffer> pBuf)
    //---------------------------------------------------------------------------()
    // DESCRIPTION:
    // Parses a clients SMTP command in Binary mode.
@@ -1002,8 +1032,12 @@ namespace HM
    {
       // Move the data from the incoming buffer to the transparent transmission buffer.
       // If we've received more data than the max message size, don't save it.
+
       m_pTransmissionBuffer->Append(pBuf->GetBuffer(), pBuf->GetSize());
-      
+
+      // We need current message size in KB
+      int iBufSizeKB = m_pTransmissionBuffer->GetSize() / 1024;
+
       // Clear the old buffer
       pBuf->Empty();
 
@@ -1020,14 +1054,37 @@ namespace HM
 
       if (!m_pTransmissionBuffer->GetTransmissionEnded())
       {
+
+         String sLogData;
+         int iMaxSizeDrop = IniFileSettings::Instance()->GetSMTPDMaxSizeDrop();
+         if (iMaxSizeDrop > 0 && iBufSizeKB >= iMaxSizeDrop) 
+         {
+            sLogData.Format(_T("Size: %d KB, Max size: %d KB - DROP!!"), 
+            iBufSizeKB, iMaxSizeDrop);
+            LOG_SMTP(GetSessionID(), GetIPAddressString(), sLogData);      
+            String sMessage;
+            sMessage.Format(_T("552 Message size exceeds the drop maximum message size. Size: %d KB, Max size: %d KB - DROP!"), 
+                iBufSizeKB, iMaxSizeDrop);
+            _SendData(sMessage);
+         _LogAwstatsMessageRejected();
+         _ResetCurrentMessage();
+         SetReceiveBinary(false);
+         m_bPendingDisconnect = true;
+//         PostReceive();
+         PostDisconnect();
+
+         return;
+
+      } else {
          // We need more data.
          PostBufferReceive();
          return;
       }
+   }
 
       // Since this may be a time-consuming task, do it asynchronously
-      boost::shared_ptr<AsynchronousTask<TCPConnection> > finalizationTask = 
-         boost::shared_ptr<AsynchronousTask<TCPConnection> >(new AsynchronousTask<TCPConnection>
+      shared_ptr<AsynchronousTask<TCPConnection> > finalizationTask = 
+         shared_ptr<AsynchronousTask<TCPConnection> >(new AsynchronousTask<TCPConnection>
             (boost::bind(&SMTPConnection::_HandleSMTPFinalizationTaskCompleted, shared_from_this()), GetTCPConnectionTemporaryPointer()));
       
       Application::Instance()->GetAsyncWorkQueue()->AddTask(finalizationTask);
@@ -1103,11 +1160,11 @@ namespace HM
             String sMessageArchivePath2;
 
             // Now create hardlink/copy for each *local* recipient
-            boost::shared_ptr<const Domain> pDomaintmp;
+            shared_ptr<const Domain> pDomaintmp;
             bool bDomainIsLocal = false;
 
-            const std::vector<boost::shared_ptr<MessageRecipient> > vecRecipients = m_pCurrentMessage->GetRecipients()->GetVector();
-            std::vector<boost::shared_ptr<MessageRecipient> >::const_iterator iterRecipient = vecRecipients.begin();
+            const std::vector<shared_ptr<MessageRecipient> > vecRecipients = m_pCurrentMessage->GetRecipients()->GetVector();
+            std::vector<shared_ptr<MessageRecipient> >::const_iterator iterRecipient = vecRecipients.begin();
             while (iterRecipient != vecRecipients.end())
             {
                String sRecipientAddress = (*iterRecipient)->GetAddress();
@@ -1243,7 +1300,7 @@ namespace HM
    // for example where message signature and spam-headers are added.
    //---------------------------------------------------------------------------()
    {
-      boost::shared_ptr<MessageData> pMsgData;
+      shared_ptr<MessageData> pMsgData;
 
       // Check if we should add a spam header.
       int iTotalSpamScore = SpamProtection::CalculateTotalSpamScore(m_setSpamTestResults);
@@ -1264,14 +1321,14 @@ namespace HM
    }
 
    void
-   SMTPConnection::_SetMessageSignature(boost::shared_ptr<MessageData> &pMessageData)
+   SMTPConnection::_SetMessageSignature(shared_ptr<MessageData> &pMessageData)
    //---------------------------------------------------------------------------()
    // DESCRIPTION:
    // Sets the signature of the message, based on the signature in the account
    // settings and domain settings.
    //---------------------------------------------------------------------------()
    {
-      boost::shared_ptr<SignatureAdder> pSignatureAdder = boost::shared_ptr<SignatureAdder>(new SignatureAdder);
+      shared_ptr<SignatureAdder> pSignatureAdder = shared_ptr<SignatureAdder>(new SignatureAdder);
       pSignatureAdder->SetSignature(m_pCurrentMessage, m_pSenderDomain, m_pSenderAccount, pMessageData);
    }
 
@@ -1329,9 +1386,9 @@ namespace HM
 
       if (Configuration::Instance()->GetUseScriptServer())
       {
-         boost::shared_ptr<ScriptObjectContainer> pContainer = boost::shared_ptr<ScriptObjectContainer>(new ScriptObjectContainer);
-         boost::shared_ptr<Result> pResult = boost::shared_ptr<Result>(new Result);
-         boost::shared_ptr<ClientInfo> pClientInfo = boost::shared_ptr<ClientInfo>(new ClientInfo);
+         shared_ptr<ScriptObjectContainer> pContainer = shared_ptr<ScriptObjectContainer>(new ScriptObjectContainer);
+         shared_ptr<Result> pResult = shared_ptr<Result>(new Result);
+         shared_ptr<ClientInfo> pClientInfo = shared_ptr<ClientInfo>(new ClientInfo);
 
          pClientInfo->SetUsername(m_sUsername);
          pClientInfo->SetIPAddress(GetIPAddressString());
@@ -1399,7 +1456,7 @@ namespace HM
             return false;
 
          const int iChunkSize = 10000;
-         boost::shared_ptr<ByteBuffer> pBuffer = oFile.ReadChunk(iChunkSize);
+         shared_ptr<ByteBuffer> pBuffer = oFile.ReadChunk(iChunkSize);
          while (pBuffer)
          {
             // Check that buffer contains correct line endings.
@@ -1466,8 +1523,8 @@ namespace HM
       // Go through the recipients and log one row for each of them.
       String sFromAddress = m_pCurrentMessage->GetFromAddress();
 
-      const std::vector<boost::shared_ptr<MessageRecipient> > vecRecipients = m_pCurrentMessage->GetRecipients()->GetVector();
-      std::vector<boost::shared_ptr<MessageRecipient> >::const_iterator iterRecipient = vecRecipients.begin();
+      const std::vector<shared_ptr<MessageRecipient> > vecRecipients = m_pCurrentMessage->GetRecipients()->GetVector();
+      std::vector<shared_ptr<MessageRecipient> >::const_iterator iterRecipient = vecRecipients.begin();
       while (iterRecipient != vecRecipients.end())
       {
          String sRecipientAddress = (*iterRecipient)->GetAddress();
@@ -1498,7 +1555,7 @@ namespace HM
       if (m_pCurrentMessage)
       {
          // This message isn't complete, so we should delete it from disk now.
-         boost::shared_ptr<Account> emptyAccount;
+         shared_ptr<Account> emptyAccount;
 
          PersistentMessage::DeleteFile(emptyAccount, m_pCurrentMessage);
 
@@ -1541,13 +1598,14 @@ namespace HM
          sData += sSizeKeyword;
       }
 
+  sData += "250-STARTTLS\r\n";	   
+
       String sAuth = "250 AUTH LOGIN";
 
       if (m_SMTPConf->GetAuthAllowPlainText())
          sAuth += " PLAIN";
 
       sData += sAuth;
-	   
       _SendData(sData);
    
       return true;
@@ -1747,12 +1805,12 @@ namespace HM
       String sLogData;
 
       bool bIsRouteDomain = false;
-      vector<boost::shared_ptr<Route> > routes = Configuration::Instance()->GetSMTPConfiguration()->GetRoutes()->GetItemsByName(sETRNDomain.ToLower());
+      vector<shared_ptr<Route> > routes = Configuration::Instance()->GetSMTPConfiguration()->GetRoutes()->GetItemsByName(sETRNDomain.ToLower());
 
       // See if sender supplied param matches one of our domains
       if (routes.size() > 0)
        {
-          boost_foreach(boost::shared_ptr<Route> route, routes)
+          boost_foreach(shared_ptr<Route> route, routes)
           {
              if (route->GetName() == sETRNDomain2) 
              {
@@ -1766,8 +1824,8 @@ namespace HM
       {
          LOG_SMTP(GetSessionID(), GetIPAddressString(), "SMTPDeliverer - ETRN - Route found, continuing..");      
 
-         boost::shared_ptr<Routes> pRoutes = Configuration::Instance()->GetSMTPConfiguration()->GetRoutes();
-         boost::shared_ptr<Route> pRoute = pRoutes->GetItemByName(sETRNDomain.ToLower());
+         shared_ptr<Routes> pRoutes = Configuration::Instance()->GetSMTPConfiguration()->GetRoutes();
+         shared_ptr<Route> pRoute = pRoutes->GetItemByName(sETRNDomain.ToLower());
 
          if (pRoute)
          {
@@ -1840,7 +1898,7 @@ namespace HM
       AccountLogon accountLogon;
       bool disconnect;
 
-      boost::shared_ptr<const Account> pAccount = accountLogon.Logon(GetIPAddress(), m_sUsername, m_sPassword, disconnect);
+      shared_ptr<const Account> pAccount = accountLogon.Logon(GetIPAddress(), m_sUsername, m_sPassword, disconnect);
          
       if (disconnect)
       {
@@ -1884,7 +1942,7 @@ namespace HM
 
 
    int 
-   SMTPConnection::_GetMaxMessageSize(boost::shared_ptr<const Domain> pDomain)
+   SMTPConnection::_GetMaxMessageSize(shared_ptr<const Domain> pDomain)
    {
       int iMaxMessageSizeKB = m_SMTPConf->GetMaxMessageSize();
       
@@ -1996,11 +2054,11 @@ namespace HM
        const String senderAddress = m_pCurrentMessage->GetFromAddress();
 
        String senderDomainName = StringParser::ExtractDomain(senderAddress);
-       vector<boost::shared_ptr<Route> > routes = Configuration::Instance()->GetSMTPConfiguration()->GetRoutes()->GetItemsByName(senderDomainName);
+       vector<shared_ptr<Route> > routes = Configuration::Instance()->GetSMTPConfiguration()->GetRoutes()->GetItemsByName(senderDomainName);
 
        if (routes.size() > 0)
        {
-          boost_foreach(boost::shared_ptr<Route> route, routes)
+          boost_foreach(shared_ptr<Route> route, routes)
           {
              if (route->ToAllAddresses() || route->GetAddresses()->GetItemByName(senderAddress))
              {

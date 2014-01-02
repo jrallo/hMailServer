@@ -15,7 +15,7 @@
 
 namespace HM
 {
-   PGConnection::PGConnection(boost::shared_ptr<DatabaseSettings> pSettings) :
+   PGConnection::PGConnection(shared_ptr<DatabaseSettings> pSettings) :
       DALConnection(pSettings)
    {
       m_bIsConnected = false;
@@ -239,10 +239,10 @@ namespace HM
       return true;
    }
 
-   boost::shared_ptr<DALRecordset> 
+   shared_ptr<DALRecordset> 
    PGConnection::CreateRecordset()
    {
-      boost::shared_ptr<PGRecordset> recordset = boost::shared_ptr<PGRecordset>(new PGRecordset());
+      shared_ptr<PGRecordset> recordset = shared_ptr<PGRecordset>(new PGRecordset());
       return recordset;
    }
 
@@ -253,10 +253,10 @@ namespace HM
       sInput.Replace(_T("\\"), _T("\\\\"));
    }
 
-   boost::shared_ptr<IMacroExpander> 
+   shared_ptr<IMacroExpander> 
    PGConnection::CreateMacroExpander()
    {
-      boost::shared_ptr<PGSQLMacroExpander> expander = boost::shared_ptr<PGSQLMacroExpander>(new PGSQLMacroExpander());
+      shared_ptr<PGSQLMacroExpander> expander = shared_ptr<PGSQLMacroExpander>(new PGSQLMacroExpander());
       return expander;
    }
 

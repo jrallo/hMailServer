@@ -19,6 +19,8 @@ namespace HM
       bool GetUseSSL();
       void SetHostName(const String &hostName);
          
+      bool operator== (const ServerInfo &other) const;
+
    private:
 
       bool _fixed;

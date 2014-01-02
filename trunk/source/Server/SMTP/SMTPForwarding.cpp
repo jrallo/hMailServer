@@ -24,7 +24,7 @@
 namespace HM
 {
    bool 
-   SMTPForwarding::PerformForwarding(boost::shared_ptr<const Account> pRecipientAccount, boost::shared_ptr<Message> pOriginalMessage)
+   SMTPForwarding::PerformForwarding(shared_ptr<const Account> pRecipientAccount, shared_ptr<Message> pOriginalMessage)
    //---------------------------------------------------------------------------()
    // DESCRIPTION:
    // Apply forwarding for the message.
@@ -67,12 +67,13 @@ namespace HM
       String originalFileName = PersistentMessage::GetFileName(pRecipientAccount, pOriginalMessage);
 
       // Check that rule loop count is not yet reached.
-      boost::shared_ptr<MessageData> pOldMsgData  = boost::shared_ptr<MessageData>(new MessageData());
+      shared_ptr<MessageData> pOldMsgData  = shared_ptr<MessageData>(new MessageData());
       pOldMsgData->LoadFromMessage(originalFileName, pOriginalMessage);
 
-      if (RuleApplier::RuleLoopCountReached(pOldMsgData))
+      // false = check only loop counter not AutoSubmitted header because forward not rule
+      if (!RuleApplier::IsGeneratedResponseAllowed(pOldMsgData, false))
       {
-         ErrorManager::Instance()->ReportError(ErrorManager::Medium, 4333, "SMTPDeliverer::_ApplyForwarding", "Could not forward message. Maximum rule loop count reached.");
+         ErrorManager::Instance()->ReportError(ErrorManager::Medium, 4333, "SMTPDeliverer::_ApplyForwarding", "Could not forward message. Maximum forward loop count reached.");
 
          return true;
       }
@@ -80,12 +81,12 @@ namespace HM
       LOG_DEBUG(_T("Forwarding message"));
 
       // Create a copy of the message
-      boost::shared_ptr<Message> pNewMessage = PersistentMessage::CopyToQueue(pRecipientAccount, pOriginalMessage);
+      shared_ptr<Message> pNewMessage = PersistentMessage::CopyToQueue(pRecipientAccount, pOriginalMessage);
      
       pNewMessage->SetState(Message::Delivering);
       
       // Increase the number of rule-deliveries made.
-      boost::shared_ptr<MessageData> pNewMsgData = boost::shared_ptr<MessageData>(new MessageData());
+      shared_ptr<MessageData> pNewMsgData = shared_ptr<MessageData>(new MessageData());
       const String newFileName = PersistentMessage::GetFileName(pNewMessage);
       pNewMsgData->LoadFromMessage(newFileName, pNewMessage);
       pNewMsgData->IncreaseRuleLoopCount();

@@ -27,9 +27,6 @@ namespace HM
       String GetEmailAddress() const {return m_sWhiteEmailAddress; }
       void SetEMailAddress(const String &sEmail) {m_sWhiteEmailAddress = sEmail; }
 
-      String GetUserEditableEmailAddress() const; 
-      void SetUserEditableEMailAddress(const String &sEmail);
-
       String GetDescription() const {return m_sWhiteDescription; }
       void SetDescription(const String &sDescription) {m_sWhiteDescription = sDescription; }
 

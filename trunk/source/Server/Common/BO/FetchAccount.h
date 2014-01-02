@@ -63,7 +63,7 @@ namespace HM
       String GetNextTry() const {return m_sNextTry;}
       void SetNextTry(const String &sNextTry) {m_sNextTry = sNextTry;}
 
-      boost::shared_ptr<FetchAccountUIDs> GetUIDs();
+      shared_ptr<FetchAccountUIDs> GetUIDs();
 
       bool GetUseAntiSpam() const {return _useAntiSpam; }
       void SetUseAntiSpam(bool bNewVal) {_useAntiSpam = bNewVal; }
@@ -92,7 +92,7 @@ namespace HM
       int m_iMinutes;
       int m_iDaysToKeep;
       bool m_bIsActive;
-      boost::shared_ptr<FetchAccountUIDs> m_pUIDs;
+      shared_ptr<FetchAccountUIDs> m_pUIDs;
 
       bool m_bProcessMIMERecipients;
       bool m_bProcessMIMEDate;

@@ -71,11 +71,11 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "hMailServer"
             VALUE "FileDescription", "hMailServer"
-            VALUE "FileVersion", "1.0"
+            VALUE "FileVersion", "1.1"
             VALUE "InternalName", "hMailServer.exe"
             VALUE "OriginalFilename", "hMailServer.exe"
             VALUE "ProductName", "hMailServer"
-            VALUE "ProductVersion", "1.0"
+            VALUE "ProductVersion", "1.1"
         END
     END
     BLOCK "VarFileInfo"
@@ -199,15 +199,14 @@ IDR_INTERFACEIMAPFOLDERPERMISSION REGISTRY                "..\\COM\\InterfaceIMA
 IDR_INTERFACEIMAPFOLDERPERMISSIONS REGISTRY                "..\\COM\\InterfaceIMAPFolderPermissions.rgs"
 IDR_INTERFACEIMAPFOLDERACL REGISTRY                "..\\COM\\InterfaceIMAPFolderACL.rgs"
 IDR_INTERFACEDIRECTORIES REGISTRY                "..\\COM\\InterfaceDirectories.rgs"
-IDR_INTERFACELANGUAGES REGISTRY                "..\\COM\\InterfaceLanguages.rgs"
-IDR_INTERFACELINKS REGISTRY                "..\\COM\\InterfaceLinks.rgs"
+IDR_INTERFACELANGUAGES  REGISTRY                "..\\COM\\InterfaceLanguages.rgs"
+IDR_INTERFACELINKS      REGISTRY                "..\\COM\\InterfaceLinks.rgs"
 IDR_INTERFACEINCOMINGRELAY REGISTRY                "..\\COM\\InterfaceIncomingRelay.rgs"
 IDR_INTERFACEINCOMINGRELAYS REGISTRY                "..\\COM\\InterfaceIncomingRelays.rgs"
 IDR_INTERFACEMESSAGEINDEXING REGISTRY                "..\\COM\\InterfaceMessageIndexing.rgs"
 IDR_INTERFACEDIAGNOSTICS REGISTRY                "..\\COM\\InterfaceDiagnostics.rgs"
 IDR_INTERFACEDIAGNOSTICRESULTS REGISTRY                "..\\COM\\InterfaceDiagnosticResults.rgs"
 IDR_INTERFACEDIAGNOSTICRESULT REGISTRY                "..\\COM\\InterfaceDiagnosticResult.rgs"
-
 #endif    // Swedish resources
 /////////////////////////////////////////////////////////////////////////////
 

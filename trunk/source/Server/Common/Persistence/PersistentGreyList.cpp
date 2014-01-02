@@ -26,14 +26,14 @@ namespace HM
 
    }
 
-   boost::shared_ptr<GreyListTriplet> 
+   shared_ptr<GreyListTriplet> 
    PersistentGreyList::GetRecord(const String &sSenderAddress, const String &sRecipientAddress, const IPAddress & remoteIP)
    //---------------------------------------------------------------------------()
    // DESCRIPTION:
    // Returns a grey list triple based on sender, recipient and IP address.
    //---------------------------------------------------------------------------()
    {
-      boost::shared_ptr<GreyListTriplet> pTriplet;
+      shared_ptr<GreyListTriplet> pTriplet;
 
       IPAddressSQLHelper helper;
 
@@ -46,7 +46,7 @@ namespace HM
       command.AddParameter("@SENDERADDRESS", sSenderAddress);
       command.AddParameter("@RECIPIENTADDRESS", sRecipientAddress);
 
-      boost::shared_ptr<DALRecordset> pRS = Application::Instance()->GetDBManager()->OpenRecordset(command);
+      shared_ptr<DALRecordset> pRS = Application::Instance()->GetDBManager()->OpenRecordset(command);
       if (!pRS || pRS->IsEOF())
       {
          // Not found
@@ -54,7 +54,7 @@ namespace HM
       }
 
       // Read the record.
-      pTriplet = boost::shared_ptr<GreyListTriplet>(new GreyListTriplet);
+      pTriplet = shared_ptr<GreyListTriplet>(new GreyListTriplet);
       pTriplet->SetID(pRS->GetInt64Value("glid"));
       pTriplet->SetCreateTime(pRS->GetStringValue("glcreatetime"));
       pTriplet->SetBlockEndTime(pRS->GetStringValue("glblockendtime"));
@@ -71,7 +71,7 @@ namespace HM
    }
 
    bool 
-   PersistentGreyList::AddObject(boost::shared_ptr<GreyListTriplet> pTriplet)
+   PersistentGreyList::AddObject(shared_ptr<GreyListTriplet> pTriplet)
    //---------------------------------------------------------------------------()
    // DESCRIPTION:
    // Adds a new greylist triple into the database.
@@ -106,7 +106,7 @@ namespace HM
    }
 
    bool 
-   PersistentGreyList::ResetDeletionTime(boost::shared_ptr<GreyListTriplet> pTriplet)
+   PersistentGreyList::ResetDeletionTime(shared_ptr<GreyListTriplet> pTriplet)
    //---------------------------------------------------------------------------()
    // DESCRIPTION:
    // Resets the deletion time for a triple.

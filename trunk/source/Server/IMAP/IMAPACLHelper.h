@@ -14,7 +14,7 @@ namespace HM
       IMAPACLHelper();
       virtual ~IMAPACLHelper();
 
-      static String CreateACLList(boost::shared_ptr<IMAPFolder> pFolder, const String &sEscapedFolderName);
+      static String CreateACLList(shared_ptr<IMAPFolder> pFolder, const String &sEscapedFolderName);
       static bool IsValidPermissionString(const String &sPermissions);
 
    private:

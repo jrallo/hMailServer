@@ -13,7 +13,7 @@ namespace HM
       COMAuthentication(void);
       ~COMAuthentication(void);
 
-      boost::shared_ptr<const Account> Authenticate(const String &sUsername, const String &sPassword);
+      shared_ptr<const Account> Authenticate(const String &sUsername, const String &sPassword);
 
       void AttempAnonymousAuthentication();
 
@@ -29,6 +29,6 @@ namespace HM
 
    private:
 
-      boost::shared_ptr<const Account> m_pAccount;
+      shared_ptr<const Account> m_pAccount;
    };
 }

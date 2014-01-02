@@ -6,8 +6,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using NUnit.Framework;
-using UnitTest;
+using RegressionTests;
 using System.Threading;
+using RegressionTests.Shared;
+
 
 namespace StressTest
 {
@@ -17,25 +19,25 @@ namespace StressTest
       [Test]
       public void TestManyTCPIPConnections()
       {
-         Utilities.DeleteCurrentDefaultLog();
+         TestSetup.DeleteCurrentDefaultLog();
 
          const int count = 1000;
 
-         List<TCPSocket> sockets = new List<TCPSocket>();
+         List<TcpSocket> sockets = new List<TcpSocket>();
          for (int i = 0; i < count; i++)
          {
-            TCPSocket socket = new TCPSocket();
+            TcpSocket socket = new TcpSocket();
             Assert.IsTrue(socket.Connect(25));
 
             sockets.Add(socket);
          }
 
-         foreach (TCPSocket socket in sockets)
+         foreach (TcpSocket socket in sockets)
          {
             socket.Disconnect();
          }
 
-         string log = Utilities.ReadCurrentDefaultLog();
+         string log = TestSetup.ReadCurrentDefaultLog();
       }
    }
 }

@@ -158,7 +158,7 @@ namespace HM
                                     iSeverity, iErrorID, tempSource, tempDescription);
          }
 
-         boost::shared_ptr<ScriptObjectContainer> pContainer  = boost::shared_ptr<ScriptObjectContainer>(new ScriptObjectContainer);
+         shared_ptr<ScriptObjectContainer> pContainer  = shared_ptr<ScriptObjectContainer>(new ScriptObjectContainer);
          
          ScriptServer::Instance()->FireEvent(ScriptServer::EventOnError, sEventCaller, pContainer);
 

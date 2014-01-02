@@ -9,7 +9,7 @@
 #include "../COM/InterfaceFetchAccount.h"
 
 void 
-InterfaceFetchAccounts::Attach(boost::shared_ptr<HM::FetchAccounts> pFetchAccounts)
+InterfaceFetchAccounts::Attach(shared_ptr<HM::FetchAccounts> pFetchAccounts)
 {
    m_pFetchAccounts = pFetchAccounts;
 }
@@ -24,7 +24,7 @@ STDMETHODIMP InterfaceFetchAccounts::get_ItemByDBID(long lDBID, IInterfaceFetchA
       CComObject<InterfaceFetchAccount>* pInterfaceAccount = new CComObject<InterfaceFetchAccount>();
       pInterfaceAccount->SetAuthentication(m_pAuthentication);
    
-      boost::shared_ptr<HM::FetchAccount> pFetchAccount = m_pFetchAccounts->GetItemByDBID(lDBID);
+      shared_ptr<HM::FetchAccount> pFetchAccount = m_pFetchAccounts->GetItemByDBID(lDBID);
       if (!pFetchAccount)
          return DISP_E_BADINDEX;
    
@@ -51,7 +51,7 @@ STDMETHODIMP InterfaceFetchAccounts::get_Item(long lIndex, IInterfaceFetchAccoun
       CComObject<InterfaceFetchAccount>* pInterfaceAccount = new CComObject<InterfaceFetchAccount>();
       pInterfaceAccount->SetAuthentication(m_pAuthentication);
    
-      boost::shared_ptr<HM::FetchAccount> pFetchAccount = m_pFetchAccounts->GetItem(lIndex);
+      shared_ptr<HM::FetchAccount> pFetchAccount = m_pFetchAccounts->GetItem(lIndex);
       if (!pFetchAccount)
          return DISP_E_BADINDEX;
    
@@ -149,7 +149,7 @@ STDMETHODIMP InterfaceFetchAccounts::Add(IInterfaceFetchAccount **pVal)
       CComObject<InterfaceFetchAccount>* pIntFA = new CComObject<InterfaceFetchAccount>();
       pIntFA->SetAuthentication(m_pAuthentication);
    
-      boost::shared_ptr<HM::FetchAccount> pFA = boost::shared_ptr<HM::FetchAccount>(new HM::FetchAccount);
+      shared_ptr<HM::FetchAccount> pFA = shared_ptr<HM::FetchAccount>(new HM::FetchAccount);
    
       pFA->SetAccountID(m_pFetchAccounts->GetAccountID());
    

@@ -57,7 +57,7 @@ public:
 
 public:
 
-   boost::shared_ptr<HM::SURBLServers> m_pSURBLServers;
+   shared_ptr<HM::SURBLServers> m_pSURBLServers;
 
 };
 

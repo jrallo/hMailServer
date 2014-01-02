@@ -18,7 +18,7 @@ namespace HM
       bool GetMXRecords(const String &sDomain, std::vector<String> &vecFoundNames);
       bool GetARecords(const String &sDomain, std::vector<String> &saFoundNames);
       bool GetTXTRecords(const String &sDomain, std::vector<String> &foundResult);
-
+      bool GetPTRRecords(const String &sIP, std::vector<String> &vecFoundNames);
    private:
 
       bool _Resolve(const String &sSearchFor, vector<String> &vecFoundNames, WORD ResourceType, int iRecursion);

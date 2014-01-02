@@ -35,7 +35,7 @@ namespace HM
       SQLCommand command("select messageid, messagecurnooftries, messagecreatetime, messagefrom, messagenexttrytime, messagefilename, messagelocked from hm_messages "
                          " where messagetype = 1 OR messagetype = 3 order by messageid asc");
 
-      boost::shared_ptr<DALRecordset> pRS = Application::Instance()->GetDBManager()->OpenRecordset(command);
+      shared_ptr<DALRecordset> pRS = Application::Instance()->GetDBManager()->OpenRecordset(command);
       if (!pRS)
          return "";
 
@@ -65,7 +65,7 @@ namespace HM
          SQLCommand selectCommand("select recipientaddress from hm_messagerecipients where recipientmessageid = @MESSAGEID");
          selectCommand.AddParameter("@MESSAGEID", lMessageID);
 
-         boost::shared_ptr<DALRecordset> pRecipientsRS = Application::Instance()->GetDBManager()->OpenRecordset(selectCommand);
+         shared_ptr<DALRecordset> pRecipientsRS = Application::Instance()->GetDBManager()->OpenRecordset(selectCommand);
          if (!pRecipientsRS)
             return "";
 

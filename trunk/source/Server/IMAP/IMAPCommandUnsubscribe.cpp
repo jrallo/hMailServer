@@ -17,13 +17,13 @@
 namespace HM
 {
    IMAPResult
-   IMAPCommandUNSUBSCRIBE::ExecuteCommand(boost::shared_ptr<HM::IMAPConnection> pConnection, boost::shared_ptr<IMAPCommandArgument> pArgument)
+   IMAPCommandUNSUBSCRIBE::ExecuteCommand(shared_ptr<HM::IMAPConnection> pConnection, shared_ptr<IMAPCommandArgument> pArgument)
    {
       if (!pConnection->IsAuthenticated())
          return IMAPResult(IMAPResult::ResultNo, "Authenticate first");
 
       // Parse the command
-      boost::shared_ptr<IMAPSimpleCommandParser> pParser = boost::shared_ptr<IMAPSimpleCommandParser>(new IMAPSimpleCommandParser());
+      shared_ptr<IMAPSimpleCommandParser> pParser = shared_ptr<IMAPSimpleCommandParser>(new IMAPSimpleCommandParser());
 
       pParser->Parse(pArgument);
       if (pParser->ParamCount() != 1)
@@ -32,7 +32,7 @@ namespace HM
       // Fetch the folder name. 
       String sFolderName = pParser->GetParamValue(pArgument, 0);
 
-      boost::shared_ptr<IMAPFolder> pFolder = pConnection->GetFolderByFullPath(sFolderName);
+      shared_ptr<IMAPFolder> pFolder = pConnection->GetFolderByFullPath(sFolderName);
 
       IMAPResult result = ConfirmPossibleToUnsubscribe(pFolder);
       if (result.GetResult() != IMAPResult::ResultOK)
@@ -51,7 +51,7 @@ namespace HM
    }
 
    IMAPResult
-   IMAPCommandUNSUBSCRIBE::ConfirmPossibleToUnsubscribe(boost::shared_ptr<IMAPFolder> pFolder)
+   IMAPCommandUNSUBSCRIBE::ConfirmPossibleToUnsubscribe(shared_ptr<IMAPFolder> pFolder)
    {
       if (!pFolder)
          return IMAPResult(IMAPResult::ResultNo, "That mailbox does not exist.");

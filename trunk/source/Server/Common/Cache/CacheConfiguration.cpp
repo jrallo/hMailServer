@@ -23,7 +23,7 @@ namespace HM
    
    }
 
-   boost::shared_ptr<PropertySet> 
+   shared_ptr<PropertySet> 
    CacheConfiguration::_GetSettings() const
    {
       return Configuration::Instance()->GetSettings();

@@ -19,7 +19,7 @@
 namespace HM
 {
    IMAPResult
-   IMAPCommandEXPUNGE::ExecuteCommand(boost::shared_ptr<IMAPConnection> pConnection, boost::shared_ptr<IMAPCommandArgument> pArgument)
+   IMAPCommandEXPUNGE::ExecuteCommand(shared_ptr<IMAPConnection> pConnection, shared_ptr<IMAPCommandArgument> pArgument)
    {
       if (!pConnection->IsAuthenticated())
          return IMAPResult(IMAPResult::ResultNo, "Authenticate first");
@@ -30,7 +30,7 @@ namespace HM
       }
 
       // Iterate through mail boxes and delete messages marked for deletion.
-      boost::shared_ptr<IMAPFolder> pCurFolder = pConnection->GetCurrentFolder();   
+      shared_ptr<IMAPFolder> pCurFolder = pConnection->GetCurrentFolder();   
 
       if (!pCurFolder)
          return IMAPResult(IMAPResult::ResultNo, "No folder selected.");
@@ -62,8 +62,8 @@ namespace HM
 
          // Messages have been expunged
          // Notify the mailbox notifier that the mailbox contents have changed.
-         boost::shared_ptr<ChangeNotification> pNotification = 
-            boost::shared_ptr<ChangeNotification>(new ChangeNotification(pCurFolder->GetAccountID(), pCurFolder->GetID(),  ChangeNotification::NotificationMessageDeleted, affectedMessages));
+         shared_ptr<ChangeNotification> pNotification = 
+            shared_ptr<ChangeNotification>(new ChangeNotification(pCurFolder->GetAccountID(), pCurFolder->GetID(),  ChangeNotification::NotificationMessageDeleted, affectedMessages));
 
          Application::Instance()->GetNotificationServer()->SendNotification(pConnection->GetNotificationClient(), pNotification);
       }

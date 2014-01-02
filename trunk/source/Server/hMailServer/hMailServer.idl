@@ -1340,7 +1340,7 @@ interface IInterfaceRoute : IDispatch
 
 	[id(13), helpstring("Saves changes of the object in the database.")] HRESULT Save();
 	
-   [propget, id(14), helpstring("Use SSL for this route.")] HRESULT UseSSL([out, retval] VARIANT_BOOL *pVal);
+    [propget, id(14), helpstring("Use SSL for this route.")] HRESULT UseSSL([out, retval] VARIANT_BOOL *pVal);
 	[propput, id(14), helpstring("Use SSL for this route.")] HRESULT UseSSL([in] VARIANT_BOOL newVal);
 	[propget, id(15), helpstring("Description for this route.")] HRESULT Description([out, retval] BSTR *pVal);
 	[propput, id(15), helpstring("Description for this route.")] HRESULT Description([in] BSTR newVal);
@@ -1581,6 +1581,7 @@ interface IInterfaceFetchAccount : IDispatch{
 	[propput, id(20), helpstring("Gets or sets whether anti virus should be performed on messages downloaded from this account.")] HRESULT UseAntiVirus([in] VARIANT_BOOL newVal);
    [propget, id(21), helpstring("Gets or sets whether hMailServer should deliver to recipients in routes.")] HRESULT EnableRouteRecipients([out, retval] VARIANT_BOOL *pVal);
 	[propput, id(21), helpstring("Gets or sets whether hMailServer should deliver to recipients in routes.")] HRESULT EnableRouteRecipients([in] VARIANT_BOOL newVal);
+	[propget, id(22), helpstring("Gets whether the fetch account is currently locked")] HRESULT IsLocked([out, retval] VARIANT_BOOL* pVal);
 
 };
 [
@@ -2316,6 +2317,8 @@ interface IInterfaceTCPIPPort : IDispatch
    [propget, id(7), helpstring("The id of the SSL certificate to use.")] HRESULT SSLCertificateID([out, retval] long *pVal);
    [propput, id(7), helpstring("The id of the SSL certificate to use.")] HRESULT SSLCertificateID([in] long newVal);
    [id(8), helpstring("Deletes the object from the database.")] HRESULT Delete();
+   [propget, id(9), helpstring("Use StartTLS for this TCP/IP port.")] HRESULT UseSTARTTLS([out, retval] VARIANT_BOOL *pVal);
+   [propput, id(9), helpstring("Use StartTLS for this TCP/IP port.")] HRESULT UseSTARTTLS([in] VARIANT_BOOL newVal);
 };
 
 

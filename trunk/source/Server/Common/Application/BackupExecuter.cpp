@@ -60,6 +60,10 @@ namespace HM
 
       _LoadSettings();
 
+      // Special temp setting to skip files during backup/restore while still storing/restoring db file/message info.
+      bool bMessagesDBOnly = IniFileSettings::Instance()->GetBackupMessagesDBOnly();
+
+
       if (m_iBackupMode & Backup::BOMessages)
       {
          if (!PersistentMessage::GetAllMessageFilesAreInDataFolder())
@@ -126,7 +130,7 @@ namespace HM
          }
          
          // Backup message files
-         if (m_iBackupMode & Backup::BOMessages)
+         if (m_iBackupMode & Backup::BOMessages && !bMessagesDBOnly)
          {
             Logger::Instance()->LogBackup("Backing up data directory...");
             if (!_BackupDataDirectory(sDataBackupDir))
@@ -180,7 +184,7 @@ namespace HM
 
       // Should we compress the message files?
       if (m_iBackupMode & Backup::BOMessages && 
-          m_iBackupMode & Backup::BOCompression)
+          m_iBackupMode & Backup::BOCompression && !bMessagesDBOnly)
       {
          Logger::Instance()->LogBackup("Compressing message files...");
          
@@ -194,7 +198,7 @@ namespace HM
             Application::Instance()->GetBackupManager()->OnBackupFailed("Could not delete files from the destination directory.");
             return false;
          }
-      }
+       }
 
       Application::Instance()->GetBackupManager()->OnBackupCompleted();
 
@@ -228,7 +232,7 @@ namespace HM
    bool 
    BackupExecuter::_BackupDomains(XNode *pBackupNode)
    {
-      boost::shared_ptr<Domains> pDomains = boost::shared_ptr<Domains>(new Domains);
+      shared_ptr<Domains> pDomains = shared_ptr<Domains>(new Domains);
       pDomains->Refresh();
       pDomains->XMLStore(pBackupNode, m_iBackupMode);
 
@@ -236,8 +240,10 @@ namespace HM
    }
 
    bool
-   BackupExecuter::StartRestore(boost::shared_ptr<Backup> pBackup)
+   BackupExecuter::StartRestore(shared_ptr<Backup> pBackup)
    {
+      bool bMessagesDBOnly = IniFileSettings::Instance()->GetBackupMessagesDBOnly();
+
       Logger::Instance()->LogBackup("Reading XML file...");
       String sZipFile = pBackup->GetBackupFile();
 
@@ -285,18 +291,18 @@ namespace HM
          // drop the domain folders from the data directory. If we do this
          // in the wrong order, we'll hence first restore the data directory
          // and then drop it.
-         boost::shared_ptr<Domains> pDomains = boost::shared_ptr<Domains>(new Domains);
+         shared_ptr<Domains> pDomains = shared_ptr<Domains>(new Domains);
+
          pDomains->Refresh();
-         pDomains->DeleteAll();
+         if (!bMessagesDBOnly) 
+            pDomains->DeleteAll();
 
          // We need to do the same with public folders.
-         if (iRestoreOptions & Backup::BOSettings)
-         {
+         if (iRestoreOptions & Backup::BOSettings && !bMessagesDBOnly)
             Configuration::Instance()->GetIMAPConfiguration()->GetPublicFolders()->DeleteAll();
-         }
          
          // Should we restore messages as well?
-         if (iRestoreOptions & Backup::BOMessages)
+         if (iRestoreOptions & Backup::BOMessages && !bMessagesDBOnly)
          {
             Logger::Instance()->LogBackup("Restoring data directory...");
             _RestoreDataDirectory(pBackup, pBackupNode);
@@ -343,7 +349,7 @@ namespace HM
    }
 
    void
-   BackupExecuter::_RestoreDataDirectory(boost::shared_ptr<Backup> pBackup, XNode *pBackupNode)
+   BackupExecuter::_RestoreDataDirectory(shared_ptr<Backup> pBackup, XNode *pBackupNode)
    {
       XNode *pBackupInfoNode = pBackupNode->GetChild(_T("BackupInformation"));
       

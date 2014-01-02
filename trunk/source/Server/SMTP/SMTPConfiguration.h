@@ -84,15 +84,15 @@ namespace HM
       bool GetAddDeliveredToHeader();
       void SetAddDeliveredToHeader(bool bNewVal);
 
-      void OnPropertyChanged(boost::shared_ptr<Property> pProperty);
+      void OnPropertyChanged(shared_ptr<Property> pProperty);
 
-      boost::shared_ptr<IncomingRelays> GetIncomingRelays() {return _incomingRelays;}
-      boost::shared_ptr<Routes> GetRoutes() {return _routes;}
+      shared_ptr<IncomingRelays> GetIncomingRelays() {return _incomingRelays;}
+      shared_ptr<Routes> GetRoutes() {return _routes;}
 
    private:
 
-      boost::shared_ptr<PropertySet> _GetSettings() const;
-      boost::shared_ptr<IncomingRelays> _incomingRelays;
-      boost::shared_ptr<Routes> _routes;
+      shared_ptr<PropertySet> _GetSettings() const;
+      shared_ptr<IncomingRelays> _incomingRelays;
+      shared_ptr<Routes> _routes;
    };
 }

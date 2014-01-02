@@ -62,19 +62,19 @@ namespace HM
       Cache<DistributionList, PersistentDistributionList>::DeleteInstance();
    }
 
-   boost::shared_ptr<const Account> 
+   shared_ptr<const Account> 
    CacheContainer::GetAccount(const String &sName)
    {
       return Cache<Account, PersistentAccount>::Instance()->GetObject(sName);
    }
 
-   boost::shared_ptr<const Account> 
+   shared_ptr<const Account> 
    CacheContainer::GetAccount(__int64 iID)
    {
       return Cache<Account, PersistentAccount>::Instance()->GetObject(iID);
    }
 
-   boost::shared_ptr<const Domain> 
+   shared_ptr<const Domain> 
    CacheContainer::GetDomain(const String &sName)
    {
 #ifdef _DEBUG
@@ -86,38 +86,38 @@ namespace HM
       return Cache<Domain, PersistentDomain>::Instance()->GetObject(sName);
    }
 
-   boost::shared_ptr<const Domain> 
+   shared_ptr<const Domain> 
    CacheContainer::GetDomain(__int64 iID)
    {
       return Cache<Domain, PersistentDomain>::Instance()->GetObject(iID);
    }
 
-   boost::shared_ptr<const Alias> 
+   shared_ptr<const Alias> 
    CacheContainer::GetAlias(const String &sName)
    {
       return Cache<Alias, PersistentAlias>::Instance()->GetObject(sName);
    }
 
-   boost::shared_ptr<const Alias> 
+   shared_ptr<const Alias> 
    CacheContainer::GetAlias(__int64 iID)
    {
       return Cache<Alias, PersistentAlias>::Instance()->GetObject(iID);
    }
 
-   boost::shared_ptr<const DistributionList> 
+   shared_ptr<const DistributionList> 
    CacheContainer::GetDistributionList(const String &sName)
    {
       return Cache<DistributionList, PersistentDistributionList>::Instance()->GetObject(sName);
    }
 
-   boost::shared_ptr<const DistributionList> 
+   shared_ptr<const DistributionList> 
    CacheContainer::GetDistributionList(__int64 iID)
    {
       return Cache<DistributionList, PersistentDistributionList>::Instance()->GetObject(iID);
    }
 
    void 
-   CacheContainer::OnPropertyChanged(boost::shared_ptr<Property> pProperty)
+   CacheContainer::OnPropertyChanged(shared_ptr<Property> pProperty)
    {
       String sPropName = pProperty->GetName();
 

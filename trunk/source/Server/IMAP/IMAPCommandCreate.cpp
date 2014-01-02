@@ -23,13 +23,13 @@
 namespace HM
 {
    IMAPResult
-   IMAPCommandCREATE::ExecuteCommand(boost::shared_ptr<HM::IMAPConnection> pConnection, boost::shared_ptr<IMAPCommandArgument> pArgument)
+   IMAPCommandCREATE::ExecuteCommand(shared_ptr<HM::IMAPConnection> pConnection, shared_ptr<IMAPCommandArgument> pArgument)
    {
       if (!pConnection->IsAuthenticated())
          return IMAPResult(IMAPResult::ResultNo, "Authenticate first");
 
      
-      boost::shared_ptr<IMAPSimpleCommandParser> pParser = boost::shared_ptr<IMAPSimpleCommandParser>(new IMAPSimpleCommandParser());
+      shared_ptr<IMAPSimpleCommandParser> pParser = shared_ptr<IMAPSimpleCommandParser>(new IMAPSimpleCommandParser());
 
       pParser->Parse(pArgument);
 
@@ -43,7 +43,7 @@ namespace HM
          return IMAPResult(IMAPResult::ResultNo, "Folder name not specified.");
          
       // Check so that it does not already exist.
-      boost::shared_ptr<IMAPFolder> pExistsCheck = pConnection->GetFolderByFullPath(sFolderName);
+      shared_ptr<IMAPFolder> pExistsCheck = pConnection->GetFolderByFullPath(sFolderName);
       if (pExistsCheck)
          return IMAPResult(IMAPResult::ResultNo, "Folder already exists.");
 
@@ -62,7 +62,7 @@ namespace HM
       if (result.GetResult() != IMAPResult::ResultOK)
          return result;
 
-      boost::shared_ptr<IMAPFolders> pParentFolderContainer;
+      shared_ptr<IMAPFolders> pParentFolderContainer;
       if (!bIsPublicFolder)
          pParentFolderContainer = pConnection->GetAccountFolders();
       else
@@ -79,21 +79,21 @@ namespace HM
       assert(pParentFolderContainer->GetCount() > 0);
 
       // Send a notification to everyone subscribing to this event.
-      boost::shared_ptr<IMAPFolder> firstFolder = pParentFolderContainer->GetItem(0);
+      shared_ptr<IMAPFolder> firstFolder = pParentFolderContainer->GetItem(0);
    
       return IMAPResult();
    }
 
    IMAPResult
-   IMAPCommandCREATE::ConfirmPossibleToCreate(boost::shared_ptr<HM::IMAPConnection> pConnection, const std::vector<String> &vecNewPath, bool bIsPublicFolder)
+   IMAPCommandCREATE::ConfirmPossibleToCreate(shared_ptr<HM::IMAPConnection> pConnection, const std::vector<String> &vecNewPath, bool bIsPublicFolder)
    {
       if (bIsPublicFolder)
       {
-         boost::shared_ptr<IMAPFolders> pFolders = pConnection->GetPublicFolders();
+         shared_ptr<IMAPFolders> pFolders = pConnection->GetPublicFolders();
 
          std::vector<String> vecTempPath = vecNewPath;
          vecTempPath.erase(vecTempPath.end()-1);
-         boost::shared_ptr<IMAPFolder> pParentFolder = IMAPFolderUtilities::GetTopMostExistingFolder(pFolders, vecTempPath);
+         shared_ptr<IMAPFolder> pParentFolder = IMAPFolderUtilities::GetTopMostExistingFolder(pFolders, vecTempPath);
 
          // Check if the user has permission to create a folder in the parent folder
          if (pParentFolder)

@@ -11,7 +11,7 @@ namespace HM
    class SQLScriptParser  
    {
    public:
-      SQLScriptParser(boost::shared_ptr<DatabaseSettings> pSettings, const String &sFile);
+      SQLScriptParser(shared_ptr<DatabaseSettings> pSettings, const String &sFile);
       virtual ~SQLScriptParser();
 
       bool Parse(String &sErrorMessage);
@@ -23,7 +23,7 @@ namespace HM
 
       bool _PreprocessLine(String &sLine);
 
-      boost::shared_ptr<DatabaseSettings> m_pSettings;
+      shared_ptr<DatabaseSettings> m_pSettings;
       String m_sFile;
       vector<String> m_vecCommands;
 

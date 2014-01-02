@@ -12,7 +12,7 @@ namespace HM
    class PGConnection : public DALConnection
    {
    public:
-	   PGConnection(boost::shared_ptr<DatabaseSettings> pSettings);
+	   PGConnection(shared_ptr<DatabaseSettings> pSettings);
 	   virtual ~PGConnection();
 
       virtual ConnectionResult Connect(String &sErrorMessage);
@@ -33,11 +33,11 @@ namespace HM
 
       virtual bool CheckServerVersion(String &errorMessage);
 
-      virtual boost::shared_ptr<DALRecordset> CreateRecordset();
+      virtual shared_ptr<DALRecordset> CreateRecordset();
 
       virtual void EscapeString(String &sInput);
 
-      virtual boost::shared_ptr<IMacroExpander> CreateMacroExpander();
+      virtual shared_ptr<IMacroExpander> CreateMacroExpander();
 
    private:
 

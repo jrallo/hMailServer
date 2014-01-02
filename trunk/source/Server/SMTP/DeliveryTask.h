@@ -12,13 +12,13 @@ namespace HM
    class DeliveryTask : public Task
    {
    public:
-      DeliveryTask(boost::shared_ptr<Message> pMessage);
+      DeliveryTask(shared_ptr<Message> pMessage);
       ~DeliveryTask(void);
 
       virtual void DoWork();
       virtual void StopWork();
    private:
       
-      boost::shared_ptr<Message> m_pMessage;
+      shared_ptr<Message> m_pMessage;
    };
 }

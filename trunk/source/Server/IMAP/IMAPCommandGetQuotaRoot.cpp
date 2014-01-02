@@ -31,7 +31,7 @@ namespace HM
 
 
    IMAPResult 
-   IMAPCommandGetQuotaRoot::ExecuteCommand(boost::shared_ptr<IMAPConnection> pConnection, boost::shared_ptr<IMAPCommandArgument> pArgument)
+   IMAPCommandGetQuotaRoot::ExecuteCommand(shared_ptr<IMAPConnection> pConnection, shared_ptr<IMAPCommandArgument> pArgument)
    {
       if (!pConnection->IsAuthenticated())
          return IMAPResult(IMAPResult::ResultNo, "Authenticate first");
@@ -39,7 +39,7 @@ namespace HM
       if (!Configuration::Instance()->GetIMAPConfiguration()->GetUseIMAPQuota())
          return IMAPResult(IMAPResult::ResultNo, "IMAP QUOTA is not enabled.");
 
-      boost::shared_ptr<IMAPSimpleCommandParser> pParser = boost::shared_ptr<IMAPSimpleCommandParser>(new IMAPSimpleCommandParser());
+      shared_ptr<IMAPSimpleCommandParser> pParser = shared_ptr<IMAPSimpleCommandParser>(new IMAPSimpleCommandParser());
       
       pParser->Parse(pArgument);
 
@@ -57,7 +57,7 @@ namespace HM
       }
       
 
-      boost::shared_ptr<const Account> pAccount = CacheContainer::Instance()->GetAccount(pConnection->GetAccount()->GetID());
+      shared_ptr<const Account> pAccount = CacheContainer::Instance()->GetAccount(pConnection->GetAccount()->GetID());
 
       // According to the RFC, these values should be counted in kilobytes.
       __int64 iCurrentSize = AccountSizeCache::Instance()->GetSize(pAccount->GetID()) / 1024; // Convert from Bytes to KB

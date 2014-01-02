@@ -6,11 +6,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using NUnit.Framework;
-using UnitTest;
+using RegressionTests;
 using System.IO;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Net.Mail;
+using RegressionTests.Shared;
 
 namespace StressTest
 {
@@ -28,7 +29,7 @@ namespace StressTest
             for (int i = 0; i < 1000; i++)
             {
                 hMailServer.Account account =
-                    SingletonProvider<Utilities>.Instance.AddAccount(accounts, string.Format("recipient{0}@test.com", i), "test");
+                    SingletonProvider<TestSetup>.Instance.AddAccount(accounts, string.Format("recipient{0}@test.com", i), "test");
 
                 recipients.Add(account.Address);
 
@@ -37,17 +38,17 @@ namespace StressTest
 
             Marshal.ReleaseComObject(accounts);
 
-            SingletonProvider<Utilities>.Instance.AddDistributionList(_domain, "list@test.com", recipients);
+            SingletonProvider<TestSetup>.Instance.AddDistributionList(_domain, "list@test.com", recipients);
 
             System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
             sw.Start();
-            SMTPSimulator.StaticSend("test@test.com", "list@test.com", "Test", "Test message");
+            SMTPClientSimulator.StaticSend("test@test.com", "list@test.com", "Test", "Test message");
             sw.Stop();
 
             Console.WriteLine("Elapsed time: " + sw.Elapsed.TotalSeconds.ToString());
 
-            string dataDir = 
-                Path.Combine(SingletonProvider<Utilities>.Instance.GetApp().Settings.Directories.DataDirectory, "test.com");
+            string dataDir =
+                Path.Combine(SingletonProvider<TestSetup>.Instance.GetApp().Settings.Directories.DataDirectory, "test.com");
 
             // Check number of accounts.
             int secondsToWait = 60;
@@ -96,7 +97,7 @@ namespace StressTest
             for (int i = 0; i < 1000; i++)
             {
                 hMailServer.Account account =
-                    SingletonProvider<Utilities>.Instance.AddAccount(accounts, string.Format("recipient{0}@test.com", i), "test");
+                    SingletonProvider<TestSetup>.Instance.AddAccount(accounts, string.Format("recipient{0}@test.com", i), "test");
 
                 recipients.Add(account.Address);
 
@@ -107,13 +108,13 @@ namespace StressTest
 
             System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
             sw.Start();
-            SMTPSimulator.StaticSend("test@test.com", recipients, "Test", "Test message");
+            SMTPClientSimulator.StaticSend("test@test.com", recipients, "Test", "Test message");
             sw.Stop();
 
             Console.WriteLine("Elapsed time: " + sw.Elapsed.TotalSeconds.ToString());
 
             string dataDir =
-                Path.Combine(SingletonProvider<Utilities>.Instance.GetApp().Settings.Directories.DataDirectory, "test.com");
+                Path.Combine(SingletonProvider<TestSetup>.Instance.GetApp().Settings.Directories.DataDirectory, "test.com");
 
             // Check number of accounts.
             int secondsToWait = 120;
@@ -147,12 +148,12 @@ namespace StressTest
         {
            hMailServer.Accounts accounts = _domain.Accounts;
            hMailServer.Account senderAccount =
-                    SingletonProvider<Utilities>.Instance.AddAccount(accounts, string.Format("sender@test.com"), "test");
+                    SingletonProvider<TestSetup>.Instance.AddAccount(accounts, string.Format("sender@test.com"), "test");
 
            List<string> recipients = new List<string>();
 
 
-           TCPSocket sock = new TCPSocket();
+           TcpSocket sock = new TcpSocket();
            sock.Connect(25);
            string result = sock.ReadUntil("\r\n");
            sock.Send("EHLO test.com\r\n");
@@ -193,10 +194,10 @@ namespace StressTest
 
            hMailServer.Accounts accounts = _domain.Accounts;
            hMailServer.Account account =
-                    SingletonProvider<Utilities>.Instance.AddAccount(accounts, string.Format("test@test.com"), "test");
+                    SingletonProvider<TestSetup>.Instance.AddAccount(accounts, string.Format("test@test.com"), "test");
 
            string dataDir =
-               Path.Combine(SingletonProvider<Utilities>.Instance.GetApp().Settings.Directories.DataDirectory, "test.com");
+               Path.Combine(SingletonProvider<TestSetup>.Instance.GetApp().Settings.Directories.DataDirectory, "test.com");
 
            string accountDir = Path.Combine(dataDir, "test");
 
@@ -207,7 +208,7 @@ namespace StressTest
 
            for (int i = 0; i < numberOfMessages; i++)
            {
-              Assert.IsTrue(SMTPSimulator.StaticSend("test@test.com", "test@test.com", "Test", "Test message"));
+               Assert.IsTrue(SMTPClientSimulator.StaticSend("test@test.com", "test@test.com", "Test", "Test message"));
 
               if (i % 100 == 0)
               {
@@ -236,10 +237,10 @@ namespace StressTest
         {
            hMailServer.Accounts accounts = _domain.Accounts;
            hMailServer.Account account =
-                    SingletonProvider<Utilities>.Instance.AddAccount(accounts, string.Format("test@test.com"), "test");
+                    SingletonProvider<TestSetup>.Instance.AddAccount(accounts, string.Format("test@test.com"), "test");
 
            string dataDir =
-               Path.Combine(SingletonProvider<Utilities>.Instance.GetApp().Settings.Directories.DataDirectory, "test.com");
+               Path.Combine(SingletonProvider<TestSetup>.Instance.GetApp().Settings.Directories.DataDirectory, "test.com");
 
            string accountDir = Path.Combine(dataDir, "test");
 
@@ -281,16 +282,16 @@ namespace StressTest
         [Description("Send messages being scanned by SpamAssassin.")]
         public void TestSendViaSpamAssassin()
         {
-           Utilities.AssertSpamAssassinIsRunning();
+            TestSetup.AssertSpamAssassinIsRunning();
 
-           SingletonProvider<Utilities>.Instance.GetApp().Settings.AntiSpam.SpamAssassinEnabled = true;
+           SingletonProvider<TestSetup>.Instance.GetApp().Settings.AntiSpam.SpamAssassinEnabled = true;
 
            hMailServer.Accounts accounts = _domain.Accounts;
            hMailServer.Account account =
-                    SingletonProvider<Utilities>.Instance.AddAccount(accounts, string.Format("test@test.com"), "test");
+                    SingletonProvider<TestSetup>.Instance.AddAccount(accounts, string.Format("test@test.com"), "test");
 
            string dataDir =
-               Path.Combine(SingletonProvider<Utilities>.Instance.GetApp().Settings.Directories.DataDirectory, "test.com");
+               Path.Combine(SingletonProvider<TestSetup>.Instance.GetApp().Settings.Directories.DataDirectory, "test.com");
 
            string accountDir = Path.Combine(dataDir, "test");
 
@@ -358,3 +359,4 @@ namespace StressTest
         }
     }
 }
+

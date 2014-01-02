@@ -11,11 +11,11 @@ namespace VMwareIntegration.Common
 {
    public class TestEnvironments
    {
-      private static string WindowxXPPath = @"C:\VMware\Windows XP Professional\Windows XP Professional.vmx";
-      private static string Windows2000Path = @"C:\VMware\Windows 2000\Windows 2000 Professional.vmx";
-      private static string Windows2003Path = @"C:\VMware\Windows Server 2003 Enterprise Edition\Windows Server 2003 Enterprise Edition.vmx";
-      private static string Windows2008Path = @"C:\VMware\Windows Server 2008\Windows Server 2008 (experimental).vmx";
-      private static string WindowsVistaPath = @"C:\VMware\Windows Vista\Windows Vista.vmx";
+      private static string WindowxXPPath = @"C:\Build\VMware\Windows XP Professional\Windows XP Professional.vmx";
+      private static string Windows2000Path = @"C:\Build\VMware\Windows 2000\Windows 2000 Professional.vmx";
+      private static string Windows2003Path = @"C:\Build\VMware\Windows Server 2003 Enterprise Edition\Windows Server 2003 Enterprise Edition.vmx";
+      private static string Windows2008Path = @"C:\Build\VMware\Windows Server 2008\Windows Server 2008 (experimental).vmx";
+      private static string WindowsVistaPath = @"C:\Build\VMware\Windows Vista\Windows Vista.vmx";
 
 
       static public void AddAll(List<TestEnvironment> listEnvironments)

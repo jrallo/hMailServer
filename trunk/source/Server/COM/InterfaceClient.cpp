@@ -10,7 +10,7 @@
 // InterfaceClient
 
 void 
-InterfaceClient::AttachItem(boost::shared_ptr<HM::ClientInfo> pClientInfo)
+InterfaceClient::AttachItem(shared_ptr<HM::ClientInfo> pClientInfo)
 {
    m_pClientInfo = pClientInfo;
 }

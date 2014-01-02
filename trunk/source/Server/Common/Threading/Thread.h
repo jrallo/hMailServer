@@ -24,7 +24,7 @@ namespace HM
       };
 
       void ThreadFunc();
-      void AssignTask(boost::shared_ptr<Task> pTask);
+      void AssignTask(shared_ptr<Task> pTask);
       void CloseThread();
 
       State GetState() {return m_eThreadState; }
@@ -35,7 +35,7 @@ namespace HM
       void Start();
       void Stop(bool bBeKind);
 
-      boost::shared_ptr<Task> GetCurrentTask() {return m_pTask; }
+      shared_ptr<Task> GetCurrentTask() {return m_pTask; }
 
    private:
 
@@ -45,7 +45,7 @@ namespace HM
 
       HANDLE m_hThreadHandle;
 
-      boost::shared_ptr<Task> m_pTask;
+      shared_ptr<Task> m_pTask;
 
       Event m_evtNewTask;
       Event m_evtStopRequest;

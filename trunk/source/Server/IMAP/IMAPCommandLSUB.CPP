@@ -20,14 +20,14 @@
 namespace HM
 {
    IMAPResult
-   IMAPCommandLSUB::ExecuteCommand(boost::shared_ptr<HM::IMAPConnection> pConnection, boost::shared_ptr<IMAPCommandArgument> pArgument)
+   IMAPCommandLSUB::ExecuteCommand(shared_ptr<HM::IMAPConnection> pConnection, shared_ptr<IMAPCommandArgument> pArgument)
    {
       if (!pConnection->IsAuthenticated())
          return IMAPResult(IMAPResult::ResultNo, "Authenticate first");
 
       String sResponse;
    
-      boost::shared_ptr<IMAPSimpleCommandParser> pParser = boost::shared_ptr<IMAPSimpleCommandParser>(new IMAPSimpleCommandParser());
+      shared_ptr<IMAPSimpleCommandParser> pParser = shared_ptr<IMAPSimpleCommandParser>(new IMAPSimpleCommandParser());
       
       pParser->Parse(pArgument);
 
@@ -42,8 +42,8 @@ namespace HM
       if (sReference.GetLength() > 0)
          folderSpecifier = sReference + folderSpecifier;
 
-      boost::shared_ptr<IMAPFolders> pAccountFolders = pConnection->GetAccountFolders();
-      boost::shared_ptr<IMAPFolders> pPublicFolders = pConnection->GetPublicFolders();
+      shared_ptr<IMAPFolders> pAccountFolders = pConnection->GetAccountFolders();
+      shared_ptr<IMAPFolders> pPublicFolders = pConnection->GetPublicFolders();
 
       if (!pAccountFolders || !pPublicFolders)
          return IMAPResult(IMAPResult::ResultNo, "LIST failed - No folders.");

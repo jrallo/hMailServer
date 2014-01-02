@@ -26,10 +26,10 @@ namespace HM
 
       ColumnPositionCache(void);
 
-      boost::shared_ptr<ColumnPositions> GetPositions(const AnsiString &sqlStatement, DALRecordset *pRecordset);
+      shared_ptr<ColumnPositions> GetPositions(const AnsiString &sqlStatement, DALRecordset *pRecordset);
 
    private:
 
-      std::map<AnsiString, boost::shared_ptr<ColumnPositions> > _mapTableColumns;
+      std::map<AnsiString, shared_ptr<ColumnPositions> > _mapTableColumns;
    };
 }

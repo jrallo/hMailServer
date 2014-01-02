@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Data;
+using System.Globalization;
 using System.Text;
 using System.Windows.Forms;
 using Microsoft.Win32;
@@ -20,7 +21,9 @@ namespace hMailServer.Administrator
 
       public delegate void BeforeSelectedIndexChangedHandler();
       public event BeforeSelectedIndexChangedHandler BeforeSelectedIndexChanged;
+      
       List<int> _numericSortOrders = new List<int>();
+      private bool _numericalColumnsLoaded = false;
 
       public ucListView()
       {
@@ -31,13 +34,19 @@ namespace hMailServer.Administrator
          this.FullRowSelect = true;
       }
 
-      public void SetNumericSortOrder(int index)
+      private void LoadNumericalColumns()
       {
-         if (!_numericSortOrders.Contains(index))
-            _numericSortOrders.Add(index);
+         foreach (ColumnHeader column in Columns)
+         {
+            var tag = column.Tag as string;
+            if (string.IsNullOrEmpty(tag))
+               continue;
+
+            if (string.Compare(tag, "Numeric", true, CultureInfo.InvariantCulture) == 0)
+               _numericSortOrders.Add(column.Index);
+         }
       }
-
-
+      
       protected override void OnSelectedIndexChanged(EventArgs e)
       {
          base.OnSelectedIndexChanged(e);
@@ -82,6 +91,13 @@ namespace hMailServer.Administrator
 
       protected override void  OnColumnClick(ColumnClickEventArgs e)
       {
+         if (!_numericalColumnsLoaded)
+         {
+            LoadNumericalColumns();
+            _numericalColumnsLoaded = true;
+         }
+
+
          // Determine if clicked column is already the column that is being sorted.
          if (e.Column == _columnSorter.SortColumn)
          {

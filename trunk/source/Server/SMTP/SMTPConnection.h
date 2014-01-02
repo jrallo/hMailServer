@@ -35,7 +35,9 @@ namespace HM
       SMTP_COMMAND_DATA = 1010,
       SMTP_COMMAND_RSET = 1011,
       SMTP_COMMAND_NOOP = 1012,
-      SMTP_COMMAND_ETRN = 1013
+      SMTP_COMMAND_ETRN = 1013,
+	  SMTP_COMMAND_STARTTLS = 1014
+
    };
 
    class SMTPConnection : public ProtocolParser, 
@@ -51,7 +53,7 @@ namespace HM
       virtual AnsiString GetCommandSeparator() const;
 
       virtual void ParseData(const AnsiString &sRequest);
-      virtual void ParseData(boost::shared_ptr<ByteBuffer> pBuf);
+      virtual void ParseData(shared_ptr<ByteBuffer> pBuf);
 
       virtual void _SendData(const String &sData);
 
@@ -102,7 +104,7 @@ namespace HM
       // Make changes to the message before it's accepted for delivery. This is
       // for example where message signature and spam-headers are added.
 
-      void _SetMessageSignature(boost::shared_ptr<MessageData> &pMessageData);
+      void _SetMessageSignature(shared_ptr<MessageData> &pMessageData);
       // Sets the signature of the message, based on the signature in the account
       // settings and domain settings.
 
@@ -138,7 +140,7 @@ namespace HM
 
       bool _SendEHLOKeywords();
 
-      int _GetMaxMessageSize(boost::shared_ptr<const Domain> pDomain);
+      int _GetMaxMessageSize(shared_ptr<const Domain> pDomain);
 
       bool _ReadDomainAddressFromHelo(const String &sRequest);
 
@@ -148,7 +150,7 @@ namespace HM
 
       bool _GetIsLocalSender();
 
-      String _GetSpamTestResultMessage(set<boost::shared_ptr<SpamTestResult> > testResult) const;
+      String _GetSpamTestResultMessage(set<shared_ptr<SpamTestResult> > testResult) const;
 
       enum ConnectionState
       {
@@ -171,14 +173,14 @@ namespace HM
 
       ConnectionState m_CurrentState;
 
-      boost::shared_ptr<Message> m_pCurrentMessage;
+      shared_ptr<Message> m_pCurrentMessage;
 
       bool m_bTraceHeadersWritten;
 
       String m_sUsername;
       String m_sPassword;
 
-      boost::shared_ptr<SMTPConfiguration> m_SMTPConf;
+      shared_ptr<SMTPConfiguration> m_SMTPConf;
    
       AuthenticationType _requestedAuthenticationType;
       
@@ -189,17 +191,17 @@ namespace HM
 
       String m_sHeloHost;
 
-      boost::shared_ptr<TransparentTransmissionBuffer> m_pTransmissionBuffer;
+      shared_ptr<TransparentTransmissionBuffer> m_pTransmissionBuffer;
 
       // Spam detection 
       bool m_bRejectedByDelayedGreyListing;
       int m_iCurNoOfRCPTTO;
       int m_iCurNoOfInvalidCommands;
       
-      boost::shared_ptr<const Domain> m_pSenderDomain;
-      boost::shared_ptr<const Account> m_pSenderAccount;
+      shared_ptr<const Domain> m_pSenderDomain;
+      shared_ptr<const Account> m_pSenderAccount;
 
-      set<boost::shared_ptr<SpamTestResult> > m_setSpamTestResults;
+      set<shared_ptr<SpamTestResult> > m_setSpamTestResults;
 
       bool m_bReAuthenticateUser;
       bool m_bPendingDisconnect;

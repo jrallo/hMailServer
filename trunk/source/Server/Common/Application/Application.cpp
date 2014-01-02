@@ -121,7 +121,7 @@ namespace HM
       Languages::Instance()->Load();
 
       // Create the backup manager that manages backup tasks...
-      m_pBackupManager = boost::shared_ptr<BackupManager>(new BackupManager);
+      m_pBackupManager = shared_ptr<BackupManager>(new BackupManager);
 
       LOG_DEBUG("Application::InitInstance - Connecting to database...");
       if (!OpenDatabase(sErrorMessage))
@@ -138,9 +138,6 @@ namespace HM
          ErrorManager::Instance()->ReportError(ErrorManager::Critical, 5010, "Application::InitInstance", sErrorMessage);
          return false;
       }
-
-      boost::shared_ptr<Domain> pDomain = boost::shared_ptr<Domain>(new Domain());
-      PersistentDomain::ReadObject(pDomain, "");
 
       // Load the caches...
       LOG_DEBUG("Application::InitInstance - Creating caches...");
@@ -172,7 +169,7 @@ namespace HM
          return false;
       }
 
-      m_pDBManager = boost::shared_ptr<DatabaseConnectionManager>(new DatabaseConnectionManager);
+      m_pDBManager = shared_ptr<DatabaseConnectionManager>(new DatabaseConnectionManager);
       bool bConnectedSuccessfully = m_pDBManager->CreateConnections(sErrorMessage);
 
       m_sLastConnectErrorMessage = sErrorMessage;
@@ -315,29 +312,29 @@ namespace HM
 
       // Create queue for server tasks, such as responsing to SMTP and 
       // POP3 and IMAP connections
-      m_pIOCPServer = boost::shared_ptr<IOCPServer>(new IOCPServer);
+      m_pIOCPServer = shared_ptr<IOCPServer>(new IOCPServer);
 
       _RegisterSessionTypes();
 
       // Create the main work queue.
       int iMainServerQueue = WorkQueueManager::Instance()->CreateWorkQueue(4, m_sServerWorkQueue, WorkQueue::eQTPreLoad);
 
-      m_pNotificationServer = boost::shared_ptr<NotificationServer>(new NotificationServer());
-      _folderManager = boost::shared_ptr<FolderManager>(new FolderManager());
+      m_pNotificationServer = shared_ptr<NotificationServer>(new NotificationServer());
+      _folderManager = shared_ptr<FolderManager>(new FolderManager());
       
       // Create the scheduler. This is always in use.
-      m_pScheduler = boost::shared_ptr<Scheduler>(new Scheduler);
+      m_pScheduler = shared_ptr<Scheduler>(new Scheduler);
       WorkQueueManager::Instance()->AddTask(iMainServerQueue, m_pScheduler);
 
       // Always run the IOCP server.
       WorkQueueManager::Instance()->AddTask(iMainServerQueue, m_pIOCPServer);
 
       // Always run delivery manager. Software useless without it.
-      m_pSMTPDeliveryManager = boost::shared_ptr<SMTPDeliveryManager>(new SMTPDeliveryManager);
+      m_pSMTPDeliveryManager = shared_ptr<SMTPDeliveryManager>(new SMTPDeliveryManager);
       WorkQueueManager::Instance()->AddTask(iMainServerQueue, m_pSMTPDeliveryManager);
 
       // ... and the external account fetch manager.
-      m_pExternalFetchManager = boost::shared_ptr<ExternalFetchManager> (new ExternalFetchManager);
+      m_pExternalFetchManager = shared_ptr<ExternalFetchManager> (new ExternalFetchManager);
       WorkQueueManager::Instance()->AddTask(iMainServerQueue, m_pExternalFetchManager);
 
       _CreateScheduledTasks();
@@ -394,14 +391,14 @@ namespace HM
    {
       if (Configuration::Instance()->GetUseSMTP())
       {
-         boost::shared_ptr<GreyListCleanerTask> pCleanerTask = boost::shared_ptr<GreyListCleanerTask>(new GreyListCleanerTask);
+         shared_ptr<GreyListCleanerTask> pCleanerTask = shared_ptr<GreyListCleanerTask>(new GreyListCleanerTask);
          pCleanerTask->SetReoccurance(ScheduledTask::RunInfinitely);
          pCleanerTask->SetMinutesBetweenRun(IniFileSettings::Instance()->GetGreylistingExpirationInterval());
          m_pScheduler->ScheduleTask(pCleanerTask);
       }
 
       // cleaning of expired IP ranges.
-      boost::shared_ptr<RemoveExpiredRecords> removeExpiredRecordsTask = boost::shared_ptr<RemoveExpiredRecords>(new RemoveExpiredRecords);
+      shared_ptr<RemoveExpiredRecords> removeExpiredRecordsTask = shared_ptr<RemoveExpiredRecords>(new RemoveExpiredRecords);
       removeExpiredRecordsTask->SetReoccurance(ScheduledTask::RunInfinitely);
       removeExpiredRecordsTask->SetMinutesBetweenRun(1);
       m_pScheduler->ScheduleTask(removeExpiredRecordsTask);
@@ -472,10 +469,10 @@ namespace HM
          ErrorManager::Instance()->ReportError(ErrorManager::High, 4219, "Application::SubmitPendingEmail", "Could not notify SMTP deliverer about new message, since SMTP deliverer does not exist. The operation requires the SMTP server to be on.");
    }
 
-   boost::shared_ptr<WorkQueue>
+   shared_ptr<WorkQueue>
    Application::GetRandomWorkQueue()
    {
-      boost::shared_ptr<WorkQueue> pWorkQueue;
+      shared_ptr<WorkQueue> pWorkQueue;
       
       for (int i = 0; i < 10; i++)
       {
@@ -495,10 +492,10 @@ namespace HM
       
    }
 
-   boost::shared_ptr<WorkQueue>
+   shared_ptr<WorkQueue>
    Application::GetAsyncWorkQueue()
    {
-      boost::shared_ptr<WorkQueue> pAsynchQueue = WorkQueueManager::Instance()->GetQueue(m_sAsynchronousTasksQueue);
+      shared_ptr<WorkQueue> pAsynchQueue = WorkQueueManager::Instance()->GetQueue(m_sAsynchronousTasksQueue);
 
       if (!pAsynchQueue)
          ErrorManager::Instance()->ReportError(ErrorManager::Medium, 5118, "Application::GetAsyncWorkQueue()", "Async work queue not available.");
@@ -521,7 +518,7 @@ namespace HM
    }
 
    void
-   Application::OnPropertyChanged(boost::shared_ptr<Property> pProperty)
+   Application::OnPropertyChanged(shared_ptr<Property> pProperty)
    {
       if (ServerStatus::Instance()->GetState() == ServerStatus::StateStopped)
          return;
@@ -530,7 +527,7 @@ namespace HM
 
       if (sPropertyName == PROPERTY_MAX_NUMBER_OF_ASYNC_TASKS)
       {
-         boost::shared_ptr<WorkQueue> pWorkQueue = GetAsyncWorkQueue();
+         shared_ptr<WorkQueue> pWorkQueue = GetAsyncWorkQueue();
 
          if (!pWorkQueue)
             return;
@@ -539,13 +536,13 @@ namespace HM
       }
    }
 
-   boost::shared_ptr<NotificationServer> 
+   shared_ptr<NotificationServer> 
    Application::GetNotificationServer()
    {
       return m_pNotificationServer;
    }
 
-   boost::shared_ptr<FolderManager> 
+   shared_ptr<FolderManager> 
    Application::GetFolderManager()
    {
       return _folderManager;

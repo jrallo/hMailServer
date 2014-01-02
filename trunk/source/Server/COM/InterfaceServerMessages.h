@@ -60,7 +60,7 @@ END_COM_MAP()
 
 public:
 
-   boost::shared_ptr<HM::ServerMessages> m_pServerMessages;
+   shared_ptr<HM::ServerMessages> m_pServerMessages;
 
 };
 

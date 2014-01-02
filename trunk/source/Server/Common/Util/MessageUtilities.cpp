@@ -44,7 +44,7 @@ namespace HM
    }
 
 	bool
-	MessageUtilities::MoveToIMAPFolder(boost::shared_ptr<Message> pMessage, __int64 iAccountID, const String &sFolderName, bool bAutoSubscribe, bool bSetByGlobalRule, __int64 &iResultAccount, __int64 &iResultFolder)
+	MessageUtilities::MoveToIMAPFolder(shared_ptr<Message> pMessage, __int64 iAccountID, const String &sFolderName, bool bAutoSubscribe, bool bSetByGlobalRule, __int64 &iResultAccount, __int64 &iResultFolder)
    //---------------------------------------------------------------------------()
    // DESCRIPTION:
    // Moves a message to an IMAP folder. The message should not be saved when this
@@ -65,7 +65,7 @@ namespace HM
 
       std::vector<String> vecFolderPath = StringParser::SplitString(sTempFolderName, Configuration::Instance()->GetIMAPConfiguration()->GetHierarchyDelimiter());
 
-      boost::shared_ptr<IMAPFolders> pFolders;
+      shared_ptr<IMAPFolders> pFolders;
 
       bool isPublicFolder = IMAPFolderUtilities::IsPublicFolder(vecFolderPath);
 
@@ -78,13 +78,13 @@ namespace HM
          pFolders = IMAPFolderContainer::Instance()->GetFoldersForAccount(iAccountID);
 
       // Check if this folder exist
-      boost::shared_ptr<IMAPFolder> pFolder = pFolders->GetFolderByFullPath(vecFolderPath);
+      shared_ptr<IMAPFolder> pFolder = pFolders->GetFolderByFullPath(vecFolderPath);
 
       if (pFolder && pFolder->IsPublicFolder())
       {
          // Do we have permissions to append?
 		   ACLManager aclManager;
-         boost::shared_ptr<ACLPermission> pPermission = aclManager.GetPermissionForFolder(iAccountID, pFolder);
+         shared_ptr<ACLPermission> pPermission = aclManager.GetPermissionForFolder(iAccountID, pFolder);
          if (!pPermission)
             return false;
 
@@ -100,8 +100,8 @@ namespace HM
             if (!bSetByGlobalRule)
             {
                // iterate over folders until we find an already existing one.
-               boost::shared_ptr<IMAPFolders> pPublicFolders = Configuration::Instance()->GetIMAPConfiguration()->GetPublicFolders();
-               boost::shared_ptr<IMAPFolder> pTempFolder = IMAPFolderUtilities::GetTopMostExistingFolder(pPublicFolders, vecFolderPath);
+               shared_ptr<IMAPFolders> pPublicFolders = Configuration::Instance()->GetIMAPConfiguration()->GetPublicFolders();
+               shared_ptr<IMAPFolder> pTempFolder = IMAPFolderUtilities::GetTopMostExistingFolder(pPublicFolders, vecFolderPath);
                
                if (!pTempFolder)
                {
@@ -111,7 +111,7 @@ namespace HM
 
                // Do we have permissions to append?
                ACLManager aclManager;
-			      boost::shared_ptr<ACLPermission> pPermission = aclManager.GetPermissionForFolder(iAccountID, pTempFolder);
+			      shared_ptr<ACLPermission> pPermission = aclManager.GetPermissionForFolder(iAccountID, pTempFolder);
 
                if (!pPermission)
                   return false;
@@ -173,21 +173,21 @@ namespace HM
    }
 
    bool 
-   MessageUtilities::CopyToIMAPFolder(boost::shared_ptr<Message> pMessage, int iDestinationFolderID)
+   MessageUtilities::CopyToIMAPFolder(shared_ptr<Message> pMessage, int iDestinationFolderID)
    {
       // Check if the destination folder exists
-      boost::shared_ptr<IMAPFolders> pFolders = HM::IMAPFolderContainer::Instance()->GetFoldersForAccount(pMessage->GetAccountID());
-      boost::shared_ptr<IMAPFolder> pFolder = pFolders->GetItemByDBIDRecursive(iDestinationFolderID);
+      shared_ptr<IMAPFolders> pFolders = HM::IMAPFolderContainer::Instance()->GetFoldersForAccount(pMessage->GetAccountID());
+      shared_ptr<IMAPFolder> pFolder = pFolders->GetItemByDBIDRecursive(iDestinationFolderID);
 
       if (!pFolder)
          return false;
 
       // Check which account this message belongs to.
-      boost::shared_ptr<const Account> pAccount = CacheContainer::Instance()->GetAccount(pMessage->GetAccountID());
+      shared_ptr<const Account> pAccount = CacheContainer::Instance()->GetAccount(pMessage->GetAccountID());
       if (!pAccount)
          return false;
 
-      boost::shared_ptr<Message> pNewMessage = PersistentMessage::CopyToIMAPFolder(pAccount, pMessage, pFolder);
+      shared_ptr<Message> pNewMessage = PersistentMessage::CopyToIMAPFolder(pAccount, pMessage, pFolder);
       if (!pNewMessage)
          return false;
 
@@ -195,8 +195,8 @@ namespace HM
 
       pFolder->GetMessages()->AddItem(pNewMessage);
 
-      boost::shared_ptr<ChangeNotification> pNotification = 
-         boost::shared_ptr<ChangeNotification>(new ChangeNotification(pNewMessage->GetAccountID(), pNewMessage->GetFolderID(), ChangeNotification::NotificationMessageAdded));
+      shared_ptr<ChangeNotification> pNotification = 
+         shared_ptr<ChangeNotification>(new ChangeNotification(pNewMessage->GetAccountID(), pNewMessage->GetFolderID(), ChangeNotification::NotificationMessageAdded));
 
       Application::Instance()->GetNotificationServer()->SendNotification(pNotification);
 
@@ -204,7 +204,7 @@ namespace HM
    }
 
    bool
-   MessageUtilities::RetrieveOriginatingAddress(boost::shared_ptr<Message> pMessage, String &hostName, IPAddress &address)
+   MessageUtilities::RetrieveOriginatingAddress(shared_ptr<Message> pMessage, String &hostName, IPAddress &address)
    //---------------------------------------------------------------------------()
    // DESCRIPTION:
    // Tries to determine the IP address / host this email originally comes from.
@@ -214,7 +214,7 @@ namespace HM
       address = IPAddress();
 
       // Extract Received headers from the message.
-      boost::shared_ptr<MimeHeader> pHeader = _GetMessageHeader(pMessage);
+      shared_ptr<MimeHeader> pHeader = _GetMessageHeader(pMessage);
 
       std::list<String> receivedHeaders;
 
@@ -255,7 +255,7 @@ namespace HM
       std::list<std::pair<String, IPAddress>>::const_iterator iter = addresses.begin();
       std::list<std::pair<String, IPAddress>>::const_iterator iterEnd = addresses.end();
 
-      boost::shared_ptr<IncomingRelays> incomingRelays = Configuration::Instance()->GetSMTPConfiguration()->GetIncomingRelays();
+      shared_ptr<IncomingRelays> incomingRelays = Configuration::Instance()->GetSMTPConfiguration()->GetIncomingRelays();
 
       for (; iter != iterEnd; iter++)
       {
@@ -274,7 +274,7 @@ namespace HM
    }
 
    String 
-   MessageUtilities::GetSendersIP(boost::shared_ptr<Message> pMessage)
+   MessageUtilities::GetSendersIP(shared_ptr<Message> pMessage)
    {
       const String fileName = PersistentMessage::GetFileName(pMessage);
 
@@ -306,15 +306,15 @@ namespace HM
       return sIPAddress;
    }
 
-   boost::shared_ptr<MimeHeader> 
-   MessageUtilities::_GetMessageHeader(boost::shared_ptr<Message> pMessage)
+   shared_ptr<MimeHeader> 
+   MessageUtilities::_GetMessageHeader(shared_ptr<Message> pMessage)
    {
       String fileName = PersistentMessage::GetFileName(pMessage);
 
       AnsiString sHeader = PersistentMessage::LoadHeader(fileName);
-      boost::shared_ptr<MimeHeader> pHeader = boost::shared_ptr<MimeHeader>(new MimeHeader());
+      shared_ptr<MimeHeader> pHeader = shared_ptr<MimeHeader>(new MimeHeader());
       
-      boost::shared_ptr<MimeHeader> pMimeHeader = boost::shared_ptr<MimeHeader>(new MimeHeader);
+      shared_ptr<MimeHeader> pMimeHeader = shared_ptr<MimeHeader>(new MimeHeader);
       pHeader->Load(sHeader, sHeader.GetLength(), true);
 
       return pHeader;

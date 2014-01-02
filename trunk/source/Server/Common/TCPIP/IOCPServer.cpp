@@ -30,7 +30,7 @@ namespace HM
    IOCPServer::IOCPServer(void) :
       _dummy_context(_io_service, boost::asio::ssl::context::sslv23)
    {
-
+		m_bUseSTARTTLS = false;
    }
 
    IOCPServer::~IOCPServer(void)
@@ -60,26 +60,28 @@ namespace HM
       LocalIPAddresses::Instance()->LoadIPAddresses();
 
       // Create one socket for each IP address specified in the multi-homing settings.
-      vector<boost::shared_ptr<TCPIPPort> > vecTCPIPPorts = Configuration::Instance()->GetTCPIPPorts()->GetVector();
+      vector<shared_ptr<TCPIPPort> > vecTCPIPPorts = Configuration::Instance()->GetTCPIPPorts()->GetVector();
 
-      vector<boost::shared_ptr<TCPIPPort> >::iterator iterPort = vecTCPIPPorts.begin();
-      vector<boost::shared_ptr<TCPIPPort> >::iterator iterPortEnd = vecTCPIPPorts.end();
+      vector<shared_ptr<TCPIPPort> >::iterator iterPort = vecTCPIPPorts.begin();
+      vector<shared_ptr<TCPIPPort> >::iterator iterPortEnd = vecTCPIPPorts.end();
 
-      vector<boost::shared_ptr<TCPServer> > vecTCPServers;
+      vector<shared_ptr<TCPServer> > vecTCPServers;
 
       for (; iterPort != iterPortEnd; iterPort++)
       {
-         boost::shared_ptr<TCPIPPort> pPort = (*iterPort);
+         shared_ptr<TCPIPPort> pPort = (*iterPort);
          IPAddress address = pPort->GetAddress();
          int iPort = pPort->GetPortNumber();
          SessionType st = pPort->GetProtocol();
          bool bUseSSL = pPort->GetUseSSL();
+		 m_bUseSTARTTLS = pPort->GetUseSTARTTLS();
+          
+         
+         shared_ptr<SSLCertificate> pSSLCertificate;
 
-         boost::shared_ptr<SSLCertificate> pSSLCertificate;
-
-         if (bUseSSL)
+         if (bUseSSL || m_bUseSTARTTLS)
          {
-            boost::shared_ptr<SSLCertificates> pSSLCertificates = Configuration::Instance()->GetSSLCertificates();
+            shared_ptr<SSLCertificates> pSSLCertificates = Configuration::Instance()->GetSSLCertificates();
             pSSLCertificate = pSSLCertificates->GetItemByDBID(pPort->GetSSLCertificateID());
          }
 
@@ -87,7 +89,7 @@ namespace HM
             continue;
 
          
-         boost::shared_ptr<TCPServer> pTCPServer = boost::shared_ptr<TCPServer> (new TCPServer(_io_service, address, iPort, st, pSSLCertificate));
+         shared_ptr<TCPServer> pTCPServer = shared_ptr<TCPServer> (new TCPServer(_io_service, address, iPort, st, pSSLCertificate,(m_bUseSTARTTLS == true)? 1 : 0));
 
          pTCPServer->Run();
 
@@ -101,13 +103,13 @@ namespace HM
 
       int iQueueID = WorkQueueManager::Instance()->CreateWorkQueue(iThreadCount, "IOCPQueue", WorkQueue::eQTFixedSize);
       
-      boost::shared_ptr<WorkQueue> pWorkQueue = WorkQueueManager::Instance()->GetQueue("IOCPQueue");
+      shared_ptr<WorkQueue> pWorkQueue = WorkQueueManager::Instance()->GetQueue("IOCPQueue");
 
       // Launch a thread that holds the IOCP objects
 
       for (int i = 0; i < iThreadCount; i++)
       {
-         boost::shared_ptr<IOCPQueueWorkerTask> pWorkerTask = boost::shared_ptr<IOCPQueueWorkerTask>(new IOCPQueueWorkerTask(_io_service));
+         shared_ptr<IOCPQueueWorkerTask> pWorkerTask = shared_ptr<IOCPQueueWorkerTask>(new IOCPQueueWorkerTask(_io_service));
          WorkQueueManager::Instance()->AddTask(iQueueID, pWorkerTask);
       }	
 
@@ -116,8 +118,8 @@ namespace HM
 
       m_evtClose.Wait();
 
-      vector<boost::shared_ptr<TCPServer> >::iterator iterServer = vecTCPServers.begin();
-      vector<boost::shared_ptr<TCPServer> >::iterator iterEnd = vecTCPServers.end();
+      vector<shared_ptr<TCPServer> >::iterator iterServer = vecTCPServers.begin();
+      vector<shared_ptr<TCPServer> >::iterator iterEnd = vecTCPServers.end();
       for (; iterServer != iterEnd; iterServer++)
       {
          (*iterServer)->StopAccept();
@@ -129,21 +131,21 @@ namespace HM
 
    }
 
-   boost::shared_ptr<TCPConnection> 
+   shared_ptr<TCPConnection> 
    IOCPServer::CreateConnection(boost::asio::ssl::context& context)
    {
       TCPConnection::PrepareSSLContext(context);
       
-      boost::shared_ptr<TCPConnection> pNewConnection = boost::shared_ptr<TCPConnection> (new TCPConnection(true, _io_service, context));
+	  shared_ptr<TCPConnection> pNewConnection = shared_ptr<TCPConnection> (new TCPConnection(true, _io_service, context, (m_bUseSTARTTLS == true)? 1 : 0 )); // 1 starttls on
 
       return pNewConnection;
    }
 
 
-   boost::shared_ptr<TCPConnection> 
+   shared_ptr<TCPConnection> 
    IOCPServer::CreateConnection()
    {
-      boost::shared_ptr<TCPConnection> pNewConnection = boost::shared_ptr<TCPConnection> (new TCPConnection(false, _io_service, _dummy_context));
+      shared_ptr<TCPConnection> pNewConnection = shared_ptr<TCPConnection> (new TCPConnection(false, _io_service, _dummy_context,0)); // 0 starttls off
 
       return pNewConnection;
    }

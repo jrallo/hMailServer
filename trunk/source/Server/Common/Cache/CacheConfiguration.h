@@ -30,7 +30,7 @@ namespace HM
 
    private:
 
-      boost::shared_ptr<PropertySet> _GetSettings() const;
+      shared_ptr<PropertySet> _GetSettings() const;
 
    };
 }

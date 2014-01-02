@@ -51,7 +51,7 @@ namespace HM
    }
 
    void
-   RuleApplier::ApplyRules(boost::shared_ptr<Rules> pRules, boost::shared_ptr<const Account> account, boost::shared_ptr<Message> pMessage, RuleResult &ruleResult)
+   RuleApplier::ApplyRules(shared_ptr<Rules> pRules, shared_ptr<const Account> account, shared_ptr<Message> pMessage, RuleResult &ruleResult)
    {
       LOG_DEBUG(_T("Applying rules"));
 
@@ -60,14 +60,14 @@ namespace HM
          return;
       }
 
-      boost::shared_ptr<MessageData> pMessageData = boost::shared_ptr<MessageData>(new MessageData());
+      shared_ptr<MessageData> pMessageData = shared_ptr<MessageData>(new MessageData());
       pMessageData->LoadFromMessage(account, pMessage);
       
       m_iRuleAccountID = pRules->GetAccountID();
 
       for (int i = 0; i < pRules->GetCount(); i++)
       {
-         boost::shared_ptr<Rule> pRule = pRules->GetItem(i);
+         shared_ptr<Rule> pRule = pRules->GetItem(i);
 
          if (pRule && pRule->GetActive())
          {
@@ -87,17 +87,18 @@ namespace HM
    }
 
    bool
-   RuleApplier::_ApplyRule(boost::shared_ptr<Rule> pRule, boost::shared_ptr<const Account> account, boost::shared_ptr<MessageData> pMsgData, bool &bContinueRuleProcessing, RuleResult &ruleResult)
+   RuleApplier::_ApplyRule(shared_ptr<Rule> pRule, shared_ptr<const Account> account, shared_ptr<MessageData> pMsgData, bool &bContinueRuleProcessing, RuleResult &ruleResult)
    {
-      LOG_DEBUG(_T("Applying rule"));
+		if (Logger::Instance()->GetLogDebug())
+			LOG_DEBUG(_T("Applying rule " + pRule->GetName()));
 
       bool bAllRequired = pRule->GetUseAND();
       bool bDoActions = false;
 
-      boost::shared_ptr<RuleCriterias> pCriterias = pRule->GetCriterias();
+      shared_ptr<RuleCriterias> pCriterias = pRule->GetCriterias();
       for (int i = 0; i < pCriterias->GetCount(); i++)
       {
-         boost::shared_ptr<RuleCriteria> pCriteria = pCriterias->GetItem(i);
+         shared_ptr<RuleCriteria> pCriteria = pCriterias->GetItem(i);
 
          if (!pCriteria)
             continue;
@@ -132,13 +133,13 @@ namespace HM
    }
 
    void
-   RuleApplier::_ApplyActions(boost::shared_ptr<Rule> pRule, boost::shared_ptr<const Account> account, boost::shared_ptr<MessageData> pMsgData, bool &bContinueRuleProcessing, RuleResult &ruleResult)
+   RuleApplier::_ApplyActions(shared_ptr<Rule> pRule, shared_ptr<const Account> account, shared_ptr<MessageData> pMsgData, bool &bContinueRuleProcessing, RuleResult &ruleResult)
    {  
-      boost::shared_ptr<RuleActions> pActions = pRule->GetActions();
+      shared_ptr<RuleActions> pActions = pRule->GetActions();
 
       for (int i = 0; i < pActions->GetCount(); i++)
       {
-         boost::shared_ptr<RuleAction> pAction = pActions->GetItem(i);
+         shared_ptr<RuleAction> pAction = pActions->GetItem(i);
 
          if (pAction)
          {
@@ -148,7 +149,7 @@ namespace HM
    }
 
    void
-   RuleApplier::_ApplyAction(boost::shared_ptr<Rule> pRule, boost::shared_ptr<RuleAction> pAction, boost::shared_ptr<const Account> account, boost::shared_ptr<MessageData> pMsgData, bool &bContinueRuleProcessing, RuleResult &ruleResult)
+   RuleApplier::_ApplyAction(shared_ptr<Rule> pRule, shared_ptr<RuleAction> pAction, shared_ptr<const Account> account, shared_ptr<MessageData> pMsgData, bool &bContinueRuleProcessing, RuleResult &ruleResult)
    {  
       Logger::Instance()->LogDebug(_T("Performing rule action"));
       switch (pAction->GetType())
@@ -212,9 +213,10 @@ namespace HM
    }
 
    void 
-   RuleApplier::_ApplyActionForward(boost::shared_ptr<RuleAction> pAction, boost::shared_ptr<const Account> account, boost::shared_ptr<MessageData> pMsgData) const
+   RuleApplier::_ApplyActionForward(shared_ptr<RuleAction> pAction, shared_ptr<const Account> account, shared_ptr<MessageData> pMsgData) const
    {
-      if (RuleLoopCountReached(pMsgData))
+      // false = check only loop counter not AutoSubmitted header because forward
+      if (!IsGeneratedResponseAllowed(pMsgData, false))
       {
          ErrorManager::Instance()->ReportError(ErrorManager::Medium, 5064, "RuleApplier::_ApplyActionForward", "Could not forward message. Maximum rule loop count reached.");
          return;
@@ -226,26 +228,26 @@ namespace HM
          return;
       }
 
-      boost::shared_ptr<Message> pMsg = PersistentMessage::CopyToQueue(account, pMsgData->GetMessage());
+      shared_ptr<Message> pMsg = PersistentMessage::CopyToQueue(account, pMsgData->GetMessage());
 
       if (!pMsg)
          return;
 
       pMsg->SetState(Message::Delivering);
 
-      boost::shared_ptr<Account> emptyAccount;
+      shared_ptr<Account> emptyAccount;
 
       // Increase the number of rule-deliveries made.
       String newFileName = PersistentMessage::GetFileName(emptyAccount, pMsg);
 
-      boost::shared_ptr<MessageData> pNewMsgData = boost::shared_ptr<MessageData>(new MessageData());
+      shared_ptr<MessageData> pNewMsgData = shared_ptr<MessageData>(new MessageData());
       pNewMsgData->LoadFromMessage(emptyAccount, pMsg);
       pNewMsgData->IncreaseRuleLoopCount();
       pNewMsgData->Write(newFileName);
       
       // We need to update the SMTP envelope from address, if this
       // message is forwarded by a user-level account.
-      boost::shared_ptr<CONST Account> pAccount = CacheContainer::Instance()->GetAccount(m_iRuleAccountID);
+      shared_ptr<CONST Account> pAccount = CacheContainer::Instance()->GetAccount(m_iRuleAccountID);
       if (pAccount)
          pMsg->SetFromAddress(pAccount->GetAddress());
       
@@ -268,15 +270,16 @@ namespace HM
    }
 
    void 
-   RuleApplier::_ApplyActionCopy(boost::shared_ptr<Rule> rule, boost::shared_ptr<const Account> account, boost::shared_ptr<MessageData> pMsgData) const
+   RuleApplier::_ApplyActionCopy(shared_ptr<Rule> rule, shared_ptr<const Account> account, shared_ptr<MessageData> pMsgData) const
    {
-      if (RuleLoopCountReached(pMsgData))
+      // false = check only loop counter not AutoSubmitted header because forwarding copy
+      if (!IsGeneratedResponseAllowed(pMsgData, false))
       {
          ErrorManager::Instance()->ReportError(ErrorManager::Medium, 5201, "RuleApplier::_ApplyActionCopy", "Could not copy message. Maximum rule loop count reached.");
          return;
       }
 
-      boost::shared_ptr<Message> pMsg = PersistentMessage::CopyToQueue(account, pMsgData->GetMessage());
+      shared_ptr<Message> pMsg = PersistentMessage::CopyToQueue(account, pMsgData->GetMessage());
       
       if (!pMsg)
          return;
@@ -288,7 +291,7 @@ namespace HM
       if (pMsgData->GetMessage()->GetAccountID() > 0)
       {
          // What account is it in?
-         boost::shared_ptr<const Account> recipientAccount = CacheContainer::Instance()->GetAccount(pMsgData->GetMessage()->GetAccountID());
+         shared_ptr<const Account> recipientAccount = CacheContainer::Instance()->GetAccount(pMsgData->GetMessage()->GetAccountID());
 
          if (recipientAccount)
          {
@@ -301,12 +304,13 @@ namespace HM
       else
       {
          // Copy the old reciopients.
-         std::vector<boost::shared_ptr<MessageRecipient> >  &oldRecipients = pMsgData->GetMessage()->GetRecipients()->GetVector();
+         std::vector<shared_ptr<MessageRecipient> >  &oldRecipients = pMsgData->GetMessage()->GetRecipients()->GetVector();
 
-         boost_foreach(boost::shared_ptr<MessageRecipient> recipient, oldRecipients)
+         boost_foreach(shared_ptr<MessageRecipient> recipient, oldRecipients)
          {
-            boost::shared_ptr<MessageRecipient> newRecipient = boost::shared_ptr<MessageRecipient >(new MessageRecipient());
+            shared_ptr<MessageRecipient> newRecipient = shared_ptr<MessageRecipient >(new MessageRecipient());
             newRecipient->CopyFrom(recipient);
+            newRecipient->SetMessageID(0);
 
             pMsg->GetRecipients()->Add(newRecipient);
          }
@@ -317,7 +321,7 @@ namespace HM
       // Increase the number of rule-deliveries made.
       String newMessageFileName = PersistentMessage::GetFileName(pMsg);
 
-      boost::shared_ptr<MessageData> pNewMsgData = boost::shared_ptr<MessageData>(new MessageData());
+      shared_ptr<MessageData> pNewMsgData = shared_ptr<MessageData>(new MessageData());
       pNewMsgData->LoadFromMessage(newMessageFileName, pMsg);
       pNewMsgData->IncreaseRuleLoopCount();
       pNewMsgData->SetFieldValue("X-CopyRule", rule->GetName());
@@ -337,13 +341,13 @@ namespace HM
    }
 
    void 
-   RuleApplier::_ApplyActionScriptFunction(boost::shared_ptr<RuleAction> pAction, boost::shared_ptr<const Account> account, boost::shared_ptr<MessageData> pMsgData) const
+   RuleApplier::_ApplyActionScriptFunction(shared_ptr<RuleAction> pAction, shared_ptr<const Account> account, shared_ptr<MessageData> pMsgData) const
    {
       // Run a custom function
       String sFunctionName = pAction->GetScriptFunction();
 
-      boost::shared_ptr<ScriptObjectContainer> pContainer = boost::shared_ptr<ScriptObjectContainer>(new ScriptObjectContainer);
-      boost::shared_ptr<Result> pResult = boost::shared_ptr<Result>(new Result);
+      shared_ptr<ScriptObjectContainer> pContainer = shared_ptr<ScriptObjectContainer>(new ScriptObjectContainer);
+      shared_ptr<Result> pResult = shared_ptr<Result>(new Result);
       pContainer->AddObject("HMAILSERVER_MESSAGE", pMsgData->GetMessage(), ScriptObject::OTMessage);
       pContainer->AddObject("Result", pResult, ScriptObject::OTResult);
       
@@ -357,7 +361,7 @@ namespace HM
    }
 
    void 
-   RuleApplier::_ApplyActionSetHeader(boost::shared_ptr<RuleAction> pAction, boost::shared_ptr<const Account> account, boost::shared_ptr<MessageData> pMsgData) const
+   RuleApplier::_ApplyActionSetHeader(shared_ptr<RuleAction> pAction, shared_ptr<const Account> account, shared_ptr<MessageData> pMsgData) const
    {
       // Run a custom function
       String sHeader = pAction->GetHeaderName();
@@ -371,11 +375,12 @@ namespace HM
    }
 
    void 
-   RuleApplier::_ApplyActionReply(boost::shared_ptr<RuleAction> pAction, boost::shared_ptr<MessageData> pMsgData) const
+   RuleApplier::_ApplyActionReply(shared_ptr<RuleAction> pAction, shared_ptr<MessageData> pMsgData) const
    {
-      if (RuleLoopCountReached(pMsgData))
+      // true = check AutoSubmitted header and do not respond if set
+      if (!IsGeneratedResponseAllowed(pMsgData, true))
       {
-         ErrorManager::Instance()->ReportError(ErrorManager::Medium, 5065, "RuleApplier::_ApplyActionReply", "Could not reply message. Maximum rule loop count reached.");
+         ErrorManager::Instance()->ReportError(ErrorManager::Medium, 5065, "RuleApplier::_ApplyActionReply", "Could not reply message. Maximum rule loop count reached or Auto-Submitted header.");
          return;
       }
 
@@ -388,15 +393,15 @@ namespace HM
          return;
       }
 
-      boost::shared_ptr<Account> emptyAccount;
+      shared_ptr<Account> emptyAccount;
 
-      // Send a copy of this email.
-      boost::shared_ptr<Message> pMsg = boost::shared_ptr<Message>(new Message());
+      // Sen d a copy of this email.
+      shared_ptr<Message> pMsg = shared_ptr<Message>(new Message());
       pMsg->SetState(Message::Delivering);
       
       String newMessageFileName = PersistentMessage::GetFileName(pMsg);
 
-      boost::shared_ptr<MessageData> pNewMsgData = boost::shared_ptr<MessageData>(new MessageData());
+      shared_ptr<MessageData> pNewMsgData = shared_ptr<MessageData>(new MessageData());
       pNewMsgData->LoadFromMessage(newMessageFileName, pMsg);
       pNewMsgData->SetReturnPath("");
       pNewMsgData->GenerateMessageID();
@@ -405,8 +410,10 @@ namespace HM
       pNewMsgData->SetSubject(pAction->GetSubject());
       pNewMsgData->SetBody(pAction->GetBody());
       pNewMsgData->SetSentTime(Time::GetCurrentMimeDate());
-      pNewMsgData->IncreaseRuleLoopCount();
+      pNewMsgData->SetAutoReplied();
+	  pNewMsgData->IncreaseRuleLoopCount();
       pNewMsgData->Write(newMessageFileName);
+	  
 
       // Add recipients.
       bool recipientOK = false;
@@ -418,7 +425,7 @@ namespace HM
    }
 
    bool
-   RuleApplier::_MessageMatchesCriteria(boost::shared_ptr<RuleCriteria> pCriteria, boost::shared_ptr<MessageData> pMsgData) const
+   RuleApplier::_MessageMatchesCriteria(shared_ptr<RuleCriteria> pCriteria, shared_ptr<MessageData> pMsgData) const
    {
       String sFieldValue;
       if (pCriteria->GetUsePredefined())
@@ -448,9 +455,9 @@ namespace HM
             break;
          case RuleCriteria::FTRecipientList:
             {
-               boost::shared_ptr<Message> pMessage = pMsgData->GetMessage();
-               std::vector<boost::shared_ptr<MessageRecipient> > vecRecipients = pMessage->GetRecipients()->GetVector();
-               std::vector<boost::shared_ptr<MessageRecipient> >::iterator iterRecipient = vecRecipients.begin();
+               shared_ptr<Message> pMessage = pMsgData->GetMessage();
+               std::vector<shared_ptr<MessageRecipient> > vecRecipients = pMessage->GetRecipients()->GetVector();
+               std::vector<shared_ptr<MessageRecipient> >::iterator iterRecipient = vecRecipients.begin();
 
                while (iterRecipient != vecRecipients.end())
                {
@@ -564,12 +571,16 @@ namespace HM
    }
 
    bool
-   RuleApplier::RuleLoopCountReached(boost::shared_ptr<MessageData> pMsgData)
+   RuleApplier::IsGeneratedResponseAllowed(shared_ptr<MessageData> pMsgData, bool bChkAutoSubmit)
    {
       int iCurrProcessCount = pMsgData->GetRuleLoopCount();
       int iMaxAllowed = Configuration::Instance()->GetSMTPConfiguration()->GetRuleLoopLimit();
 
-      if (iCurrProcessCount < iMaxAllowed)
+      if (iCurrProcessCount >= iMaxAllowed)
+         return false;
+
+      // bChkAutoSubmit - Fix for google calendar loop http://www.hmailserver.com/forum/viewtopic.php?f=7&t=24423
+      if (bChkAutoSubmit && pMsgData->IsAutoSubmitted())
          return false;
 
       return true;

@@ -46,7 +46,7 @@ END_COM_MAP()
 
 public:
 
-   void Attach(boost::shared_ptr<HM::RuleCriterias> pCriterias);
+   void Attach(shared_ptr<HM::RuleCriterias> pCriterias);
 
    STDMETHOD(get_ItemByDBID)(/*[in]*/ long DBID, /*[out, retval]*/ IInterfaceRuleCriteria** pVal);
    STDMETHOD(get_Item)(/*[in]*/ long Index, /*[out, retval]*/ IInterfaceRuleCriteria **pVal);
@@ -58,7 +58,7 @@ public:
 
 private:
 
-   boost::shared_ptr<HM::RuleCriterias> m_pRuleCriterias;
+   shared_ptr<HM::RuleCriterias> m_pRuleCriterias;
 
 
 

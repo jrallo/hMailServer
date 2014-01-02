@@ -17,7 +17,7 @@ namespace HM
       String GetName() const;
       void SetName(const String &sName);
 
-      boost::shared_ptr<GroupMembers> GetMembers();
+      shared_ptr<GroupMembers> GetMembers();
       
       bool UserIsMember(__int64 iAccountID);
 

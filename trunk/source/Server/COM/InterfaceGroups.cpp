@@ -11,7 +11,7 @@
 #include "InterfaceGroup.h"
 
 void 
-InterfaceGroups::Attach(boost::shared_ptr<HM::Groups> pBA) 
+InterfaceGroups::Attach(shared_ptr<HM::Groups> pBA) 
 { 
    m_pGroups = pBA; 
 }
@@ -65,7 +65,7 @@ InterfaceGroups::get_Item(long Index, IInterfaceGroup **pVal)
       CComObject<InterfaceGroup>* pInterfaceGroup = new CComObject<InterfaceGroup>();
       pInterfaceGroup->SetAuthentication(m_pAuthentication);
    
-      boost::shared_ptr<HM::Group> pBA = m_pGroups->GetItem(Index);
+      shared_ptr<HM::Group> pBA = m_pGroups->GetItem(Index);
    
       if (!pBA)
          return DISP_E_BADINDEX;
@@ -111,7 +111,7 @@ InterfaceGroups::get_ItemByDBID(long lDBID, IInterfaceGroup **pVal)
       CComObject<InterfaceGroup>* pInterfaceGroup = new CComObject<InterfaceGroup>();
       pInterfaceGroup->SetAuthentication(m_pAuthentication);
    
-      boost::shared_ptr<HM::Group> pBA = m_pGroups->GetItemByDBID(lDBID);
+      shared_ptr<HM::Group> pBA = m_pGroups->GetItemByDBID(lDBID);
    
       if (!pBA)
          return DISP_E_BADINDEX;
@@ -141,7 +141,7 @@ InterfaceGroups::get_ItemByName(BSTR sName, IInterfaceGroup **pVal)
       CComObject<InterfaceGroup>* pInterfaceGroup = new CComObject<InterfaceGroup>();
       pInterfaceGroup->SetAuthentication(m_pAuthentication);
    
-      boost::shared_ptr<HM::Group> pBA = m_pGroups->GetItemByName(sName);
+      shared_ptr<HM::Group> pBA = m_pGroups->GetItemByName(sName);
    
       if (!pBA)
          return DISP_E_BADINDEX;
@@ -174,7 +174,7 @@ InterfaceGroups::Add(IInterfaceGroup **pVal)
       CComObject<InterfaceGroup>* pInterfaceGroup = new CComObject<InterfaceGroup>();
       pInterfaceGroup->SetAuthentication(m_pAuthentication);
    
-      boost::shared_ptr<HM::Group> pBA = boost::shared_ptr<HM::Group>(new HM::Group);
+      shared_ptr<HM::Group> pBA = shared_ptr<HM::Group>(new HM::Group);
    
       pInterfaceGroup->AttachItem(pBA);
       pInterfaceGroup->AttachParent(m_pGroups, false);

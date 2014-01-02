@@ -24,7 +24,7 @@ namespace HM
    }
 
 
-   /*boost::shared_ptr<DALRecordset>
+   /*shared_ptr<DALRecordset>
    DALRecordsetFactory::CreateRecordset()
    {
 

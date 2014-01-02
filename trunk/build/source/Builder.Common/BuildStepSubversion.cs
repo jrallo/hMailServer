@@ -70,7 +70,7 @@ namespace Builder.Common
             launcher.LaunchProcess(ExpandMacros(m_oBuilder.ParameterSubversionPath), ExpandMacros(sCommand), out output);
 
             if (output.IndexOf("svn help cleanup") > 0)
-                throw new Exception("Failed");
+                throw new Exception("SVN command failed.");
         }
 
         void launcher_Output(string output)

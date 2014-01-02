@@ -13,7 +13,7 @@
 
 InterfaceFetchAccount::InterfaceFetchAccount()
 {
-   m_pObject = boost::shared_ptr<HM::FetchAccount>(new HM::FetchAccount());
+   m_pObject = shared_ptr<HM::FetchAccount>(new HM::FetchAccount());
 }
 
 STDMETHODIMP InterfaceFetchAccount::get_ID(LONG* pVal)
@@ -555,6 +555,23 @@ STDMETHODIMP InterfaceFetchAccount::get_NextDownloadTime(BSTR* pVal)
    {
       return COMError::GenerateGenericMessage();
    }
+}
+
+STDMETHODIMP InterfaceFetchAccount::get_IsLocked(VARIANT_BOOL* pVal)
+{
+	try
+	{
+		if (!m_pObject)
+			return GetAccessDenied();
+
+		bool locked = HM::PersistentFetchAccount::IsLocked(m_pObject->GetID());
+		*pVal = locked ? VARIANT_TRUE : VARIANT_FALSE;
+		return S_OK;
+	}
+	catch (...)
+	{
+		return COMError::GenerateGenericMessage();
+	}
 }
 
 STDMETHODIMP InterfaceFetchAccount::get_UseAntiSpam(VARIANT_BOOL *pVal)

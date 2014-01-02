@@ -27,13 +27,13 @@ namespace HM
    }
 
    String
-   MailerDaemonAddressDeterminer::GetMailerDaemonAddress(const boost::shared_ptr<Message> pOrigMessage)
+   MailerDaemonAddressDeterminer::GetMailerDaemonAddress(const shared_ptr<Message> pOrigMessage)
    {
       String sOriginalSender = pOrigMessage->GetFromAddress();
       String sOriginialRecipient;
 
-      boost::shared_ptr<MessageRecipients> pRecipients = pOrigMessage->GetRecipients();
-      std::vector<boost::shared_ptr<MessageRecipient> > & recipients = pRecipients->GetVector();
+      shared_ptr<MessageRecipients> pRecipients = pOrigMessage->GetRecipients();
+      std::vector<shared_ptr<MessageRecipient> > & recipients = pRecipients->GetVector();
       if (recipients.size() > 0)
          sOriginialRecipient = (*recipients.begin())->GetAddress();
 

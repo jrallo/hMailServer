@@ -85,7 +85,7 @@ STDMETHODIMP InterfaceDatabase::get_IsConnected(VARIANT_BOOL *pVal)
       if (!m_pConfig)
          return GetAccessDenied();
 
-      boost::shared_ptr<HM::DatabaseConnectionManager> pDBManager = HM::Application::Instance()->GetDBManager();
+      shared_ptr<HM::DatabaseConnectionManager> pDBManager = HM::Application::Instance()->GetDBManager();
       if (pDBManager)
          *pVal = m_pDBManager->GetIsConnected() ? VARIANT_TRUE : VARIANT_FALSE;
       else
@@ -275,7 +275,7 @@ STDMETHODIMP InterfaceDatabase::CommitTransaction()
       if (!m_pConn)
          return COMError::GenerateError("No transaction started");
    
-      boost::shared_ptr<HM::DALConnection> pTempConn = m_pConn;
+      shared_ptr<HM::DALConnection> pTempConn = m_pConn;
       m_pConn.reset();
    
       HM::String sErrorMessage;
@@ -305,7 +305,7 @@ STDMETHODIMP InterfaceDatabase::RollbackTransaction()
       if (!m_pConn)
          return COMError::GenerateError("No transaction started");
    
-      boost::shared_ptr<HM::DALConnection> pTempConn = m_pConn;
+      shared_ptr<HM::DALConnection> pTempConn = m_pConn;
       m_pConn.reset();
    
       HM::String sErrorMessage;
@@ -444,7 +444,7 @@ STDMETHODIMP InterfaceDatabase::UtilGetFileNameByMessageID(hyper lMessageID, BST
       HM::String sSQL;
       sSQL.Format(_T("select messagefilename from hm_messages where messageid = %d"), lMessageID);
    
-      boost::shared_ptr<HM::DALRecordset> pRS = m_pDBManager->OpenRecordset(HM::SQLCommand(sSQL));
+      shared_ptr<HM::DALRecordset> pRS = m_pDBManager->OpenRecordset(HM::SQLCommand(sSQL));
       if (!pRS)
          return S_OK;
    
@@ -487,11 +487,11 @@ STDMETHODIMP InterfaceDatabase::CreateInternalDatabase()
       HM::String sEmpty;
    
       // Create a settings object which we use to connect to the server.
-      boost::shared_ptr<HM::DatabaseSettings> pSettings = boost::shared_ptr<HM::DatabaseSettings>(
+      shared_ptr<HM::DatabaseSettings> pSettings = shared_ptr<HM::DatabaseSettings>(
          new HM::DatabaseSettings(sEmpty, sDatabaseName, sEmpty, sPassword, sDirectory, sEmpty, HM::DatabaseSettings::TypeMSSQLCompactEdition, 0));
    
       // Connect to the new database
-      boost::shared_ptr<HM::DALConnection> pConn = HM::DALConnectionFactory::CreateConnection(pSettings);
+      shared_ptr<HM::DALConnection> pConn = HM::DALConnectionFactory::CreateConnection(pSettings);
    
       if (pConn->Connect(sErrorMessage) != HM::DALConnection::Connected)
       {
@@ -542,11 +542,11 @@ STDMETHODIMP InterfaceDatabase::CreateExternalDatabase(eDBtype ServerType, BSTR 
          return COMError::GenerateError("The database name may not contain spaces.");
    
       // Create a settings object for the connection ...
-      boost::shared_ptr<HM::DatabaseSettings> pSettings = boost::shared_ptr<HM::DatabaseSettings>(
+      shared_ptr<HM::DatabaseSettings> pSettings = shared_ptr<HM::DatabaseSettings>(
          new HM::DatabaseSettings(sServerName, sEmpty, sUsername, sPassword, sEmpty, sEmpty,(HM::DatabaseSettings::SQLDBType) ServerType, lPort));
    
       // Connect to the database serve   
-      boost::shared_ptr<HM::DALConnection> pConn = HM::DALConnectionFactory::CreateConnection(pSettings);
+      shared_ptr<HM::DALConnection> pConn = HM::DALConnectionFactory::CreateConnection(pSettings);
    
       HM::String sErrorMessage;
       if (pConn->Connect(sErrorMessage) != HM::DALConnection::Connected)
@@ -562,7 +562,7 @@ STDMETHODIMP InterfaceDatabase::CreateExternalDatabase(eDBtype ServerType, BSTR 
       pConn->Disconnect();
    
       // Create a new settings object where we specify the database name as well.
-      pSettings = boost::shared_ptr<HM::DatabaseSettings>(
+      pSettings = shared_ptr<HM::DatabaseSettings>(
          new HM::DatabaseSettings(sServerName, sDatabaseName, sUsername, sPassword, sEmpty, sEmpty,(HM::DatabaseSettings::SQLDBType) ServerType, lPort));
    
       // Reconnect to the new database.
@@ -609,11 +609,11 @@ STDMETHODIMP InterfaceDatabase::SetDefaultDatabase(eDBtype ServerType, BSTR Serv
          return COMError::GenerateError("The database name may not contain spaces.");
    
       // Create a settings object for the connection ...
-      boost::shared_ptr<HM::DatabaseSettings> pSettings = boost::shared_ptr<HM::DatabaseSettings>(
+      shared_ptr<HM::DatabaseSettings> pSettings = shared_ptr<HM::DatabaseSettings>(
          new HM::DatabaseSettings(sServerName, sEmpty, sUsername, sPassword, sEmpty, sEmpty,(HM::DatabaseSettings::SQLDBType) ServerType, lPort));
    
       // Connect to the database server.
-      boost::shared_ptr<HM::DALConnection> pConn = HM::DALConnectionFactory::CreateConnection(pSettings);
+      shared_ptr<HM::DALConnection> pConn = HM::DALConnectionFactory::CreateConnection(pSettings);
    
       HM::String sErrorMessage;
       if (pConn->Connect(sErrorMessage) != HM::DALConnection::Connected)

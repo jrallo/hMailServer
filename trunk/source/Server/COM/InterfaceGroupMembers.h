@@ -59,11 +59,11 @@ public:
    STDMETHOD(DeleteByDBID)(/*[in]*/ long DBID);
    STDMETHOD(Add)(/*[out, retval]*/ IInterfaceGroupMember **pVal);
 
-   void Attach(boost::shared_ptr<HM::GroupMembers> pGroupMembers);
+   void Attach(shared_ptr<HM::GroupMembers> pGroupMembers);
 
 public:
 
-   boost::shared_ptr<HM::GroupMembers> m_pGroupMembers;
+   shared_ptr<HM::GroupMembers> m_pGroupMembers;
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(GroupMembers), InterfaceGroupMembers)

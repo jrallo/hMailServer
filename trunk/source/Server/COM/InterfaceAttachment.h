@@ -44,11 +44,11 @@ public:
    STDMETHOD(SaveAs)(/*[out, retval]*/ BSTR pVal);
    STDMETHOD(Delete)();
 
-   void Attach(boost::shared_ptr<HM::Attachment> pAttachment);
+   void Attach(shared_ptr<HM::Attachment> pAttachment);
 
 private:
 
-   boost::shared_ptr<HM::Attachment> m_pAttachment;
+   shared_ptr<HM::Attachment> m_pAttachment;
 
 };
 

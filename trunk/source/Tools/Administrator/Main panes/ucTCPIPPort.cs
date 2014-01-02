@@ -65,6 +65,7 @@ namespace hMailServer.Administrator
             textIPAddress.Text = _representedObject.Address;
             textTCPIPPort.Number = _representedObject.PortNumber;
             checkEnableSSL.Checked = _representedObject.UseSSL;
+			checkStartTLS.Checked = _representedObject.UseSTARTTLS;
             comboProtocol.SelectedValue = _representedObject.Protocol;
             comboSSLCertificate.SelectedValue = _representedObject.SSLCertificateID;
 
@@ -106,6 +107,7 @@ namespace hMailServer.Administrator
             _representedObject.Address = textIPAddress.Text;
             _representedObject.PortNumber = textTCPIPPort.Number;
             _representedObject.UseSSL = checkEnableSSL.Checked;
+			_representedObject.UseSTARTTLS = checkStartTLS.Checked;
             _representedObject.Protocol = (hMailServer.eSessionType)comboProtocol.SelectedValue;
 
             if (comboSSLCertificate.SelectedValue == null)
@@ -154,14 +156,26 @@ namespace hMailServer.Administrator
 
         private void checkEnableSSL_CheckedChanged(object sender, EventArgs e)
         {
+			if (checkEnableSSL.Checked == true)
+			{
+				checkStartTLS.Checked = false;
+			}
             EnableDisable();
         }
 
         private void EnableDisable()
         {
-            comboSSLCertificate.Enabled = checkEnableSSL.Checked;
+            comboSSLCertificate.Enabled = (checkEnableSSL.Checked || checkStartTLS.Checked);
         }
 
+		private void checkStartTLS_CheckedChanged(object sender, EventArgs e)
+		{
+			if (checkStartTLS.Checked == true)
+			{
+				checkEnableSSL.Checked = false;
+			}
+			EnableDisable();
+		}
     }
 }
 

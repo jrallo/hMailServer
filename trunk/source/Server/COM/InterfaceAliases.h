@@ -55,14 +55,14 @@ public:
    STDMETHOD(DeleteByDBID)(/*[in]*/ long Index);
    STDMETHOD(get_ItemByName)(BSTR Name, IInterfaceAlias **pVal);
 
-   void Attach(boost::shared_ptr<HM::Aliases> pAliases);
+   void Attach(shared_ptr<HM::Aliases> pAliases);
    void SetDomain(__int64 iDomain) { m_iDomainID = iDomain; }
 
 private:
 
-   // void InternalAdd(boost::shared_ptr<HM::Alias> pObject);
+   // void InternalAdd(shared_ptr<HM::Alias> pObject);
 
-   boost::shared_ptr<HM::Aliases> m_pAliases;
+   shared_ptr<HM::Aliases> m_pAliases;
    __int64 m_iDomainID;
 
 };

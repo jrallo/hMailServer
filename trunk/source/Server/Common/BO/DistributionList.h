@@ -47,7 +47,7 @@ namespace HM
       bool XMLLoad(XNode *pParentNode, int iRestoreOptions);
       bool XMLLoadSubItems(XNode *pParentNode, int iRestoreOptions);
 
-      boost::shared_ptr<DistributionListRecipients> GetMembers() const;
+      shared_ptr<DistributionListRecipients> GetMembers() const;
 
    protected:
 

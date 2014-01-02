@@ -26,10 +26,11 @@ namespace HM
    }
 
    // 2011-11-15 JDR: Modified this function to include quickIndex to pick a specific query.
-   set<boost::shared_ptr<PersistentMessageMetaData::MessageInfo> >
+   set<shared_ptr<PersistentMessageMetaData::MessageInfo> >
    PersistentMessageMetaData::GetMessagesToIndex(bool quickIndex = false)
    {
-      set<boost::shared_ptr<MessageInfo> > result;
+      PersistentMessage persistentMessage;
+      set<shared_ptr<MessageInfo> > result;
 
       SQLStatement statement;
       statement.AddColumn("messageid");
@@ -39,19 +40,25 @@ namespace HM
       statement.AddColumn("accountaddress");
       statement.SetStatementType(SQLStatement::STSelect);
       statement.SetTable("hm_messages");
-      // Are we doing a quick index? 
-      if (quickIndex == true) {
+
+      // Are we doing a quick index? Quick means that we only index recent messages and ignore older ones.
+      if (quickIndex == true) 
+      {
          // 1000 default
          int iIndexerQuickLimit = IniFileSettings::Instance()->GetIndexerQuickLimit();
+         int latestMessageId = persistentMessage.GetLatestMessageId();
+         int oldestMessageToIndex = latestMessageId - iIndexerQuickLimit;
+         if (oldestMessageToIndex < 0)
+            oldestMessageToIndex = 0;
 
-         // yes, only pick the last iIndexerQuickLimit records... very quick compared to full
+         // Only pick the last iIndexerQuickLimit records... very quick compared to full
          String whereClause;
-         whereClause.Format(_T("hm_messages.messagetype = 2 AND hm_messages.messageid > (select max(hm_messages.messageid) - %d from hm_messages) AND hm_message_metadata.metadata_id IS NULL"), iIndexerQuickLimit);
+         whereClause.Format(_T("hm_messages.messagetype = 2 AND hm_messages.messageid > %d AND hm_message_metadata.metadata_id IS NULL"), oldestMessageToIndex);
          statement.SetWhereClause(whereClause);
          statement.SetAdditionalSQL("LEFT JOIN hm_accounts ON hm_messages.messageaccountid = hm_accounts.accountid LEFT JOIN hm_message_metadata ON hm_messages.messageid = hm_message_metadata.metadata_messageid ");
-
-         LOG_DEBUG("Doing QUICK index...");
-      } else {
+      } 
+      else 
+      {
          // 25000 default
          int iIndexerFullLimit = IniFileSettings::Instance()->GetIndexerFullLimit();
 
@@ -59,17 +66,16 @@ namespace HM
          statement.SetWhereClause("messagetype = 2 AND NOT EXISTS (SELECT metadata_messageid FROM hm_message_metadata WHERE hm_messages.messagetype = 2 and hm_messages.messageid = hm_message_metadata.metadata_messageid)");
          statement.SetAdditionalSQL("left join hm_accounts on hm_messages.messageaccountid = hm_accounts.accountid");
          statement.SetTopRows(iIndexerFullLimit);
-         LOG_DEBUG("Doing FULL index... ");
       }
 
-      boost::shared_ptr<DALRecordset> pRS = Application::Instance()->GetDBManager()->OpenRecordset(statement);
+      shared_ptr<DALRecordset> pRS = Application::Instance()->GetDBManager()->OpenRecordset(statement);
 
       if (!pRS)
          return result;
 
       while (!pRS->IsEOF())
       {
-         boost::shared_ptr<MessageInfo> messageInfo = boost::shared_ptr<MessageInfo>(new MessageInfo);
+         shared_ptr<MessageInfo> messageInfo = shared_ptr<MessageInfo>(new MessageInfo);
          messageInfo->MessageID = pRS->GetInt64Value("messageid");
          messageInfo->AccountID = pRS->GetLongValue("messageaccountid");
          messageInfo->FolderID = pRS->GetLongValue("messagefolderid");
@@ -77,7 +83,7 @@ namespace HM
          String accountAddress = pRS->GetStringValue("accountaddress");
          String fileName = pRS->GetStringValue("messagefilename");
 
-         boost::shared_ptr<Message> dummyMessage = boost::shared_ptr<Message>(new Message);
+         shared_ptr<Message> dummyMessage = shared_ptr<Message>(new Message);
          dummyMessage->SetID(messageInfo->MessageID);
          dummyMessage->SetAccountID(messageInfo->AccountID);
          dummyMessage->SetFolderID(messageInfo->FolderID);
@@ -127,7 +133,7 @@ namespace HM
       whereClause.Format(_T("metadata_accountid = %d and metadata_folderid = %d"), accountID, folderID);
       sql.SetWhereClause(whereClause);
 
-      boost::shared_ptr<DALRecordset> pRS = Application::Instance()->GetDBManager()->OpenRecordset(sql);
+      shared_ptr<DALRecordset> pRS = Application::Instance()->GetDBManager()->OpenRecordset(sql);
 
       while (!pRS->IsEOF())
       {
@@ -162,7 +168,7 @@ namespace HM
 
 
    bool 
-   PersistentMessageMetaData::SaveObject(boost::shared_ptr<MessageMetaData> metaData)
+   PersistentMessageMetaData::SaveObject(shared_ptr<MessageMetaData> metaData)
    {
       SQLStatement statement;
       statement.SetTable("hm_message_metadata");
@@ -200,7 +206,7 @@ namespace HM
    }
 
    bool
-   PersistentMessageMetaData::DeleteForMessage(boost::shared_ptr<Message> message)
+   PersistentMessageMetaData::DeleteForMessage(shared_ptr<Message> message)
    {
       if (message->GetState() != Message::Delivered)
       {
@@ -219,7 +225,7 @@ namespace HM
    {
       SQLCommand command("select count(*) as c from hm_message_metadata");
 
-      boost::shared_ptr<DALRecordset> pRS = Application::Instance()->GetDBManager()->OpenRecordset(command);
+      shared_ptr<DALRecordset> pRS = Application::Instance()->GetDBManager()->OpenRecordset(command);
       if (!pRS)
          return false;
 

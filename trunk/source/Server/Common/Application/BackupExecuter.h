@@ -20,7 +20,7 @@ namespace HM
       ~BackupExecuter(void);
 
       bool StartBackup();
-      bool StartRestore(boost::shared_ptr<Backup> pBackup);
+      bool StartRestore(shared_ptr<Backup> pBackup);
 
    private:
 
@@ -29,14 +29,12 @@ namespace HM
       bool _BackupDomains(XNode *pNode);
       bool _BackupDataDirectory(const String &sDataBackupDir);
 
-      void _RestoreDataDirectory(boost::shared_ptr<Backup> pBackup, XNode *pBackupNode);
+      void _RestoreDataDirectory(shared_ptr<Backup> pBackup, XNode *pBackupNode);
       
       int m_iBackupMode;
       
       // Backup properties
       String m_sDestination;
-
-
       String m_sXMLFile;
    };
 }

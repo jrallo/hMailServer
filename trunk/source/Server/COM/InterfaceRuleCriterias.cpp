@@ -11,7 +11,7 @@
 #include "../Common/BO/RuleCriteria.h"
 
 void 
-InterfaceRuleCriterias::Attach(boost::shared_ptr<HM::RuleCriterias> pCriterias)
+InterfaceRuleCriterias::Attach(shared_ptr<HM::RuleCriterias> pCriterias)
 {
    m_pRuleCriterias = pCriterias;
 }
@@ -26,7 +26,7 @@ STDMETHODIMP InterfaceRuleCriterias::get_ItemByDBID(long lDBID, IInterfaceRuleCr
       CComObject<InterfaceRuleCriteria>* pInterfaceRuleCriteria = new CComObject<InterfaceRuleCriteria>();
       pInterfaceRuleCriteria->SetAuthentication(m_pAuthentication);
    
-      boost::shared_ptr<HM::RuleCriteria> pRule = m_pRuleCriterias->GetItemByDBID(lDBID);
+      shared_ptr<HM::RuleCriteria> pRule = m_pRuleCriterias->GetItemByDBID(lDBID);
       if (!pRule)
          return DISP_E_BADINDEX;
    
@@ -53,7 +53,7 @@ STDMETHODIMP InterfaceRuleCriterias::get_Item(long lIndex, IInterfaceRuleCriteri
       CComObject<InterfaceRuleCriteria>* pInterfaceRuleCriteria = new CComObject<InterfaceRuleCriteria>();
       pInterfaceRuleCriteria->SetAuthentication(m_pAuthentication);
    
-      boost::shared_ptr<HM::RuleCriteria> pRule = m_pRuleCriterias->GetItem(lIndex);
+      shared_ptr<HM::RuleCriteria> pRule = m_pRuleCriterias->GetItem(lIndex);
       if (!pRule)
          return DISP_E_BADINDEX;
    
@@ -101,7 +101,7 @@ STDMETHODIMP InterfaceRuleCriterias::Add(IInterfaceRuleCriteria** pVal)
       CComObject<InterfaceRuleCriteria>* pIntDA = new CComObject<InterfaceRuleCriteria>();
       pIntDA->SetAuthentication(m_pAuthentication);
    
-      boost::shared_ptr<HM::RuleCriteria> pDA = boost::shared_ptr<HM::RuleCriteria>(new HM::RuleCriteria);
+      shared_ptr<HM::RuleCriteria> pDA = shared_ptr<HM::RuleCriteria>(new HM::RuleCriteria);
    
       pDA->SetRuleID(m_pRuleCriterias->GetRuleID());
    

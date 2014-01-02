@@ -66,7 +66,7 @@ namespace HM
    }
 
    void
-   SMTPDeliverer::DeliverMessage(boost::shared_ptr<Message> pMessage)
+   SMTPDeliverer::DeliverMessage(shared_ptr<Message> pMessage)
    //---------------------------------------------------------------------------()
    // DESCRIPTION:
    // Submits the next message in the database. 
@@ -142,7 +142,7 @@ namespace HM
    // Returns true if delivery should continue. False if it should be aborted.
    //---------------------------------------------------------------------------()
    bool
-   SMTPDeliverer::_PreprocessMessage(boost::shared_ptr<Message> pMessage, String &sendersIP, RuleResult &globalRuleResult)
+   SMTPDeliverer::_PreprocessMessage(shared_ptr<Message> pMessage, String &sendersIP, RuleResult &globalRuleResult)
    {
       // Before we do anything else, check that the message file exists. If the file
       // does not exist, there is nothing to deliver. So if the file does not exist,
@@ -227,7 +227,7 @@ namespace HM
 
 
    void
-   SMTPDeliverer::_SubmitErrorLog(boost::shared_ptr<Message> pOrigMessage, vector<String> &saErrorMessages)
+   SMTPDeliverer::_SubmitErrorLog(shared_ptr<Message> pOrigMessage, vector<String> &saErrorMessages)
    //---------------------------------------------------------------------------()
    // DESCRIPTION:
    // Some of the messages was not sent to the recipient. We have to
@@ -250,13 +250,14 @@ namespace HM
 
       const String fileName = PersistentMessage::GetFileName(pOrigMessage);
 
-      boost::shared_ptr<MessageData> pMsgData = boost::shared_ptr<MessageData> (new MessageData());
+      shared_ptr<MessageData> pMsgData = shared_ptr<MessageData> (new MessageData());
       pMsgData->LoadFromMessage(fileName, pOrigMessage);
 
-      if (RuleApplier::RuleLoopCountReached(pMsgData))
+      // true because we don't want to send bounces if AutoSubmitted header
+      if (!RuleApplier::IsGeneratedResponseAllowed(pMsgData, true))
       {
          String sMessage;
-         sMessage.Format(_T("Did not submit bounce message for message %I64d from %s since rule loop count was reached."), pOrigMessage->GetID(), String(pOrigMessage->GetFromAddress()));
+         sMessage.Format(_T("Did not submit bounce message for message %I64d from %s since rule loop count was reached or Auto-Submitted header."), pOrigMessage->GetID(), String(pOrigMessage->GetFromAddress()));
          ErrorManager::Instance()->ReportError(ErrorManager::Medium, 4404, "SMTPDeliverer::_ApplyForwarding", sMessage);
 
          return;
@@ -284,13 +285,13 @@ namespace HM
       sErrMsg.Replace(_T("%MACRO_RECIPIENTS%"), sCollectedErrors);
 
       // Send a copy of this email.
-      boost::shared_ptr<Message> pMsg = boost::shared_ptr<Message>(new Message());
+      shared_ptr<Message> pMsg = shared_ptr<Message>(new Message());
       pMsg->SetState(Message::Delivering);
       pMsg->SetFromAddress("");
 
       const String newFileName = PersistentMessage::GetFileName(pMsg);
 
-      boost::shared_ptr<MessageData> pNewMsgData = boost::shared_ptr<MessageData>(new MessageData());
+      shared_ptr<MessageData> pNewMsgData = shared_ptr<MessageData>(new MessageData());
       pNewMsgData->LoadFromMessage(newFileName, pMsg);
 
       // Required headers
@@ -323,7 +324,7 @@ namespace HM
 
    
    bool
-   SMTPDeliverer::_HandleInfectedMessage(boost::shared_ptr<Message> pMessage, const String &virusName)
+   SMTPDeliverer::_HandleInfectedMessage(shared_ptr<Message> pMessage, const String &virusName)
    //---------------------------------------------------------------------------()
    // DESCRIPTION:
    // Called if a virus is found in an email message. Checks in the configuration
@@ -340,8 +341,8 @@ namespace HM
          if (antiVirusConfig.AVNotifyReceiver())
          {
             // Notify every receiver of the email.
-            vector<boost::shared_ptr<MessageRecipient> > &vecRecipients = pMessage->GetRecipients()->GetVector();
-            vector<boost::shared_ptr<MessageRecipient> >::iterator iterRecipient = vecRecipients.begin();
+            vector<shared_ptr<MessageRecipient> > &vecRecipients = pMessage->GetRecipients()->GetVector();
+            vector<shared_ptr<MessageRecipient> >::iterator iterRecipient = vecRecipients.begin();
 
             while (iterRecipient != vecRecipients.end())
             {
@@ -366,7 +367,7 @@ namespace HM
       }
       else if (antiVirusConfig.AVAction() == AntiVirusConfiguration::ActionStripAttachments)
       {
-         boost::shared_ptr<MessageAttachmentStripper> pStripper = boost::shared_ptr<MessageAttachmentStripper>(new MessageAttachmentStripper());
+         shared_ptr<MessageAttachmentStripper> pStripper = shared_ptr<MessageAttachmentStripper>(new MessageAttachmentStripper());
 
          pStripper->Strip(pMessage);
 
@@ -385,7 +386,7 @@ namespace HM
    }
 
    bool 
-   SMTPDeliverer::_RunVirusProtection(boost::shared_ptr<Message> pMessage)
+   SMTPDeliverer::_RunVirusProtection(shared_ptr<Message> pMessage)
    //---------------------------------------------------------------------------()
    // DESCRIPTION:
    // Runs virus scanning. If a virus is found, it's handled according to the
@@ -422,14 +423,14 @@ namespace HM
    }
 
    bool 
-   SMTPDeliverer::_RunGlobalRules(boost::shared_ptr<Message> pMessage, RuleResult &ruleResult)
+   SMTPDeliverer::_RunGlobalRules(shared_ptr<Message> pMessage, RuleResult &ruleResult)
    //---------------------------------------------------------------------------()
    // DESCRIPTION:
    // Performs global rules. We will do this on every retry of the message.
    //---------------------------------------------------------------------------()
    {
-      boost::shared_ptr<RuleApplier> pRuleApplier = boost::shared_ptr<RuleApplier>(new RuleApplier);
-      boost::shared_ptr<Account> emptyAccount;
+      shared_ptr<RuleApplier> pRuleApplier = shared_ptr<RuleApplier>(new RuleApplier);
+      shared_ptr<Account> emptyAccount;
       pRuleApplier->ApplyRules(ObjectCache::Instance()->GetGlobalRules(), emptyAccount, pMessage, ruleResult);
 
       if (ruleResult.GetDeleteEmail())
@@ -452,7 +453,7 @@ namespace HM
    }
 
    void 
-   SMTPDeliverer::_LogAwstatsMessageRejected(const String &sSendersIP, boost::shared_ptr<Message> pMessage, const String &sReason)
+   SMTPDeliverer::_LogAwstatsMessageRejected(const String &sSendersIP, shared_ptr<Message> pMessage, const String &sReason)
    //---------------------------------------------------------------------------()
    // DESCRIPTION:
    // If awstats logging is enabled, this function goes through all the recipients
@@ -468,8 +469,8 @@ namespace HM
       // Go through the recipients and log one row for each of them.
       String sFromAddress = pMessage->GetFromAddress();     
 
-      const std::vector<boost::shared_ptr<MessageRecipient> > vecRecipients = pMessage->GetRecipients()->GetVector();
-      std::vector<boost::shared_ptr<MessageRecipient> >::const_iterator iterRecipient = vecRecipients.begin();
+      const std::vector<shared_ptr<MessageRecipient> > vecRecipients = pMessage->GetRecipients()->GetVector();
+      std::vector<shared_ptr<MessageRecipient> >::const_iterator iterRecipient = vecRecipients.begin();
       while (iterRecipient != vecRecipients.end())
       {
          String sRecipientAddress = (*iterRecipient)->GetAddress();

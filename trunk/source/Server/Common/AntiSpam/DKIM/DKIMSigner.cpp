@@ -26,14 +26,14 @@ namespace HM
    }
 
    void 
-   DKIMSigner::Sign(boost::shared_ptr<Message> message)
+   DKIMSigner::Sign(shared_ptr<Message> message)
    {
      
       AnsiString senderAddress = message->GetFromAddress();
       AnsiString senderDomain = StringParser::ExtractDomain(senderAddress);
 
       // Check if signing is enabled for this domain.
-      boost::shared_ptr<const Domain> pDomain = CacheContainer::Instance()->GetDomain(senderDomain);
+      shared_ptr<const Domain> pDomain = CacheContainer::Instance()->GetDomain(senderDomain);
 
       if (!pDomain || !pDomain->GetDKIMEnabled())
          return;

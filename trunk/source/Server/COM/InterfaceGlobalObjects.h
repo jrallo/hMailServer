@@ -26,7 +26,7 @@ public:
 	{
 	}
 
-   void SetAuthentication(boost::shared_ptr<HM::COMAuthentication> pAuthentication);
+   void SetAuthentication(shared_ptr<HM::COMAuthentication> pAuthentication);
 
 DECLARE_REGISTRY_RESOURCEID(IDR_INTERFACEGLOBALOBJECTS)
 
@@ -58,7 +58,7 @@ public:
 
 private:
 
-   boost::shared_ptr<HM::COMAuthentication> m_pAuthentication;
+   shared_ptr<HM::COMAuthentication> m_pAuthentication;
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(GlobalObjects), InterfaceGlobalObjects)

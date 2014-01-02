@@ -33,7 +33,7 @@ namespace VMwareIntegration.Console
             System.Console.WriteLine(message);
 
             TestRunner runner = new TestRunner(true, environment, true);
-            runner.TestCompleted += new TestRunner.TestCompletedDelegate(runner_TestCompleted);
+            runner.TestCompleted += runner_TestCompleted;
             if (!runner.Run())
                return -1;
 

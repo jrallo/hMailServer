@@ -7,6 +7,7 @@
 #include "SQLCERecordset.h"
 #include "Macros/SQLCEMacroExpander.h"
 #include "DatabaseSettings.h"
+#include "ADOInt64Helper.h"
 #include "../Util/Time.h"
 #include <sqlce_oledb.h>
 #include <sqlce_err.h>
@@ -21,7 +22,7 @@ using namespace std;
 
 namespace HM
 {
-   SQLCEConnection::SQLCEConnection(boost::shared_ptr<DatabaseSettings> pSettings) :
+   SQLCEConnection::SQLCEConnection(shared_ptr<DatabaseSettings> pSettings) :
       DALConnection(pSettings)
    {
       HRESULT hr =cSQLCEConnection.CreateInstance(__uuidof(Connection));
@@ -518,17 +519,17 @@ namespace HM
       return true;
    }
 
-   boost::shared_ptr<DALRecordset> 
+   shared_ptr<DALRecordset> 
    SQLCEConnection::CreateRecordset()
    {
-      boost::shared_ptr<SQLCERecordset> recordset = boost::shared_ptr<SQLCERecordset>(new SQLCERecordset());
+      shared_ptr<SQLCERecordset> recordset = shared_ptr<SQLCERecordset>(new SQLCERecordset());
       return recordset;
    }
 
-   boost::shared_ptr<IMacroExpander> 
+   shared_ptr<IMacroExpander> 
    SQLCEConnection::CreateMacroExpander()
    {
-      boost::shared_ptr<SQLCEMacroExpander> expander = boost::shared_ptr<SQLCEMacroExpander>(new SQLCEMacroExpander());
+      shared_ptr<SQLCEMacroExpander> expander = shared_ptr<SQLCEMacroExpander>(new SQLCEMacroExpander());
       return expander;
    }
 
@@ -555,11 +556,8 @@ namespace HM
          }
          else if (parameter.GetType() == SQLParameter::ParamTypeInt64)
          {
-            VARIANT integerType;
-            integerType.vt = VT_I8;
-            integerType.llVal = parameter.GetInt64Value();
-
-            adoCommand->Parameters->Append(adoCommand->CreateParameter(_bstr_t(parameterName), adBigInt,adParamInput, 4, integerType));
+            // Windows 2000 backwards compatibility:
+            ADO64Helper::AddInt64Parameter(adoCommand, parameterName, parameter.GetInt64Value());
          }
          if (parameter.GetType() == SQLParameter::ParamTypeUnsignedInt32)
          {

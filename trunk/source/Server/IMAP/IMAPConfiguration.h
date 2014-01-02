@@ -40,8 +40,8 @@ namespace HM
       void SetIMAPPublicFolderName(const String &newVal);
 
       static String GetPublicFolderDiskName();
-      boost::shared_ptr<IMAPFolders> GetPublicFolders();
-      boost::shared_ptr<Groups> GetGroups();
+      shared_ptr<IMAPFolders> GetPublicFolders();
+      shared_ptr<Groups> GetGroups();
 
       bool XMLStore(XNode *pBackupNode, int Options);
       bool XMLLoad(XNode *pBackupNode, int iRestoreOptions);
@@ -52,10 +52,10 @@ namespace HM
       
 
    private:
-      boost::shared_ptr<PropertySet> _GetSettings() const;
+      shared_ptr<PropertySet> _GetSettings() const;
 
-      boost::shared_ptr<IMAPFolders> m_pPublicFolders;
-      boost::shared_ptr<Groups> m_pGroups;
+      shared_ptr<IMAPFolders> m_pPublicFolders;
+      shared_ptr<Groups> m_pGroups;
    };
 
 }

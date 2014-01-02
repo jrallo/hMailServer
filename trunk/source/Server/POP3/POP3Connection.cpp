@@ -298,6 +298,9 @@ namespace HM
    void
    POP3Connection::OnConnectionTimeout()
    {
+      // Fix for mailbox remailing locked even after timeout
+      // http://www.hmailserver.com/forum/viewtopic.php?f=7&t=22361
+      _UnlockMailbox();
       String sMessage = "-ERR Autologout; idle too long\r\n";
       SendData(sMessage);
    }
@@ -327,6 +330,10 @@ namespace HM
    void
    POP3Connection::_ProtocolQUIT()
    {
+      // NEED FOR BUG FIX: Unlock should not be allowed unless user was auth'd
+      // because next pop check is allowed even if in-use!
+      // Problem is people have grown accustomed to this & could cause more
+      // issues if fixed.
       _SaveMailboxChanges();
       _UnlockMailbox();
 
@@ -337,7 +344,7 @@ namespace HM
    POP3Connection::_ProtocolUSER(const String &Parameter)
    {
       // Apply domain aliases to the user name.
-      boost::shared_ptr<DomainAliases> pDA = ObjectCache::Instance()->GetDomainAliases();
+      shared_ptr<DomainAliases> pDA = ObjectCache::Instance()->GetDomainAliases();
       m_Username = pDA->ApplyAliasesOnAddress(Parameter);
       _SendData("+OK Send your password" );      
    }
@@ -404,7 +411,7 @@ namespace HM
          return true;
       }
 
-      boost::shared_ptr<Message> message = _GetMessage(lMessageID);
+      shared_ptr<Message> message = _GetMessage(lMessageID);
       if (message)
       {
          message->SetFlagDeleted(true);
@@ -444,7 +451,7 @@ namespace HM
          String sRow;
 
          int index = 0;
-         boost_foreach(boost::shared_ptr<Message> pMessage, _messages)
+         boost_foreach(shared_ptr<Message> pMessage, _messages)
          {
             index++;
             if (!pMessage->GetFlagDeleted())
@@ -465,7 +472,7 @@ namespace HM
          // List only one single message.
          long messageIndex = _ttol(sParameter);
 
-         boost::shared_ptr<Message> pMessage = _GetMessage(messageIndex);
+         shared_ptr<Message> pMessage = _GetMessage(messageIndex);
 
          if (pMessage)
             sResponse.Format(_T("+OK %d %d"), messageIndex, pMessage->GetSize());
@@ -505,7 +512,7 @@ namespace HM
 
          // List the actual messages.
          int index = 0;
-         boost_foreach(boost::shared_ptr<Message> pMessage, _messages)
+         boost_foreach(shared_ptr<Message> pMessage, _messages)
          {
             index++;
             if (!pMessage->GetFlagDeleted())
@@ -521,7 +528,7 @@ namespace HM
       {  
          // List only one single message.
          long messageIndex = _ttol(Parameter);
-         boost::shared_ptr<Message> pMessage = _GetMessage(messageIndex);
+         shared_ptr<Message> pMessage = _GetMessage(messageIndex);
 
          if (pMessage)
             sResponse.Format(_T("+OK %d %u"), messageIndex, pMessage->GetUID());
@@ -546,7 +553,7 @@ namespace HM
 
       int iRequestedMessageIndex = _tstol(Parameter);
 
-      boost::shared_ptr<Message> pMessage = _GetMessage(iRequestedMessageIndex);
+      shared_ptr<Message> pMessage = _GetMessage(iRequestedMessageIndex);
 
       if (!pMessage || pMessage->GetFlagDeleted())
       {
@@ -562,7 +569,7 @@ namespace HM
    }
 
    void 
-   POP3Connection::_StartSendFile(boost::shared_ptr<Message> message)
+   POP3Connection::_StartSendFile(shared_ptr<Message> message)
    {  
       String fileName = PersistentMessage::GetFileName(_account, message);
 
@@ -593,7 +600,7 @@ namespace HM
          // Continue sending the file..
          int bufferSize = GetBufferSize();
 
-         boost::shared_ptr<ByteBuffer> pBuffer = _currentFile.ReadChunk(bufferSize);
+         shared_ptr<ByteBuffer> pBuffer = _currentFile.ReadChunk(bufferSize);
 
          while (pBuffer)
          {
@@ -679,7 +686,7 @@ namespace HM
 
       int iRequestedMessageIndex = _tstol(Msg);
 
-      boost::shared_ptr<Message> pMessage = _GetMessage(iRequestedMessageIndex);
+      shared_ptr<Message> pMessage = _GetMessage(iRequestedMessageIndex);
 
       if (!pMessage || pMessage->GetFlagDeleted())
       {
@@ -832,7 +839,7 @@ namespace HM
       if (_account)
       {
          std::set<int> messagesToDelete;
-         boost_foreach(boost::shared_ptr<Message> message, _messages)
+         boost_foreach(shared_ptr<Message> message, _messages)
          {
             if (message->GetFlagDeleted())
                messagesToDelete.insert(message->GetUID());
@@ -849,12 +856,12 @@ namespace HM
       // Fix for negative STAT results when box over 2GB
       __int64 iTotalSize = 0;
 
-      std::vector<boost::shared_ptr<Message> >::iterator iter = _messages.begin();
-      std::vector<boost::shared_ptr<Message> >::iterator iterEnd = _messages.end();
+      std::vector<shared_ptr<Message> >::iterator iter = _messages.begin();
+      std::vector<shared_ptr<Message> >::iterator iterEnd = _messages.end();
 
       for (; iter != iterEnd; iter++)
       {
-         boost::shared_ptr<Message> pMessage = (*iter);
+         shared_ptr<Message> pMessage = (*iter);
 
          if (!pMessage->GetFlagDeleted())
          {
@@ -879,12 +886,12 @@ namespace HM
       iNoOfMessages = 0;
       iTotalBytes = 0;
 
-      std::vector<boost::shared_ptr<Message> >::iterator iter = _messages.begin();
-      std::vector<boost::shared_ptr<Message> >::iterator iterEnd = _messages.end();
+      std::vector<shared_ptr<Message> >::iterator iter = _messages.begin();
+      std::vector<shared_ptr<Message> >::iterator iterEnd = _messages.end();
 
       for (; iter != iterEnd; iter++)
       {
-         boost::shared_ptr<Message> pMessage = (*iter);
+         shared_ptr<Message> pMessage = (*iter);
 
          if (!pMessage->GetFlagDeleted())
          {
@@ -894,10 +901,10 @@ namespace HM
       }
    }
 
-   boost::shared_ptr<Message>
+   shared_ptr<Message>
    POP3Connection::_GetMessage(unsigned int index)
    {
-      boost::shared_ptr<Message> result;
+      shared_ptr<Message> result;
       if (index >= 1 && index <= _messages.size())
          result = _messages[index-1];
 
@@ -919,7 +926,7 @@ namespace HM
          If there are messages marked for deletion in the mailbox, this woulnd't work.
 
       */
-      boost_foreach(boost::shared_ptr<Message> message, _messages)
+      boost_foreach(shared_ptr<Message> message, _messages)
          message->SetFlagDeleted(false);
    }
 }

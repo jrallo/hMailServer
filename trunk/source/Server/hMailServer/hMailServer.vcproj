@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9,00"
+	Version="9.00"
 	Name="hMailServer"
 	ProjectGUID="{2679BEE5-8D11-4F4B-BC1A-49EEA96A3423}"
 	RootNamespace="hMailServer"
@@ -55,7 +55,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\..\Libraries\boost_1_45_0;..\..\..\..\Libraries\mssqlce3.5;&quot;..\..\..\..\Libraries\openssl-1.0.0c\include&quot;;..\..\..\..\Libraries\pgsql8.2.4\include"
+				AdditionalIncludeDirectories="..\..\..\..\Libraries\boost_1_52_0;..\..\..\..\Libraries\mssqlce3.5;&quot;..\..\..\..\Libraries\openssl-1.0.1c\include&quot;;..\..\..\..\Libraries\pgsql8.2.4\include"
 				PreprocessorDefinitions="WIN32;_WINDOWS;_DEBUG;UNICODE;_UNICODE;BOOST_DATE_TIME_NO_LIB"
 				MinimalRebuild="false"
 				ExceptionHandling="2"
@@ -82,11 +82,12 @@
 			<Tool
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="true"
+				AdditionalOptions="/ignore:4099"
 				AdditionalDependencies="Adsiid.lib activeds.lib IPHlpAPI.lib Dnsapi.lib Ws2_32.lib libpq.lib libeay32.lib ssleay32.lib"
 				ShowProgress="0"
 				OutputFile="$(OutDir)/hMailServer.exe"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="..\..\..\..\Libraries\boost_libs;&quot;..\..\..\..\Libraries\openssl-1.0.0c\libs&quot;;..\..\..\..\Libraries\pgsql8.2.4"
+				AdditionalLibraryDirectories="..\..\..\..\Libraries\boost_libs;&quot;..\..\..\..\Libraries\openssl-1.0.1c\libs&quot;;..\..\..\..\Libraries\pgsql8.2.4"
 				IgnoreAllDefaultLibraries="false"
 				IgnoreDefaultLibraryNames=""
 				GenerateDebugInformation="true"
@@ -159,7 +160,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/MP&#x0D;&#x0A;"
-				AdditionalIncludeDirectories="..\..\..\..\Libraries/boost_1_45_0;..\..\..\..\Libraries\mssqlce3.5;&quot;..\..\..\..\Libraries\openssl-1.0.0c\include&quot;;..\..\..\..\Libraries\pgsql8.2.4\include"
+				AdditionalIncludeDirectories="..\..\..\..\Libraries/boost_1_52_0;..\..\..\..\Libraries\mssqlce3.5;&quot;..\..\..\..\Libraries\openssl-1.0.1c\include&quot;;..\..\..\..\Libraries\pgsql8.2.4\include"
 				PreprocessorDefinitions="WIN32;_WINDOWS;UNICODE;_UNICODE;NDEBUG;BOOST_DATE_TIME_NO_LIB"
 				ExceptionHandling="2"
 				RuntimeLibrary="0"
@@ -167,7 +168,7 @@
 				WarningLevel="3"
 				WarnAsError="false"
 				Detect64BitPortabilityProblems="false"
-				DebugInformationFormat="3"
+				DebugInformationFormat="0"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -184,11 +185,11 @@
 			<Tool
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="true"
-				AdditionalOptions="/SAFESEH"
+				AdditionalOptions="/SAFESEH /ignore:4099"
 				AdditionalDependencies="libeay32.lib ssleay32.lib Adsiid.lib activeds.lib IPHlpAPI.lib Dnsapi.lib Ws2_32.lib libpq.lib"
 				OutputFile="$(OutDir)/hMailServer.exe"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="..\..\..\..\Libraries\boost_libs;&quot;..\..\..\..\Libraries\openssl-1.0.0c\libs&quot;;..\..\..\..\Libraries\pgsql8.2.4"
+				AdditionalLibraryDirectories="..\..\..\..\Libraries\boost_libs;&quot;..\..\..\..\Libraries\openssl-1.0.1c\libs&quot;;..\..\..\..\Libraries\pgsql8.2.4"
 				IgnoreDefaultLibraryNames=""
 				GenerateDebugInformation="true"
 				SubSystem="2"
@@ -259,7 +260,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\..\Libraries\boost_1_45_0;..\..\..\..\Libraries\mssqlce3.5;&quot;..\..\..\..\Libraries\openssl-1.0.0c\include&quot;;..\..\..\..\Libraries\pgsql8.2.4\include"
+				AdditionalIncludeDirectories="..\..\..\..\Libraries\boost_1_52_0;..\..\..\..\Libraries\mssqlce3.5;&quot;..\..\..\..\Libraries\openssl-1.0.1c\include&quot;;..\..\..\..\Libraries\pgsql8.2.4\include"
 				PreprocessorDefinitions="WIN32;_WINDOWS;_DEBUG;UNICODE;_UNICODE;BOOST_DATE_TIME_NO_LIB"
 				MinimalRebuild="true"
 				ExceptionHandling="2"
@@ -286,11 +287,12 @@
 			<Tool
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="true"
+				AdditionalOptions="/ignore:4099"
 				AdditionalDependencies="Adsiid.lib activeds.lib IPHlpAPI.lib Dnsapi.lib Ws2_32.lib libpq.lib libeay32.lib ssleay32.lib"
 				ShowProgress="0"
 				OutputFile="$(OutDir)/hMailServer.exe"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="..\..\..\..\Libraries\boost_libs;&quot;..\..\..\..\Libraries\openssl-1.0.0c\libs&quot;;..\..\..\..\Libraries\pgsql8.2.4"
+				AdditionalLibraryDirectories="..\..\..\..\Libraries\boost_libs;&quot;..\..\..\..\Libraries\openssl-1.0.1c\libs&quot;;..\..\..\..\Libraries\pgsql8.2.4"
 				IgnoreAllDefaultLibraries="false"
 				IgnoreDefaultLibraryNames=""
 				GenerateDebugInformation="true"
@@ -559,11 +561,11 @@
 						>
 					</File>
 					<File
-						RelativePath="..\Com\InterfaceClient.rgs"
+						RelativePath=".\InterfaceClient.rgs"
 						>
 					</File>
 					<File
-						RelativePath=".\InterfaceClient.rgs"
+						RelativePath="..\Com\InterfaceClient.rgs"
 						>
 					</File>
 					<File
@@ -1083,11 +1085,11 @@
 						>
 					</File>
 					<File
-						RelativePath="..\Com\InterfaceResult.rgs"
+						RelativePath="..\COM\InterfaceResult.rgs"
 						>
 					</File>
 					<File
-						RelativePath="..\COM\InterfaceResult.rgs"
+						RelativePath="..\Com\InterfaceResult.rgs"
 						>
 					</File>
 					<File
@@ -1380,11 +1382,11 @@
 							>
 						</File>
 						<File
-							RelativePath="..\COM\InterfaceAntiSpam.rgs"
+							RelativePath=".\InterfaceAntiSpam.rgs"
 							>
 						</File>
 						<File
-							RelativePath=".\InterfaceAntiSpam.rgs"
+							RelativePath="..\COM\InterfaceAntiSpam.rgs"
 							>
 						</File>
 						<File
@@ -1400,11 +1402,11 @@
 							>
 						</File>
 						<File
-							RelativePath=".\InterfaceBlockedAttachments.rgs"
+							RelativePath="..\COM\InterfaceBlockedAttachments.rgs"
 							>
 						</File>
 						<File
-							RelativePath="..\COM\InterfaceBlockedAttachments.rgs"
+							RelativePath=".\InterfaceBlockedAttachments.rgs"
 							>
 						</File>
 						<File
@@ -1420,15 +1422,11 @@
 							>
 						</File>
 						<File
-							RelativePath="..\COM\InterfaceGreyListingWhiteAddress.rgs"
-							>
-						</File>
-						<File
 							RelativePath=".\InterfaceGreyListingWhiteAddress.rgs"
 							>
 						</File>
 						<File
-							RelativePath="..\COM\InterfaceGreyListingWhiteAddresses.rgs"
+							RelativePath="..\COM\InterfaceGreyListingWhiteAddress.rgs"
 							>
 						</File>
 						<File
@@ -1436,11 +1434,43 @@
 							>
 						</File>
 						<File
-							RelativePath="..\COM\InterfaceIMAPFolder.rgs"
+							RelativePath="..\COM\InterfaceGreyListingWhiteAddresses.rgs"
+							>
+						</File>
+						<File
+							RelativePath="..\COM\InterfaceGroup.rgs"
+							>
+						</File>
+						<File
+							RelativePath="..\COM\InterfaceGroupMember.rgs"
+							>
+						</File>
+						<File
+							RelativePath="..\COM\InterfaceGroupMembers.rgs"
+							>
+						</File>
+						<File
+							RelativePath="..\COM\InterfaceGroups.rgs"
 							>
 						</File>
 						<File
 							RelativePath=".\InterfaceIMAPFolder.rgs"
+							>
+						</File>
+						<File
+							RelativePath="..\COM\InterfaceIMAPFolder.rgs"
+							>
+						</File>
+						<File
+							RelativePath="..\COM\InterfaceIMAPFolderACL.rgs"
+							>
+						</File>
+						<File
+							RelativePath="..\COM\InterfaceIMAPFolderPermission.rgs"
+							>
+						</File>
+						<File
+							RelativePath="..\COM\InterfaceIMAPFolderPermissions.rgs"
 							>
 						</File>
 						<File
@@ -1476,6 +1506,14 @@
 							>
 						</File>
 						<File
+							RelativePath="..\COM\InterfaceSSLCertificate.rgs"
+							>
+						</File>
+						<File
+							RelativePath="..\COM\InterfaceSSLCertificates.rgs"
+							>
+						</File>
+						<File
 							RelativePath="..\COM\InterfaceSURBLServer.rgs"
 							>
 						</File>
@@ -1484,11 +1522,11 @@
 							>
 						</File>
 						<File
-							RelativePath="..\COM\InterfaceTCPIPPort.rgs"
+							RelativePath=".\InterfaceTCPIPPort.rgs"
 							>
 						</File>
 						<File
-							RelativePath=".\InterfaceTCPIPPort.rgs"
+							RelativePath="..\COM\InterfaceTCPIPPort.rgs"
 							>
 						</File>
 						<File
@@ -2384,6 +2422,14 @@
 							>
 						</File>
 						<File
+							RelativePath="..\Common\SQL\ADOInt64Helper.cpp"
+							>
+						</File>
+						<File
+							RelativePath="..\Common\SQL\ADOInt64Helper.h"
+							>
+						</File>
+						<File
 							RelativePath="..\Common\Sql\ADORecordset.cpp"
 							>
 						</File>
@@ -3125,6 +3171,14 @@
 						</File>
 						<File
 							RelativePath="..\Common\AntiSpam\SURBL.h"
+							>
+						</File>
+						<File
+							RelativePath="..\Common\AntiSpam\WhiteListCache.cpp"
+							>
+						</File>
+						<File
+							RelativePath="..\Common\AntiSpam\WhiteListCache.h"
 							>
 						</File>
 						<Filter

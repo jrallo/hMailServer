@@ -43,7 +43,7 @@ namespace HM
       }
 
       // Try to read triplet.
-      boost::shared_ptr<GreyListTriplet> pTriplet = PersistentGreyList::GetRecord(sSenderAddress, sRecipientAddress, remoteIP);
+      shared_ptr<GreyListTriplet> pTriplet = PersistentGreyList::GetRecord(sSenderAddress, sRecipientAddress, remoteIP);
 
       AntiSpamConfiguration &antiSpamConfig = Configuration::Instance()->GetAntiSpamConfiguration();
 
@@ -83,7 +83,7 @@ namespace HM
       }
 
       // Create new triplet record.
-      pTriplet = boost::shared_ptr<GreyListTriplet>(new GreyListTriplet());
+      pTriplet = shared_ptr<GreyListTriplet>(new GreyListTriplet());
 
       // Set timestamps.
       const int iUnblockMinutes = antiSpamConfig.GetGreyListingInitialDelay();

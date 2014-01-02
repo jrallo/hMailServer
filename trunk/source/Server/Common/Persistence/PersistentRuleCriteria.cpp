@@ -21,10 +21,10 @@ namespace HM
    }
 
    bool
-   PersistentRuleCriteria::ReadObject(boost::shared_ptr<RuleCriteria> pRuleCriteria, const SQLCommand &command)
+   PersistentRuleCriteria::ReadObject(shared_ptr<RuleCriteria> pRuleCriteria, const SQLCommand &command)
    {
 
-      boost::shared_ptr<DALRecordset> pRS = Application::Instance()->GetDBManager()->OpenRecordset(command);
+      shared_ptr<DALRecordset> pRS = Application::Instance()->GetDBManager()->OpenRecordset(command);
       if (!pRS)
          return false;
 
@@ -38,7 +38,7 @@ namespace HM
    }
 
    bool
-   PersistentRuleCriteria::ReadObject(boost::shared_ptr<RuleCriteria> pRuleCriteria, boost::shared_ptr<DALRecordset> pRS)
+   PersistentRuleCriteria::ReadObject(shared_ptr<RuleCriteria> pRuleCriteria, shared_ptr<DALRecordset> pRS)
    {
       if (pRS->IsEOF())
          return false;
@@ -55,14 +55,14 @@ namespace HM
    }
 
    bool
-   PersistentRuleCriteria::SaveObject(boost::shared_ptr<RuleCriteria> pRuleCriteria, String &errorMessage)
+   PersistentRuleCriteria::SaveObject(shared_ptr<RuleCriteria> pRuleCriteria, String &errorMessage)
    {
       // errorMessage - not supported yet.
       return SaveObject(pRuleCriteria);
    }
 
    bool
-   PersistentRuleCriteria::SaveObject(boost::shared_ptr<RuleCriteria> pRuleCriteria)
+   PersistentRuleCriteria::SaveObject(shared_ptr<RuleCriteria> pRuleCriteria)
    {
       SQLStatement oStatement;
       oStatement.SetTable("hm_rule_criterias");
@@ -102,7 +102,7 @@ namespace HM
    }
 
    bool
-   PersistentRuleCriteria::DeleteObject(boost::shared_ptr<RuleCriteria> pRuleCriteria)
+   PersistentRuleCriteria::DeleteObject(shared_ptr<RuleCriteria> pRuleCriteria)
    {
       SQLCommand command("delete from hm_rule_criterias where criteriaid = @CRITERIAID");
       command.AddParameter("@CRITERIAID", pRuleCriteria->GetID());

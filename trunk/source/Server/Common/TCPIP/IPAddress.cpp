@@ -262,22 +262,36 @@ namespace HM
    IPAddress::WithinRange(const IPAddress &lower, const IPAddress &upper) const
    {
 #ifdef _DEBUG
-      String lower1 = lower.ToString();
-      String lower2 = upper.ToString();
+      String lower1Str = lower.ToString();
+      String lower2Str = upper.ToString();
       String thisIP = ToString();
 #endif
 
-      if (GetAddress1() < lower.GetAddress1() || GetAddress1() > upper.GetAddress1())
-         return false;
-
+      unsigned __int64 addressToCheck1 = GetAddress1();
+      unsigned __int64 addressToCheck2 = GetAddress2();
+      
       // If it's an IPv4 address, we don't need to compare the second part.
       if (_address.is_v4())
-         return true;
+      {
+         if (addressToCheck1 >= lower.GetAddress1() && addressToCheck1 <= upper.GetAddress1())
+            return true;
+      }
+      else if (_address.is_v6())
+      {
+         // Check that it's same or higher as the lower bound.
+         if (addressToCheck1 >  lower.GetAddress1() || 
+            (addressToCheck1 == lower.GetAddress1() && addressToCheck2 >= lower.GetAddress2()))
+         {
+            // Check that it's same or less than upper bound.
+            if (addressToCheck1 <  upper.GetAddress1() || 
+               (addressToCheck1 == upper.GetAddress1() && addressToCheck2 <= upper.GetAddress2()))
+            {
+               return true;
+            }
+         }
+      }
 
-      if (GetAddress2() < lower.GetAddress2() || GetAddress2() > upper.GetAddress2())
-         return false;
-
-      return true;
+      return false   ;
    }
 
    bool 

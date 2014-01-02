@@ -17,15 +17,15 @@ namespace HM
       static void Lock(__int64 ID);
       static void Unlock(__int64 ID);
       static void UnlockAll();
-
-      static bool ReadObject(boost::shared_ptr<FetchAccount> pFA, const SQLCommand& command);
-      static bool ReadObject(boost::shared_ptr<FetchAccount> oFA, boost::shared_ptr<DALRecordset> pRS);
-      static bool SaveObject(boost::shared_ptr<FetchAccount> oFA, String &errorMessage);
-      static bool SaveObject(boost::shared_ptr<FetchAccount> oFA);
-      static bool DeleteObject(boost::shared_ptr<FetchAccount> pFA);
+		static bool IsLocked(__int64 ID);
+      static bool ReadObject(shared_ptr<FetchAccount> pFA, const SQLCommand& command);
+      static bool ReadObject(shared_ptr<FetchAccount> oFA, shared_ptr<DALRecordset> pRS);
+      static bool SaveObject(shared_ptr<FetchAccount> oFA, String &errorMessage);
+      static bool SaveObject(shared_ptr<FetchAccount> oFA);
+      static bool DeleteObject(shared_ptr<FetchAccount> pFA);
       static void DeleteByAccountID(__int64 ID);
 
       static void SetRetryNow(__int64 iFAID);
-      static void SetNextTryTime(boost::shared_ptr<FetchAccount> pFA);
+      static void SetNextTryTime(shared_ptr<FetchAccount> pFA);
    };
 }

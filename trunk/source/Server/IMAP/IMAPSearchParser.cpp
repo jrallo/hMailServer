@@ -115,20 +115,20 @@ namespace HM
    }
 
    IMAPResult 
-   IMAPSearchParser::ParseCommand(boost::shared_ptr<IMAPCommandArgument> pArgument, bool bIsSort)
+   IMAPSearchParser::ParseCommand(shared_ptr<IMAPCommandArgument> pArgument, bool bIsSort)
    {
       // Replace literals in the command.
-      boost::shared_ptr<IMAPSimpleCommandParser> pSimpleParser = boost::shared_ptr<IMAPSimpleCommandParser> (new IMAPSimpleCommandParser);
+      shared_ptr<IMAPSimpleCommandParser> pSimpleParser = shared_ptr<IMAPSimpleCommandParser> (new IMAPSimpleCommandParser);
 
       if (bIsSort)
       {
          pSimpleParser->Parse(pArgument);
          pSimpleParser->UnliteralData();
 
-         boost::shared_ptr<IMAPSimpleWord> pSort = pSimpleParser->Word(0);
+         shared_ptr<IMAPSimpleWord> pSort = pSimpleParser->Word(0);
          if (pSort->Paranthezied())
          {
-            m_pSortParser = boost::shared_ptr<IMAPSortParser>(new IMAPSortParser);
+            m_pSortParser = shared_ptr<IMAPSortParser>(new IMAPSortParser);
             m_pSortParser->Parse(pSort->Value());
          }
 
@@ -175,13 +175,13 @@ namespace HM
       }
 
       // Replace literals in the command.
-      pSimpleParser = boost::shared_ptr<IMAPSimpleCommandParser> (new IMAPSimpleCommandParser);
+      pSimpleParser = shared_ptr<IMAPSimpleCommandParser> (new IMAPSimpleCommandParser);
       pArgument->Command(resultString);
 
       pSimpleParser->Parse(pArgument);
       pSimpleParser->UnliteralData();
 
-      boost::shared_ptr<IMAPSearchCriteria> pCriteria = boost::shared_ptr<IMAPSearchCriteria> (new IMAPSearchCriteria);
+      shared_ptr<IMAPSearchCriteria> pCriteria = shared_ptr<IMAPSearchCriteria> (new IMAPSearchCriteria);
 
       int currentWord = 0;
       IMAPResult result = _ParseSegment(pSimpleParser, currentWord, pCriteria, 0);
@@ -194,7 +194,7 @@ namespace HM
    }
 
    IMAPResult
-   IMAPSearchParser::_ParseSegment(boost::shared_ptr<IMAPSimpleCommandParser> pSimpleParser, int &currentWord, boost::shared_ptr<IMAPSearchCriteria> pCriteria, int iRecursion)
+   IMAPSearchParser::_ParseSegment(shared_ptr<IMAPSimpleCommandParser> pSimpleParser, int &currentWord, shared_ptr<IMAPSearchCriteria> pCriteria, int iRecursion)
    {
       iRecursion++;
       if (iRecursion > 50)
@@ -205,7 +205,7 @@ namespace HM
       int originalCriteriaCount = pCriteria->GetSubCriterias().size();
       for (; currentWord < pSimpleParser->WordCount(); currentWord++)
       {
-         boost::shared_ptr<IMAPSimpleWord> pWord = pSimpleParser->Word(currentWord);
+         shared_ptr<IMAPSimpleWord> pWord = pSimpleParser->Word(currentWord);
          String sCurCommand = pWord->Value().ToUpper();
 
          
@@ -213,7 +213,7 @@ namespace HM
          if (sCurCommand == _T("OR"))
          {
             // We have a sub argument.
-            boost::shared_ptr<IMAPSearchCriteria> pSubCriteria = boost::shared_ptr<IMAPSearchCriteria> (new IMAPSearchCriteria());
+            shared_ptr<IMAPSearchCriteria> pSubCriteria = shared_ptr<IMAPSearchCriteria> (new IMAPSearchCriteria());
 
             pSubCriteria->SetType(IMAPSearchCriteria::CTSubCriteria);
             pSubCriteria->SetIsOR(true);
@@ -228,7 +228,7 @@ namespace HM
             continue;
          }
  
-         boost::shared_ptr<IMAPSearchCriteria> pNewCriteria = boost::shared_ptr<IMAPSearchCriteria> (new IMAPSearchCriteria);
+         shared_ptr<IMAPSearchCriteria> pNewCriteria = shared_ptr<IMAPSearchCriteria> (new IMAPSearchCriteria);
          IMAPResult result = _ParseWord(pSimpleParser, pNewCriteria, currentWord );
          if (result.GetResult() != IMAPResult::ResultOK)
             return result;
@@ -250,7 +250,7 @@ namespace HM
    }
 
    IMAPResult 
-   IMAPSearchParser::_ParseWord(boost::shared_ptr<IMAPSimpleCommandParser> pSimpleParser, boost::shared_ptr<IMAPSearchCriteria> pNewCriteria, int &iCurrentWord)
+   IMAPSearchParser::_ParseWord(shared_ptr<IMAPSimpleCommandParser> pSimpleParser, shared_ptr<IMAPSearchCriteria> pNewCriteria, int &iCurrentWord)
    {
       String sCurCommand = pSimpleParser->Word(iCurrentWord)->Value();
 
@@ -262,7 +262,7 @@ namespace HM
          if (iCurrentWord > pSimpleParser->WordCount() - 1)
             return IMAPResult(IMAPResult::ResultBad, "Syntax error. NOT used but no search criteria specified.");
 
-         boost::shared_ptr<IMAPSimpleWord> pWord = pSimpleParser->Word(iCurrentWord);
+         shared_ptr<IMAPSimpleWord> pWord = pSimpleParser->Word(iCurrentWord);
          sCurCommand = pWord->Value().ToUpper();
       }
       else
@@ -316,7 +316,7 @@ namespace HM
          if (iCurrentWord > pSimpleParser->WordCount() - 1)
             return IMAPResult(IMAPResult::ResultBad, "Syntax error. Missing value.");
 
-         boost::shared_ptr<IMAPSimpleWord> pWord = pSimpleParser->Word(iCurrentWord);
+         shared_ptr<IMAPSimpleWord> pWord = pSimpleParser->Word(iCurrentWord);
 
          if (pWord)
          {
@@ -340,7 +340,7 @@ namespace HM
          if (iCurrentWord > pSimpleParser->WordCount() - 1)
             return IMAPResult(IMAPResult::ResultBad, "Syntax error. UID parameters missing.");
 
-         boost::shared_ptr<IMAPSimpleWord> pWord = pSimpleParser->Word(iCurrentWord);
+         shared_ptr<IMAPSimpleWord> pWord = pSimpleParser->Word(iCurrentWord);
          if (pWord)
          {
             String sTemp = pWord->Value();
@@ -379,7 +379,7 @@ namespace HM
          if (iCurrentWord > pSimpleParser->WordCount() - 1)
             return IMAPResult(IMAPResult::ResultBad, "Syntax error. Missing charset name.");
 
-         boost::shared_ptr<IMAPSimpleWord> pWord = pSimpleParser->Word(iCurrentWord);
+         shared_ptr<IMAPSimpleWord> pWord = pSimpleParser->Word(iCurrentWord);
 
          if (pWord)
          {
